@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SodaFish 小食堂 · 复古车票风</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%90%9F%3C/text%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Ma+Shan+Zheng&family=Klee+One:wght@400;600&family=Space+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f7f4ec; --card-bg: #fffdf9; --ink-main: #3d342c; --ink-sub: #85796b;
+            --line-color: rgba(200, 195, 185, 0.15); --card-line: #f0ece1;
+            --tape-green: rgba(171, 202, 178, 0.7); --tape-pink: rgba(233, 175, 175, 0.7);
+            --wrapper-bg: rgba(255, 255, 255, 0.4); --wrapper-border: rgba(217, 208, 194, 0.5);
+            --primary: #d49a9a; --bar-bg: #e8e2d5;
+            --font-english: 'Great Vibes', cursive; --font-chinese-title: 'Ma Shan Zheng', cursive;
+            --font-body: 'Klee One', 'KaiTi', serif;
+        }
+        body.dark-mode {
+            --bg-color: #2a2a2a; --card-bg: #3a3a3a; --ink-main: #e0dcd5; --ink-sub: #a09b93;
+            --line-color: rgba(255, 255, 255, 0.03); --card-line: #444;
+            --tape-green: rgba(74, 114, 84, 0.8); --tape-pink: rgba(133, 84, 84, 0.8);
+            --wrapper-bg: rgba(0, 0, 0, 0.2); --wrapper-border: rgba(255, 255, 255, 0.05);
+            --primary: #b07272; --bar-bg: #444;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.3s, color 0.3s, border-color 0.3s; }
+        body {
+            background-color: var(--bg-color);
+            background-image: linear-gradient(var(--line-color) 1px, transparent 1px), linear-gradient(90deg, var(--line-color) 1px, transparent 1px);
+            background-size: 25px 25px; font-family: var(--font-body); color: var(--ink-main); padding: 2rem 1.5rem; line-height: 1.7; min-height: 100vh;
+        }
+        .toolbar { max-width: 1000px; margin: 0 auto 1.5rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; padding: 0 1rem; }
+        .filter-group { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+        .btn-sticker { font-family: var(--font-body); font-size: 0.95rem; font-weight: 600; padding: 0.5rem 1.2rem; border-radius: 30px; cursor: pointer; border: 1px dashed var(--ink-sub); background: var(--card-bg); color: var(--ink-main); box-shadow: 2px 2px 0 rgba(0,0,0,0.05); transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+        .btn-sticker:hover { transform: translateY(-2px) rotate(-1deg); box-shadow: 3px 4px 5px rgba(0,0,0,0.08); }
+        .btn-sticker.active { background: var(--ink-main); color: var(--bg-color); border-style: solid; transform: rotate(1deg); }
+        .btn-theme { border-radius: 50%; width: 40px; height: 40px; padding: 0; justify-content: center; font-size: 1.2rem; border-style: solid; }
+        .wrapper { max-width: 1000px; margin: 0 auto; background: var(--wrapper-bg); padding: 3rem 2rem; border-radius: 12px; box-shadow: inset 0 0 20px rgba(255,255,255,0.05), 0 4px 20px rgba(0,0,0,0.03); border: 1px solid var(--wrapper-border); overflow: hidden; }
+        header { text-align: center; margin-bottom: 3rem; position: relative; }
+        .header-title-wrap { display: flex; align-items: baseline; justify-content: center; gap: 1.5rem; }
+        .title-english { font-family: var(--font-english); font-size: 4.5rem; color: #5c7a6b; text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.1), 2px 3px 5px rgba(0, 0, 0, 0.2); transform: rotate(-2deg); line-height: 1; }
+        body.dark-mode .title-english { color: #86a895; }
+        .title-chinese { font-family: var(--font-chinese-title); font-size: 3rem; letter-spacing: 2px; position: relative; }
+        .title-chinese::after { content: '〰〰〰'; position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); font-size: 1.5rem; color: #c98d8d; letter-spacing: -2px; }
+        header p { color: var(--ink-sub); font-size: 1rem; margin-top: 2rem; letter-spacing: 2px; }
+        header::before { content: '🐟'; position: absolute; left: 10%; top: 20px; font-size: 2.5rem; transform: rotate(-20deg); opacity: 0.8; }
+        header::after { content: '🍰'; position: absolute; right: 10%; top: 20px; font-size: 2.5rem; transform: rotate(15deg); opacity: 0.8; }
+        .list-section { margin-bottom: 3.5rem; position: relative; } .list-section.hidden { display: none; }
+        .section-title { display: inline-block; font-family: var(--font-chinese-title); font-size: 1.5rem; padding: 0.4rem 2rem; border-radius: 4px; margin-bottom: 2rem; box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.06); position: relative; }
+        .section-title::before { content: ''; position: absolute; top: -6px; left: 10px; width: 30px; height: 12px; background: rgba(255,255,255,0.4); border: 1px solid rgba(0,0,0,0.05); transform: rotate(-10deg); }
+        .section-title.main-course { background: var(--tape-green); transform: rotate(-1deg); border: 1px dashed #85a38e; }
+        .section-title.dessert { background: var(--tape-pink); transform: rotate(1deg); border: 1px dashed #cc9292; }
+        .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.8rem; }
+        .book-card { background: var(--card-bg); border: 1px dashed var(--wrapper-border); border-radius: 6px; padding: 2.2rem 1.4rem 1.6rem; position: relative; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s; box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.05); background-image: linear-gradient(transparent 95%, var(--card-line) 100%); background-size: 100% 1.7rem; background-position: 0 1.4rem; display: flex; flex-direction: column; }
+        .book-card:hover { transform: translateY(-6px) rotate(-1deg); box-shadow: 5px 8px 15px rgba(0, 0, 0, 0.08); z-index: 2; }
+        .book-card::before { content: '📍'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-size: 1.2rem; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2)); opacity: 0.8; z-index: 10; }
+        .book-card:nth-child(2n) { transform: rotate(0.5deg); } .book-card:nth-child(3n) { transform: rotate(-0.8deg); }
+        .book-card:hover { transform: translateY(-5px) rotate(0deg) scale(1.02); }
+        .book-name { font-family: var(--font-chinese-title); font-size: 1.4rem; margin-bottom: 0.8rem; line-height: 1.2; }
+        .book-meta { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; margin-bottom: 0.8rem; }
+        .book-note { font-size: 0.95rem; color: var(--ink-sub); border-top: 1px dashed var(--wrapper-border); padding-top: 0.8rem; margin-top: 0.8rem; flex-grow: 1; }
+        .price-badge, .status-badge { font-size: 0.85rem; padding: 0.15rem 0.6rem; border-radius: 20px; font-weight: bold; border: 1px solid transparent; }
+        .status-badge { border-radius: 4px; transform: rotate(-2deg); }
+        .status-done { background: #eaf3ec; color: #4a7452; border-color: #c1d4c5; } .status-ready { background: #e1ecf4; color: #3b6b8c; border-color: #bcd3e1; } .status-wip { background: #fff3e0; color: #d17d32; border-color: #ffe0b2; }
+        .price-wait { background: #fdf5e6; color: #a87b5a; border-color: #e8dcc8; } .price-new { background: #ffe4e1; color: #d15b5b; border-color: #f4c2c2; } .price-free { background: #e0f2f1; color: #00897b; border-color: #b2dfdb; }
+        body.dark-mode .status-done { background: rgba(74, 116, 82, 0.3); color: #83c496; border-color: rgba(193, 212, 197, 0.3); }
+        body.dark-mode .status-ready { background: rgba(59, 107, 140, 0.3); color: #83b5d9; border-color: rgba(188, 211, 225, 0.3); }
+        body.dark-mode .status-wip { background: rgba(209, 125, 50, 0.2); color: #f0b073; border-color: rgba(255, 224, 178, 0.2); }
+        body.dark-mode .price-wait { background: rgba(168, 123, 90, 0.2); color: #d4b08f; border-color: rgba(232, 220, 200, 0.2); }
+        body.dark-mode .price-new { background: rgba(209, 91, 91, 0.2); color: #f09b9b; border-color: rgba(244, 194, 194, 0.2); }
+        body.dark-mode .price-free { background: rgba(0, 137, 123, 0.2); color: #74d4c7; border-color: rgba(178, 223, 219, 0.2); }
+        .bookmark-ribbon { position: absolute; top: -1px; right: 15px; width: 20px; height: 30px; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%); opacity: 0.8; box-shadow: 1px 2px 3px rgba(0,0,0,0.1); }
+        .ribbon-pink { background: #d49a9a; } .ribbon-blue { background: #a2b9c4; } .ribbon-green { background: #9abca2; } .ribbon-yellow { background: #dcc197; }
+        .order-btn { margin-top: 1rem; padding: 0.4rem 0; font-family: var(--font-body); font-size: 0.95rem; font-weight: bold; border: 1px dashed var(--ink-sub); border-radius: 20px; background: transparent; color: var(--ink-main); cursor: pointer; transition: all 0.2s; width: 100%; }
+        .order-btn:hover { background: var(--wrapper-border); } .order-btn.added { background: var(--primary); color: #fff; border-style: solid; border-color: var(--primary); cursor: not-allowed; opacity: 0.8; }
+        .float-group { position: fixed; bottom: 90px; right: 30px; display: flex; flex-direction: column; gap: 15px; z-index: 100; }
+        .cart-float, .rank-float { width: 55px; height: 55px; border-radius: 50%; background: var(--card-bg); color: var(--ink-main); border: 1px dashed var(--ink-sub); box-shadow: 2px 4px 12px rgba(0,0,0,0.1); font-size: 1.6rem; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.2s; position: relative; }
+        .cart-float:hover, .rank-float:hover { transform: scale(1.1) rotate(5deg); }
+        .cart-badge { position: absolute; top: -5px; right: -5px; background: #d15b5b; color: #fff; font-size: 0.8rem; font-weight: bold; width: 22px; height: 22px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid var(--bg-color); }
+        .panel { position: fixed; top: 0; right: -420px; width: 100%; max-width: 400px; height: 100vh; background: var(--card-bg); box-shadow: -4px 0 20px rgba(0,0,0,0.15); z-index: 200; transition: right 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; background-image: repeating-linear-gradient(0deg, transparent, transparent 29px, var(--card-line) 29px, var(--card-line) 30px); }
+        .panel.open { right: 0; }
+        .panel-header { padding: 1.5rem; border-bottom: 1px dashed var(--wrapper-border); display: flex; justify-content: space-between; align-items: center; font-family: var(--font-chinese-title); font-size: 1.4rem; }
+        .close-panel { cursor: pointer; font-size: 1.5rem; background: none; border: none; color: var(--ink-main); }
+        .panel-body { flex-grow: 1; overflow-y: auto; padding: 1.5rem; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 0; border-bottom: 1px dashed var(--wrapper-border); }
+        .cart-item-title { font-weight: bold; font-family: var(--font-chinese-title); font-size: 1.1rem; }
+        .remove-item { background: none; border: none; color: #d15b5b; cursor: pointer; font-size: 0.85rem; text-decoration: underline; }
+        .empty-cart-msg { text-align: center; color: var(--ink-sub); margin-top: 3rem; font-style: italic; }
+        .panel-footer { padding: 1.5rem; border-top: 2px dashed var(--ink-sub); background: var(--wrapper-bg); }
+        .cart-total { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 1rem; font-size: 1.1rem; }
+        .submit-order-btn { width: 100%; padding: 0.8rem; border-radius: 8px; background: var(--ink-main); color: var(--bg-color); font-family: var(--font-chinese-title); font-size: 1.2rem; font-weight: bold; border: none; cursor: pointer; transition: transform 0.2s; }
+        .submit-order-btn:hover { transform: translateY(-2px); } .submit-order-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .rank-list { display: flex; flex-direction: column; gap: 1.2rem; } .rank-item { position: relative; }
+        .rank-info { display: flex; justify-content: space-between; font-size: 0.95rem; margin-bottom: 0.4rem; font-weight: bold; }
+        .rank-bar-bg { width: 100%; height: 12px; background: var(--bar-bg); border-radius: 10px; overflow: hidden; }
+        .rank-bar-fill { height: 100%; background: var(--primary); border-radius: 10px; width: 0%; transition: width 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .rank-item:nth-child(1) .rank-bar-fill { background: #d15b5b; } .rank-item:nth-child(2) .rank-bar-fill { background: #dcc197; } .rank-item:nth-child(3) .rank-bar-fill { background: #9abca2; }
+        .success-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(3px); display: flex; justify-content: center; align-items: center; z-index: 300; opacity: 0; visibility: hidden; transition: all 0.3s; }
+        .success-modal.show { opacity: 1; visibility: visible; }
+        .success-box { background: var(--card-bg); padding: 3rem 2rem; border-radius: 12px; text-align: center; border: 2px dashed var(--ink-sub); transform: scale(0.8); transition: transform 0.3s; position: relative; max-width: 90%; width: 320px; }
+        .success-modal.show .success-box { transform: scale(1); }
+        .stamp { position: absolute; top: 15px; right: 15px; border: 3px solid #d15b5b; color: #d15b5b; font-family: var(--font-chinese-title); font-size: 1.2rem; padding: 0.2rem 0.5rem; border-radius: 6px; transform: rotate(15deg); opacity: 0.8; }
+        .success-box h3 { font-family: var(--font-chinese-title); font-size: 1.8rem; margin-bottom: 1rem; }
+        .success-box p { color: var(--ink-sub); margin-bottom: 2rem; line-height: 1.6; }
+        .success-box button { padding: 0.5rem 2rem; border-radius: 20px; border: 1px dashed var(--ink-sub); background: transparent; cursor: pointer; font-family: var(--font-body); color: var(--ink-main); }
+        #backToTop { position: fixed; bottom: 25px; right: 32px; width: 45px; height: 45px; border-radius: 50%; background: var(--card-bg); color: var(--ink-main); border: 1px dashed var(--ink-sub); font-size: 1.3rem; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 2px 3px 10px rgba(0,0,0,0.1); opacity: 0; visibility: hidden; transform: translateY(20px); transition: all 0.3s; z-index: 100; }
+        #backToTop.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        footer { text-align: center; margin-top: 4rem; font-family: var(--font-chinese-title); font-size: 1.2rem; color: var(--ink-sub); letter-spacing: 2px; border-top: 2px dashed var(--wrapper-border); padding-top: 2rem; }
+
+        /* ================= 版本一专属：复古车票餐牌 ================= */
+        .menu-tag {
+            position: absolute; top: -12px; left: 15px;
+            padding: 0.25rem 1rem;
+            font-family: 'Space Mono', monospace; /* 复古打字机字体 */
+            font-size: 0.9rem; font-weight: bold; letter-spacing: 1px;
+            box-shadow: 2px 3px 6px rgba(0,0,0,0.12);
+            z-index: 5; transform: rotate(-3deg);
+            /* 左右挖空缺口 + 底部锯齿 */
+            mask: radial-gradient(circle at 0 50%, transparent 4px, black 5px),
+                  radial-gradient(circle at 100% 50%, transparent 4px, black 5px),
+                  linear-gradient(black, black);
+            mask-composite: intersect;
+            -webkit-mask: radial-gradient(circle at 0 50%, transparent 4px, black 5px),
+                          radial-gradient(circle at 100% 50%, transparent 4px, black 5px),
+                          linear-gradient(black, black);
+            -webkit-mask-composite: source-in;
+            border-bottom: 2px dashed rgba(0,0,0,0.2);
+        }
+        .tag-a { background: #f5e6c8; color: #7a5c3c; border-bottom-color: #d4bc9a; }
+        .tag-b { background: #e3ecd9; color: #566c4f; border-bottom-color: #b8c9b1; }
+        .tag-c { background: #fce4e4; color: #8c5a5a; border-bottom-color: #dbabab; }
+
+        @media (max-width: 1024px) { .grid-cards { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.2rem; } .wrapper { padding: 2rem 1.5rem; } .title-english { font-size: 4rem; } .title-chinese { font-size: 2.6rem; } }
+        @media (max-width: 768px) { body { padding: 1.5rem 1rem; } .toolbar { justify-content: center; flex-direction: column; padding: 0; } .filter-group { justify-content: center; width: 100%; } .btn-sticker { flex: 1; justify-content: center; } .btn-theme { flex: none; } .title-english { font-size: 3rem; } .title-chinese { font-size: 2rem; } header::before, header::after { display: none; } .panel { max-width: 100%; right: -100%; } }
+        @media (max-width: 480px) { body { padding: 1rem 0.5rem; } .wrapper { padding: 1.5rem 1rem; } .title-english { font-size: 2.5rem; } .title-chinese { font-size: 1.6rem; } .grid-cards { grid-template-columns: 1fr; gap: 1rem; } .book-card { padding: 2rem 1rem 1.2rem; } .float-group { bottom: 80px; right: 15px; gap: 10px; } .cart-float, .rank-float { width: 45px; height: 45px; font-size: 1.3rem; } #backToTop { bottom: 15px; right: 18px; width: 40px; height: 40px; } }
+    </style>
+    <style>
+        /* ===== 实时数据接入所需的最小补充：沿用原纸张/车票语言，不改既有观感 ===== */
+        .live-line { display: flex; align-items: center; justify-content: center; gap: 0.55rem; margin-top: 1.15rem; font-family: 'Space Mono', monospace; font-size: 0.78rem; letter-spacing: 1px; color: var(--ink-sub); }
+        .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #7fa985; box-shadow: 0 0 0 3px rgba(127, 169, 133, 0.16); }
+        .live-dot.off { background: #c98d8d; box-shadow: 0 0 0 3px rgba(201, 141, 141, 0.16); }
+        body.dark-mode .live-dot { box-shadow: 0 0 0 3px rgba(127, 169, 133, 0.22); }
+        .vote-chip { font-family: 'Space Mono', monospace; font-size: 0.76rem; letter-spacing: 0.5px; padding: 0.12rem 0.55rem; border-radius: 20px; border: 1px dashed var(--wrapper-border); color: var(--ink-sub); }
+        .vote-chip.hot { color: #b5564f; border-color: #e3b8b4; background: rgba(209, 91, 91, 0.05); }
+        body.dark-mode .vote-chip.hot { color: #f0a19c; border-color: rgba(240, 155, 155, 0.3); background: rgba(209, 91, 91, 0.12); }
+        .paper-field { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.85rem; }
+        .paper-field label { font-size: 0.8rem; letter-spacing: 1px; color: var(--ink-sub); }
+        .paper-field input, .paper-field textarea { width: 100%; font-family: var(--font-body); font-size: 0.95rem; color: var(--ink-main); background: transparent; border: none; border-bottom: 1px dashed var(--ink-sub); padding: 0.3rem 0.1rem; outline: none; resize: none; }
+        .paper-field input::placeholder, .paper-field textarea::placeholder { color: var(--ink-sub); opacity: 0.55; }
+        .paper-field input:focus, .paper-field textarea:focus { border-bottom-color: var(--primary); }
+        .slip-no { font-family: 'Space Mono', monospace !important; font-size: 0.8rem !important; letter-spacing: 1px; color: var(--ink-sub) !important; margin-bottom: 1rem !important; }
+        .shop-link { display: inline-block; margin-top: 0.9rem; font-family: 'Space Mono', monospace; font-size: 0.72rem; letter-spacing: 1px; color: var(--ink-sub); text-decoration: none; border-bottom: 1px dashed var(--wrapper-border); }
+        .shop-link:hover { color: var(--ink-main); }
+        .grid-note { grid-column: 1 / -1; text-align: center; color: var(--ink-sub); font-style: italic; padding: 2rem 0; }
+        #toast { position: fixed; left: 50%; bottom: 34px; transform: translate(-50%, 12px); max-width: 88vw; padding: 0.6rem 1.1rem; border-radius: 8px; border: 1px dashed var(--ink-sub); background: var(--card-bg); color: var(--ink-main); font-size: 0.9rem; box-shadow: 0 6px 18px rgba(0,0,0,0.12); opacity: 0; visibility: hidden; transition: all 0.25s; z-index: 400; }
+        #toast.show { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+        .rank-stat { font-size: 0.9rem; color: var(--ink-sub); margin-bottom: 1.5rem; }
+        .rank-stat b { font-family: 'Space Mono', monospace; color: var(--ink-main); }
+        .feed-item { display: flex; gap: 0.6rem; align-items: baseline; font-size: 0.88rem; }
+        .feed-item .t { font-family: 'Space Mono', monospace; font-size: 0.72rem; color: var(--ink-sub); white-space: nowrap; }
+        .rank-list + .feed-title { margin-top: 2rem; }
+        .feed-title { font-family: var(--font-chinese-title); font-size: 1.05rem; margin-bottom: 0.9rem; padding-bottom: 0.4rem; border-bottom: 1px dashed var(--wrapper-border); }
+        .qr-slot { text-align: center; border: 1px dashed var(--ink-sub); border-radius: 8px; padding: 1rem 1rem 0.8rem; margin-bottom: 1.4rem; background: rgba(255,255,255,0.25); }
+        body.dark-mode .qr-slot { background: rgba(0,0,0,0.15); }
+        .qr-slot img { max-width: 180px; max-height: 180px; border-radius: 6px; display: inline-block; }
+        .qr-cap { font-family: 'Space Mono', monospace; font-size: 0.72rem; letter-spacing: 1px; color: var(--ink-sub); margin-top: 0.5rem; }
+        .dl-box { border: 1px dashed var(--ink-sub); border-radius: 6px; padding: 0.9rem 1rem; margin-top: 0.8rem; text-align: left; font-size: 0.9rem; }
+        .dl-box b { font-family: var(--font-chinese-title); }
+        .dl-box a { color: #3b6b8c; word-break: break-all; }
+        .order-status { display: inline-block; font-size: 0.8rem; padding: 0.1rem 0.6rem; border-radius: 20px; font-weight: bold; border: 1px solid transparent; }
+        .order-status.wait { background: #fff3e0; color: #d17d32; border-color: #ffe0b2; }
+        .order-status.ok { background: #e1ecf4; color: #3b6b8c; border-color: #bcd3e1; }
+        .order-status.done { background: #eaf3ec; color: #4a7452; border-color: #c1d4c5; }
+        .order-status.no { background: #fce4e4; color: #8c5a5a; border-color: #dbabab; }
+        body.dark-mode .order-status.wait { background: rgba(209,125,50,0.2); color: #f0b073; border-color: rgba(255,224,178,0.2); }
+        body.dark-mode .order-status.ok { background: rgba(59,107,140,0.3); color: #83b5d9; border-color: rgba(188,211,225,0.3); }
+        body.dark-mode .order-status.done { background: rgba(74,116,82,0.3); color: #83c496; border-color: rgba(193,212,197,0.3); }
+        body.dark-mode .order-status.no { background: rgba(209,91,91,0.2); color: #f09b9b; border-color: rgba(244,194,194,0.2); }
+        .my-order-item { display: flex; justify-content: space-between; align-items: center; gap: 0.6rem; padding: 0.6rem 0; border-bottom: 1px dashed var(--wrapper-border); font-size: 0.88rem; }
+        .copy-link { background: none; border: none; color: #3b6b8c; cursor: pointer; font-size: 0.8rem; text-decoration: underline; padding: 0; font-family: var(--font-body); }
+        .success-box button { margin: 0 0.3rem; }
+    </style>
+    <style>
+        /* ===== 鸡排店骨架装修：粘性顶栏 / hero 横幅 / 筛选侧卡 / 大封面卡 / 取餐码查询 / 赞赏区 / 移动底部 tab =====
+           全部沿用车票风的纸张、虚线、胶带、原字体与配色，不引入新风格。 */
+        .topbar {
+            position: sticky; top: 0; z-index: 150; margin: -2rem -1.5rem 0;
+            padding: 0.55rem max(1rem, env(safe-area-inset-left)) 0.55rem max(1rem, env(safe-area-inset-right));
+            background: var(--bg-color);
+            background-image: linear-gradient(var(--line-color) 1px, transparent 1px), linear-gradient(90deg, var(--line-color) 1px, transparent 1px);
+            background-size: 25px 25px; background-position: 0 -0.5rem;
+            border-bottom: 1px dashed var(--ink-sub); box-shadow: 0 3px 14px rgba(0,0,0,0.06);
+        }
+        .topbar-inner { max-width: 1000px; margin: 0 auto; display: flex; align-items: center; gap: 1rem; }
+        .logo-stamp { display: flex; align-items: center; gap: 0.55rem; text-decoration: none; color: var(--ink-main); cursor: pointer; }
+        .logo-stamp .logo-mark { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; background: var(--card-bg); border: 1px dashed var(--ink-sub); border-radius: 8px; box-shadow: 2px 2px 0 rgba(0,0,0,0.06); transform: rotate(-4deg); }
+        .logo-stamp .logo-txt { font-family: var(--font-chinese-title); font-size: 1.15rem; letter-spacing: 1px; }
+        .logo-stamp .logo-sub { font-family: 'Space Mono', monospace; font-size: 0.62rem; letter-spacing: 2px; color: var(--ink-sub); display: block; margin-top: -3px; }
+        .top-nav { display: flex; gap: 0.4rem; margin-left: auto; flex-wrap: wrap; }
+        .top-nav .btn-sticker { padding: 0.3rem 0.85rem; font-size: 0.85rem; }
+        .cart-pill { position: relative; }
+        .cart-pill .cart-badge { position: absolute; top: -7px; right: -7px; background: #d15b5b; color: #fff; font-size: 0.7rem; font-weight: bold; min-width: 18px; height: 18px; border-radius: 50%; display: none; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid var(--bg-color); }
+
+        .hero-actions { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; margin-top: 1.4rem; }
+
+        .layout2col { display: grid; grid-template-columns: 218px minmax(0, 1fr); gap: 2.2rem; align-items: start; }
+        .filter-card {
+            position: sticky; top: 76px; background: var(--card-bg); border: 1px dashed var(--wrapper-border); border-radius: 8px;
+            padding: 1.2rem 1rem 1.1rem; box-shadow: 2px 3px 0 rgba(0,0,0,0.05); position: sticky;
+        }
+        .filter-card::before { content: ''; position: absolute; top: -9px; left: 50%; transform: translateX(-50%) rotate(-2deg); width: 56px; height: 16px; background: var(--tape-green); border-radius: 2px; opacity: 0.8; }
+        .filter-card h4 { font-family: var(--font-chinese-title); font-size: 1.05rem; margin-bottom: 0.8rem; letter-spacing: 1px; }
+        .filter-card .filter-group { flex-direction: column; display: flex; gap: 0.55rem; flex-wrap: nowrap; }
+        .filter-card .btn-sticker { justify-content: flex-start; }
+        .filter-mini { margin-top: 1rem; padding-top: 0.9rem; border-top: 1px dashed var(--wrapper-border); font-size: 0.8rem; color: var(--ink-sub); line-height: 1.9; }
+        .filter-mini b { font-family: 'Space Mono', monospace; color: var(--ink-main); }
+
+        /* 大封面卡：在原 book-card 上加封面区 */
+        .cover-box {
+            position: relative; margin: -0.6rem -0.4rem 1rem; border: 1px dashed var(--wrapper-border); border-radius: 5px;
+            overflow: hidden; aspect-ratio: 4 / 3; background: linear-gradient(160deg, #f7f1e2, #efe6d2 55%, #e9dcc3);
+            display: flex; align-items: center; justify-content: center;
+        }
+        body.dark-mode .cover-box { background: linear-gradient(160deg, #46403a, #3b352f 55%, #332e28); }
+        .cover-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .cover-fb { text-align: center; color: #a08d6f; }
+        body.dark-mode .cover-fb { color: #8d7f6a; }
+        .cover-fb .fb-char { font-family: var(--font-chinese-title); font-size: 2.6rem; line-height: 1.1; color: #8f7b5c; display: block; }
+        body.dark-mode .cover-fb .fb-char { color: #a99a80; }
+        .cover-fb .fb-line { font-family: 'Space Mono', monospace; font-size: 0.62rem; letter-spacing: 3px; margin-top: 0.3rem; display: block; }
+        .cover-box::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 8px, rgba(120,96,68,0.04) 8px, rgba(120,96,68,0.04) 9px); pointer-events: none; }
+
+        /* 取餐码查询条 */
+        .pickup-bar {
+            background: var(--card-bg); border: 1px dashed var(--ink-sub); border-radius: 10px; padding: 1.3rem 1.4rem;
+            margin-bottom: 3rem; position: relative; box-shadow: 2px 3px 0 rgba(0,0,0,0.05);
+        }
+        .pickup-bar::before { content: ''; position: absolute; top: -9px; left: 24px; transform: rotate(-3deg); width: 60px; height: 16px; background: var(--tape-pink); border-radius: 2px; opacity: 0.8; }
+        .pickup-row { display: flex; gap: 0.7rem; flex-wrap: wrap; margin-top: 0.8rem; }
+        .pickup-input {
+            flex: 1; min-width: 150px; font-family: 'Space Mono', monospace; font-size: 1.15rem; letter-spacing: 6px; text-align: center;
+            padding: 0.55rem 0.7rem; border: 1px dashed var(--ink-sub); border-radius: 6px; background: transparent; color: var(--ink-main); outline: none;
+        }
+        .pickup-input:focus { border-color: var(--primary); }
+        .pickup-btn { flex: none; font-family: var(--font-chinese-title); font-size: 1.05rem; padding: 0.5rem 1.6rem; border-radius: 20px; border: 1px dashed var(--ink-sub); background: var(--tape-green); color: var(--ink-main); cursor: pointer; transition: all 0.2s; }
+        .pickup-btn:hover { transform: translateY(-2px); box-shadow: 2px 4px 8px rgba(0,0,0,0.08); }
+        .pickup-hint { font-size: 0.82rem; color: var(--ink-sub); margin-top: 0.7rem; }
+        .pickup-result { margin-top: 1rem; }
+        .pickup-title { font-family: var(--font-chinese-title); font-size: 1.2rem; margin-bottom: 0.3rem; }
+
+        /* 赞赏主厨区 */
+        .tip-section {
+            text-align: center; background: var(--card-bg); border: 1px dashed var(--ink-sub); border-radius: 10px;
+            padding: 2rem 1.5rem 1.8rem; margin: 3.5rem 0 0; position: relative; box-shadow: 2px 3px 0 rgba(0,0,0,0.05);
+        }
+        .tip-section::before { content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(2deg); width: 64px; height: 18px; background: var(--tape-yellow, rgba(220,193,151,0.75)); background: rgba(220,193,151,0.75); border-radius: 2px; }
+        .tip-section h3 { font-family: var(--font-chinese-title); font-size: 1.45rem; margin-bottom: 0.5rem; }
+        .tip-section p { color: var(--ink-sub); font-size: 0.92rem; }
+
+        /* 移动端底部 tab */
+        .tabbar-mobile {
+            display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 160;
+            background: var(--card-bg); border-top: 1px dashed var(--ink-sub);
+            box-shadow: 0 -4px 16px rgba(0,0,0,0.08); padding: 0.35rem 0.3rem calc(0.35rem + env(safe-area-inset-bottom));
+        }
+        .tabbar-mobile .tab-btn {
+            flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px;
+            background: none; border: none; cursor: pointer; color: var(--ink-sub); font-family: var(--font-body);
+            font-size: 0.62rem; letter-spacing: 1px; position: relative; padding: 0.2rem 0; border-radius: 8px;
+        }
+        .tabbar-mobile .tab-btn .ico { font-size: 1.15rem; line-height: 1.2; }
+        .tabbar-mobile .tab-btn:active { transform: scale(0.94); }
+        .tabbar-mobile .tab-btn .cart-badge { top: -4px; right: calc(50% - 20px); }
+
+        @media (min-width: 769px) { .float-group { bottom: 90px; } }
+        @media (max-width: 900px) {
+            .layout2col { grid-template-columns: 1fr; }
+            .filter-card { position: static; }
+            .filter-card .filter-group { flex-direction: row; flex-wrap: wrap; }
+            .filter-card .btn-sticker { flex: 1; justify-content: center; }
+            .filter-mini { display: none; }
+        }
+        @media (max-width: 768px) {
+            body { padding-bottom: 4.6rem !important; }
+            .topbar { margin: -1.5rem -1rem 0; }
+            .top-nav { display: none; }
+            .topbar-inner { justify-content: space-between; }
+            .float-group { display: none; }
+            .tabbar-mobile { display: flex; }
+            .grid-cards { grid-template-columns: 1fr; }
+            .pickup-row { flex-direction: column; }
+            .pickup-input { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="topbar-inner">
+            <a class="logo-stamp" href="#" id="logoHome">
+                <span class="logo-mark">🐟</span>
+                <span><span class="logo-txt">SodaFish 小食堂</span><span class="logo-sub">CANTEEN · EST. 2026</span></span>
+            </a>
+            <nav class="top-nav">
+                <button class="btn-sticker" type="button" data-nav="section-main">🐟 主菜</button>
+                <button class="btn-sticker" type="button" data-nav="section-dessert">🍰 甜点</button>
+                <button class="btn-sticker" type="button" data-nav="rank">📊 心愿榜</button>
+                <button class="btn-sticker" type="button" data-nav="pickup">🎫 取餐码</button>
+                <button class="btn-sticker" type="button" data-nav="tip">☕ 赞赏主厨</button>
+                <button class="btn-sticker cart-pill" type="button" id="cartPill">🛒 餐盘 <span id="pillCount">0</span><div class="cart-badge" id="pillBadge">0</div></button>
+                <button class="btn-sticker btn-theme" id="themeToggle" type="button">🌙</button>
+            </nav>
+        </div>
+    </div>
+    <div class="wrapper">
+        <header>
+            <div class="header-title-wrap"><div class="title-english">SodaFish</div><div class="title-chinese">小食堂</div></div>
+            <p>✦ 记录每一次文字与味蕾的相遇 ✦</p>
+            <div class="live-line"><span class="live-dot off" id="liveDot"></span><span id="liveTxt">正在连接小食堂…</span></div>
+            <div class="hero-actions">
+                <button class="btn-sticker" type="button" data-nav="section-main">🍽️ 去点单</button>
+                <button class="btn-sticker" type="button" data-nav="pickup">🎫 查我的取餐码</button>
+                <button class="btn-sticker" type="button" data-nav="rank">📊 食客心愿榜</button>
+                <button class="btn-sticker" type="button" data-nav="tip">☕ 赞赏主厨</button>
+            </div>
+        </header>
+
+        <div class="pickup-bar" id="pickup">
+            <div class="section-title dessert" style="margin-bottom:0.3rem;">🎫 取餐码查询</div>
+            <div class="pickup-row">
+                <input class="pickup-input" id="pkInput" type="text" inputmode="numeric" maxlength="4" placeholder="····">
+                <button class="pickup-btn" id="pkBtn" type="button">查一查</button>
+            </div>
+            <p class="pickup-hint">下单成功后都会拿到一张 4 位取餐码，输码就能看点单内容和出餐状态；丢了码也可以用「🧾 我的订单」里的单号 + 凭证查询。</p>
+            <div class="pickup-result" id="pkResult"></div>
+        </div>
+
+        <div class="layout2col">
+            <aside class="filter-card">
+                <h4>🍽️ 今天吃什么</h4>
+                <div class="filter-group">
+                    <button class="btn-sticker active" data-filter="all">🍽️ 全部上菜</button>
+                    <button class="btn-sticker" data-filter="main">🐟 只要主菜</button>
+                    <button class="btn-sticker" data-filter="dessert">🍰 只要甜点</button>
+                </div>
+                <div class="filter-mini" id="filterMini">
+                    主菜 <b id="miniMain">0</b> 道 · 甜点 <b id="miniDessert">0</b> 道<br>
+                    累计票数 <b id="miniVotes">0</b> · 小票 <b id="miniBallots">0</b> 张
+                </div>
+            </aside>
+            <div class="menu-col">
+                <section class="list-section" id="section-main">
+                    <div class="section-title main-course">🐟 鱼饭套餐 · 主菜正餐</div>
+                    <div class="grid-cards" id="grid-main"><div class="grid-note">正在从后厨取菜单…</div></div>
+                </section>
+                <section class="list-section" id="section-dessert">
+                    <div class="section-title dessert">🍰 饭后甜点 · 免费小食</div>
+                    <div class="grid-cards" id="grid-dessert"></div>
+                </section>
+            </div>
+        </div>
+
+        <section class="tip-section" id="tip" hidden>
+            <h3>☕ 请主厨喝杯汽水</h3>
+            <p>每道菜都是主厨手工精排的，如果吃得开心，长按识别赞赏码请主厨喝杯汽水吧 ♡</p>
+            <div class="qr-slot" style="margin:1.2rem auto 0.6rem; max-width:220px;">
+                <img id="tipImg" alt="主厨赞赏码" referrerpolicy="no-referrer">
+                <p class="qr-cap">长按识别 · 微信扫码赞赏</p>
+            </div>
+        </section>
+
+        <footer>✦ SodaFish 私人食堂 · 翻页留香 ✦<br><a class="shop-link" href="notes.html">去写点菜便签 →</a> &nbsp; <a class="shop-link" href="admin.html">店主入口 →</a></footer>
+    </div>
+    <div class="float-group"><div class="rank-float" id="rankFloat">📊</div><div class="cart-float" id="cartFloat">🛒<div class="cart-badge" id="cartBadge" style="display:none;">0</div></div><div class="rank-float" id="orderFloat">🧾</div></div>
+    <nav class="tabbar-mobile" id="tabbar">
+        <button class="tab-btn" type="button" data-tabnav="home"><span class="ico">🏠</span>首页</button>
+        <button class="tab-btn" type="button" data-tabnav="rank"><span class="ico">📊</span>心愿榜</button>
+        <button class="tab-btn" type="button" data-tabnav="cart"><span class="ico">🛒</span>餐盘<div class="cart-badge" id="tabBadge" style="display:none;">0</div></button>
+        <button class="tab-btn" type="button" data-tabnav="pickup"><span class="ico">🎫</span>查码</button>
+        <button class="tab-btn" type="button" data-tabnav="tip"><span class="ico">☕</span>赞赏</button>
+    </nav>
+    <div class="panel" id="cartPanel">
+        <div class="panel-header"><span>📝 我的点单小票</span><button class="close-panel" type="button" data-close="cartPanel">✕</button></div>
+        <div class="panel-body">
+            <div class="qr-slot" id="qrSlot" hidden>
+                <img id="qrImg" alt="店主赞赏码" referrerpolicy="no-referrer">
+                <p class="qr-cap">长按识别或扫码赞赏 · 转账时请备注单号</p>
+            </div>
+            <div id="cartList"><div class="empty-cart-msg">空空的~ 快去挑选喜欢的菜吧！</div></div>
+            <div style="margin-top:1.6rem;">
+                <div class="paper-field"><label for="nick">署名（可不填）</label><input id="nick" type="text" maxlength="16" placeholder="留个名字，老板好记人"></div>
+                <div class="paper-field"><label for="msg">想说的话（可不填）</label><textarea id="msg" rows="2" maxlength="80" placeholder="比如：求返场！"></textarea></div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="cart-total"><span>本次点单：</span><span id="cartTotal" style="color:#d15b5b;">0 道 · ¥0</span></div>
+            <button class="submit-order-btn" id="submitBtn" type="button" disabled>确认下单 · 生成单号</button>
+        </div>
+    </div>
+    <div class="panel" id="orderPanel">
+        <div class="panel-header"><span>🧾 我的订单 · 凭证领取</span><button class="close-panel" type="button" data-close="orderPanel">✕</button></div>
+        <div class="panel-body">
+            <p class="rank-stat">下单后会拿到 <b>单号 + 查询凭证</b>，店主核对赞赏到账并发放后，在这里凭凭证领取网盘链接。</p>
+            <div class="paper-field"><label for="lkNo">订单编号</label><input id="lkNo" type="text" maxlength="10" placeholder="SF-0001"></div>
+            <div class="paper-field"><label for="lkToken">查询凭证</label><input id="lkToken" type="text" maxlength="8" placeholder="下单成功弹窗里的 8 位码"></div>
+            <button class="submit-order-btn" id="lkBtn" type="button" style="margin-bottom:1.5rem;">查一查我的单子</button>
+            <div id="lkResult"></div>
+            <div class="feed-title">📦 存在这台设备上的单子</div>
+            <div id="myOrders"><div style="color:var(--ink-sub);font-style:italic;font-size:0.88rem;">这台设备还没有下过单。</div></div>
+        </div>
+    </div>
+    <div class="panel" id="rankPanel">
+        <div class="panel-header"><span>📊 食客心愿排行榜</span><button class="close-panel" type="button" data-close="rankPanel">✕</button></div>
+        <div class="panel-body">
+            <p class="rank-stat" id="rankStat">这里是大家共同投出的返场/上新心愿榜：</p>
+            <div class="rank-list" id="rankList"></div>
+            <div class="feed-title" id="feedTitle">🕐 刚刚的点单</div>
+            <div class="rank-list" id="feedList"></div>
+        </div>
+    </div>
+    <div class="success-modal" id="successModal">
+        <div class="success-box">
+            <div class="stamp">已下单</div>
+            <h3>单子送到后厨啦！</h3>
+            <p class="slip-no" id="okNo">SF-0000 · ¥0.00</p>
+            <p>🎫 取餐码：<b id="okPickup" style="display:inline-block;font-family:'Space Mono',monospace;font-size:1.7rem;letter-spacing:10px;color:#d15b5b;">····</b><br>
+            <span style="font-size:0.85rem;">（页面顶部「🎫 取餐码查询」输码即可查进度）</span></p>
+            <p>查询凭证：<b class="slip-no" id="okToken" style="display:inline;">--------</b><br>请扫小票里的赞赏码付款，<b>转账时备注这个单号</b>；店主核对后到「🧾 我的订单」凭凭证领取网盘链接。</p>
+            <button type="button" id="okCopy">复制单号和凭证</button>
+            <button type="button" id="okClose">太棒啦 (✿◡‿◡)</button>
+        </div>
+    </div>
+    <button id="backToTop" type="button">⬆️</button>
+    <div id="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tencent-ai/workbuddy-cloud-sdk@dev/lib/index.global.js"></script>
+    <script>
+    (function () {
+      "use strict";
+
+      /* ---------- 云端配置 ---------- */
+      var PUBLIC_CONFIG = {
+        endpoint: "https://wbapp-gs3eugedcgdizs2ix64qgs.app.workbuddy.host",
+        oauthRelayBaseUrl: "https://www.workbuddy.cn/v2/as/genie-baas/oauth",
+        publishableKey: "wbpk_Gs3EuGedCgdIzs2IX64QGS_Kyb4JtTIK9OPGi50x9MUNnUfVgw5UyYQ"
+      };
+
+      var cloud = null;
+      try {
+        cloud = WorkBuddyCloud.createWorkBuddyCloud({
+          endpoint: PUBLIC_CONFIG.endpoint,
+          oauthRelayBaseUrl: PUBLIC_CONFIG.oauthRelayBaseUrl,
+          publishableKey: PUBLIC_CONFIG.publishableKey
+        });
+      } catch (e) {
+        cloud = null;
+      }
+
+      var $ = function (id) { return document.getElementById(id); };
+      var esc = function (s) {
+        return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+          return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c];
+        });
+      };
+
+      var state = {
+        books: [],
+        tally: {},
+        overview: { ballots: 0, votes: 0, today_ballots: 0, today_votes: 0 },
+        recent: [],
+        cart: [],
+        online: false,
+        sending: false,
+        filter: "all",
+        covers: {}
+      };
+      var byCode = {};
+      var TAG = ["tag-a", "tag-b", "tag-c"];
+
+      function toast(msg) {
+        var t = $("toast");
+        t.textContent = msg || "";
+        if (msg) {
+          t.classList.add("show");
+          clearTimeout(toast._t);
+          toast._t = setTimeout(function () { t.classList.remove("show"); }, 4000);
+        } else {
+          t.classList.remove("show");
+        }
+      }
+
+      function isOrderable(b) { return b.status === "已完成"; }
+      function fmtYuan(n) { return "¥" + (Number(n) / 100).toFixed(2); }
+      function priceText(b) {
+        var n = Number(b.price_cents) || 0;
+        return n > 0 ? fmtYuan(n) : "免费 · 赞赏";
+      }
+      function pickLabel(b) {
+        if (isOrderable(b)) return "+ 加入餐盘";
+        if (b.category === "main") return b.status === "未完成" ? "+ 催更投票" : "+ 投票求上新";
+        return "+ 投票求上新";
+      }
+
+      function ribbonOf(b) {
+        var map = { pink: "ribbon-pink", blue: "ribbon-blue", green: "ribbon-green", yellow: "ribbon-yellow" };
+        return map[b.ribbon] || "ribbon-pink";
+      }
+
+      function normTitle(t) {
+        return String(t || "").replace(/[《》\s]/g, "").toLowerCase();
+      }
+      function coverHTML(b) {
+        var url = state.covers[normTitle(b.title)];
+        if (url) {
+          return '<div class="cover-box"><img src="' + esc(url) + '" alt="' + esc(b.title) + ' 封面" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.nextElementSibling.hidden=false"><div class="cover-fb" hidden><span class="fb-char">' + esc(b.title.slice(0, 1)) + '</span><span class="fb-line">' + esc(b.code) + '</span></div></div>';
+        }
+        return '<div class="cover-box"><div class="cover-fb"><span class="fb-char">' + esc(b.title.slice(0, 1)) + '</span><span class="fb-line">' + esc(b.code) + ' · SODAFISH</span></div></div>';
+      }
+
+      function cardHTML(b, i) {
+        var priceHtml;
+        if (isOrderable(b)) {
+          priceHtml = '<span class="price-badge ' + ((Number(b.price_cents) || 0) > 0 ? "price-new" : "price-free") + '">' + esc(priceText(b)) + '</span>';
+        } else {
+          priceHtml = '<span class="price-badge ' + (b.badge === "首发" ? "price-new" : "price-wait") + '">' + esc(b.badge || "") + '</span>';
+        }
+        var stCls = b.status === "已完成" ? "status-done" : (b.status === "未上架" ? "status-ready" : "status-wip");
+        var added = state.cart.indexOf(b.code) > -1;
+        return '<div class="book-card" data-code="' + esc(b.code) + '">' +
+          '<div class="bookmark-ribbon ' + ribbonOf(b) + '"></div>' +
+          '<div class="menu-tag ' + TAG[i % 3] + '">' + esc(b.code) + '</div>' +
+          coverHTML(b) +
+          '<div class="book-name">《' + esc(b.title) + '》</div>' +
+          '<div class="book-meta">' +
+            priceHtml +
+            '<span class="status-badge ' + stCls + '">' + esc(b.status || "") + '</span>' +
+            '<span class="vote-chip" data-vote="' + esc(b.code) + '">0 票</span>' +
+          '</div>' +
+          '<div class="book-note">' + esc(b.note || "") + '</div>' +
+          '<button class="order-btn' + (added ? " added" : "") + '" type="button"' + (added ? " disabled" : "") + '>' + (added ? "✓ 已加入餐盘" : pickLabel(b)) + '</button>' +
+        '</div>';
+      }
+
+      function renderMenu() {
+        var main = [], dessert = [];
+        state.books.forEach(function (b) { (b.category === "main" ? main : dessert).push(b); });
+        $("grid-main").innerHTML = main.length ? main.map(cardHTML).join("") : '<div class="grid-note">主菜还在备料中…</div>';
+        $("grid-dessert").innerHTML = dessert.length ? dessert.map(function (b, i) { return cardHTML(b, i); }).join("") : '<div class="grid-note">甜点还没上桌…</div>';
+        paintVotes();
+        applyFilter();
+      }
+
+      /* ---------- 实时票数 ---------- */
+      function paintVotes() {
+        var chips = document.querySelectorAll("[data-vote]");
+        for (var i = 0; i < chips.length; i++) {
+          var code = chips[i].getAttribute("data-vote");
+          var n = state.tally[code] || 0;
+          chips[i].textContent = n + " 票";
+          chips[i].classList.toggle("hot", n >= 30);
+        }
+        paintRank();
+        paintFeed();
+        paintMini();
+      }
+
+      function paintMini() {
+        var o = state.overview || {};
+        var main = 0, dessert = 0;
+        state.books.forEach(function (b) { if (b.category === "main") main++; else dessert++; });
+        $("miniMain").textContent = main;
+        $("miniDessert").textContent = dessert;
+        $("miniVotes").textContent = o.votes || 0;
+        $("miniBallots").textContent = o.ballots || 0;
+      }
+
+      function paintRank() {
+        var max = 1;
+        var rows = state.books.map(function (b) {
+          var v = state.tally[b.code] || 0;
+          if (v > max) max = v;
+          return { title: b.title, code: b.code, votes: v };
+        }).sort(function (a, b) { return b.votes - a.votes; }).slice(0, 8);
+
+        var o = state.overview || {};
+        $("rankStat").innerHTML = '共 <b>' + (o.ballots || 0) + '</b> 张小票 · 累计 <b>' + (o.votes || 0) + '</b> 票 · 今日 <b>' + (o.today_votes || 0) + '</b> 票 · 订单 <b>' + (o.orders_total || 0) + '</b> 单（待核对 <b>' + (o.orders_pending || 0) + '</b>）';
+
+        if (!rows.length || !rows.some(function (r) { return r.votes > 0; })) {
+          $("rankList").innerHTML = '<div style="text-align:center;color:var(--ink-sub);font-style:italic;">还都是 0 票，等你开个头。</div>';
+          return;
+        }
+        $("rankList").innerHTML = rows.map(function (r, i) {
+          var percent = Math.round((r.votes / max) * 100);
+          return '<div class="rank-item"><div class="rank-info"><span>' + (i + 1) + '. 《' + esc(r.title) + '》</span><span>' + r.votes + ' 票</span></div>' +
+            '<div class="rank-bar-bg"><div class="rank-bar-fill" style="width: ' + percent + '%"></div></div></div>';
+        }).join("");
+      }
+
+      function timeAgo(iso) {
+        var d = new Date(iso);
+        if (isNaN(d.getTime())) return "--:--";
+        var diff = Math.max(0, (Date.now() - d.getTime()) / 1000);
+        if (diff < 60) return "刚刚";
+        if (diff < 3600) return Math.floor(diff / 60) + " 分钟前";
+        if (diff < 86400) return Math.floor(diff / 3600) + " 小时前";
+        return (d.getMonth() + 1) + "/" + d.getDate();
+      }
+
+      function paintFeed() {
+        var el = $("feedList");
+        if (!state.recent.length) {
+          el.innerHTML = '<div style="color:var(--ink-sub);font-style:italic;">还没有人点单，你可以是第一个。</div>';
+          return;
+        }
+        el.innerHTML = state.recent.map(function (r) {
+          var picks = Array.isArray(r.picks) ? r.picks : [];
+          var names = picks.map(function (c) { var b = byCode[c]; return b ? b.title : c; });
+          var shown = names.slice(0, 2).join("、") + (names.length > 2 ? " 等 " + names.length + " 道" : "");
+          var who = (r.nickname && String(r.nickname).trim()) || "匿名食客";
+          var tail = r.message ? ' <span style="color:var(--ink-sub);">「' + esc(r.message) + '」</span>' : "";
+          return '<div class="feed-item"><span class="t">' + timeAgo(r.created_at) + '</span><span><b>' + esc(who) + '</b> 点了 ' + esc(shown) + tail + '</span></div>';
+        }).join("");
+      }
+
+      /* ---------- 小票 ---------- */
+      function paintCart() {
+        var listEl = $("cartList"), badgeEl = $("cartBadge"), totalEl = $("cartTotal"), btn = $("submitBtn");
+        if (state.cart.length) {
+          badgeEl.style.display = "flex";
+          badgeEl.textContent = state.cart.length;
+        } else {
+          badgeEl.style.display = "none";
+        }
+        var n = state.cart.length;
+        $("pillCount").textContent = n;
+        $("pillBadge").style.display = n ? "flex" : "none";
+        $("pillBadge").textContent = n;
+        $("tabBadge").style.display = n ? "flex" : "none";
+        $("tabBadge").textContent = n;
+        var cents = state.cart.reduce(function (s, c) { var b = byCode[c]; return s + (b ? (Number(b.price_cents) || 0) : 0); }, 0);
+        totalEl.textContent = state.cart.length + " 道 · " + (cents > 0 ? fmtYuan(cents) : "¥0（随心赞赏）");
+        btn.disabled = !state.cart.length || state.sending || !state.online;
+        btn.textContent = state.sending ? "正在送入后厨…" : (state.online ? "确认下单 · 生成单号" : "等待连接云端…");
+
+        if (!state.cart.length) {
+          listEl.innerHTML = '<div class="empty-cart-msg">空空的~ 快去挑选喜欢的菜吧！</div>';
+          return;
+        }
+        listEl.innerHTML = state.cart.map(function (code) {
+          var b = byCode[code] || { title: code };
+          return '<div class="cart-item"><span class="cart-item-title">《' + esc(b.title) + '》</span><button class="remove-item" type="button" data-remove="' + esc(code) + '">移除</button></div>';
+        }).join("");
+      }
+
+      function addToCart(code) {
+        if (state.cart.indexOf(code) > -1) return;
+        if (state.cart.length >= 20) { toast("一次最多点 20 道，先提交这一轮吧。"); return; }
+        state.cart.push(code);
+        syncCard(code, true);
+        paintCart();
+      }
+
+      function removeFromCart(code) {
+        state.cart = state.cart.filter(function (c) { return c !== code; });
+        syncCard(code, false);
+        paintCart();
+      }
+
+      function syncCard(code, added) {
+        var card = document.querySelector('.book-card[data-code="' + code + '"]');
+        if (!card) return;
+        var btn = card.querySelector(".order-btn");
+        var b = byCode[code];
+        if (!btn || !b) return;
+        btn.classList.toggle("added", added);
+        btn.disabled = added;
+        btn.textContent = added ? "✓ 已加入餐盘" : pickLabel(b);
+      }
+
+      /* ---------- 云端读写 ---------- */
+      function unwrap(res) {
+        if (res && res.error) throw res.error;
+        return res ? res.data : null;
+      }
+
+      async function loadBooks() {
+        var data = unwrap(await cloud.database.from("soda_books").select("*").eq("active", true).order("sort", { ascending: true }));
+        state.books = data || [];
+        byCode = {};
+        state.books.forEach(function (b) { byCode[b.code] = b; });
+        try {
+          var notes = unwrap(await cloud.database.from("soda_notes").select("book,cover_url").limit(500)) || [];
+          var map = {};
+          notes.forEach(function (n) { if (n.book && n.cover_url) map[normTitle(n.book)] = n.cover_url; });
+          state.covers = map;
+        } catch (e) { state.covers = {}; }
+        renderMenu();
+      }
+
+      var refreshing = false;
+      async function refreshLive() {
+        if (refreshing || !cloud) return;
+        refreshing = true;
+        try {
+          var res = await Promise.all([
+            cloud.database.rpc("soda_tally"),
+            cloud.database.rpc("soda_overview"),
+            cloud.database.rpc("soda_recent", { lim: 6 })
+          ]);
+          var tally = unwrap(res[0]) || [];
+          state.overview = unwrap(res[1]) || state.overview;
+          state.recent = unwrap(res[2]) || [];
+          var map = {};
+          tally.forEach(function (r) { map[r.code] = Number(r.votes) || 0; });
+          state.tally = map;
+          state.online = true;
+          $("liveDot").classList.remove("off");
+          $("liveTxt").textContent = "实时 · " + new Date().toLocaleTimeString("zh-CN", { hour12: false });
+          paintVotes();
+          paintCart();
+        } catch (err) {
+          state.online = false;
+          $("liveDot").classList.add("off");
+          $("liveTxt").textContent = "离线 · 稍后自动重连";
+          paintCart();
+        } finally {
+          refreshing = false;
+        }
+      }
+
+      async function submitOrder() {
+        if (!state.cart.length || state.sending) return;
+        if (!state.online) { toast("还没连上云端，稍等一下再提交。"); return; }
+        var last = Number(localStorage.getItem("sodaLastBallot") || 0);
+        if (Date.now() - last < 8000) { toast("刚提交过一单，等几秒再来。"); return; }
+
+        state.sending = true;
+        paintCart();
+        var picks = state.cart.slice();
+        var cents = picks.reduce(function (s, c) { var b = byCode[c]; return s + (b ? (Number(b.price_cents) || 0) : 0); }, 0);
+        try {
+          var r = unwrap(await cloud.database.rpc("soda_place_order", {
+            p_book_codes: picks,
+            p_nick: ($("nick").value || "").trim().slice(0, 16) || null,
+            p_note: ($("msg").value || "").trim().slice(0, 80) || null
+          }));
+          if (!r || !r.order_no) throw (r && r.error) || new Error("下单失败");
+          localStorage.setItem("sodaLastBallot", String(Date.now()));
+          saveMyOrder({ order_no: r.order_no, query_token: r.query_token, pickup_code: r.pickup_code || "", total_cents: r.total_cents, item_count: r.item_count, created_at: new Date().toISOString() });
+          state.lastOrder = r;
+          $("okNo").textContent = r.order_no + " · " + r.item_count + " 道 · " + (r.total_cents > 0 ? fmtYuan(r.total_cents) : "免费");
+          $("okPickup").textContent = r.pickup_code || "····";
+          $("okToken").textContent = r.query_token;
+          $("msg").value = "";
+          state.cart = [];
+          state.sending = false;
+          document.querySelectorAll(".book-card").forEach(function (c) {
+            var btn = c.querySelector(".order-btn");
+            var b = byCode[c.getAttribute("data-code")];
+            if (btn && b) { btn.classList.remove("added"); btn.disabled = false; btn.textContent = pickLabel(b); }
+          });
+          paintCart();
+          paintMyOrders();
+          $("successModal").classList.add("show");
+          await refreshLive();
+        } catch (err) {
+          state.sending = false;
+          paintCart();
+          toast((err && err.message) ? String(err.message) : "提交失败：网络异常，请稍后再试。");
+        }
+      }
+
+      /* ---------- 我的订单 / 凭证查单 ---------- */
+      function myOrders() {
+        try {
+          var arr = JSON.parse(localStorage.getItem("sodaMyOrders") || "[]");
+          return Array.isArray(arr) ? arr : [];
+        } catch (e) { return []; }
+      }
+      function saveMyOrder(o) {
+        var arr = myOrders().filter(function (x) { return x.order_no !== o.order_no; });
+        arr.unshift(o);
+        try { localStorage.setItem("sodaMyOrders", JSON.stringify(arr.slice(0, 30))); } catch (e) {}
+        paintMyOrders();
+      }
+      function paintMyOrders() {
+        var el = $("myOrders");
+        var arr = myOrders();
+        if (!arr.length) {
+          el.innerHTML = '<div style="color:var(--ink-sub);font-style:italic;font-size:0.88rem;">这台设备还没有下过单。</div>';
+          return;
+        }
+        el.innerHTML = arr.map(function (o, i) {
+          return '<div class="my-order-item"><span><b>' + esc(o.order_no) + '</b>' + (o.pickup_code ? ' · 🎫 ' + esc(o.pickup_code) : '') + ' · ' + (o.item_count || 1) + ' 道 · ' +
+            ((Number(o.total_cents) || 0) > 0 ? fmtYuan(o.total_cents) : "免费") + '</span>' +
+            '<button class="copy-link" type="button" data-quick="' + i + '">查状态</button></div>';
+        }).join("");
+      }
+
+      function statusChip(s) {
+        var cls = s === "已发放" ? "done" : (s === "已核对" ? "ok" : (s === "已驳回" ? "no" : "wait"));
+        return '<span class="order-status ' + cls + '">' + esc(s || "待核对") + '</span>';
+      }
+
+      function paintLookup(r) {
+        var el = $("lkResult");
+        if (!r) {
+          el.innerHTML = '<div style="color:var(--ink-sub);font-style:italic;font-size:0.88rem;margin-top:0.6rem;">没查到这张单子，核对一下单号和凭证再试试。</div>';
+          return;
+        }
+        var cents = Number(r.total_cents) || 0;
+        var html = '<div class="dl-box">' +
+          '<div style="margin-bottom:0.4rem;"><b>' + esc(r.order_no) + '</b> · ' + (r.item_count || 1) + ' 道 · ' + (cents > 0 ? fmtYuan(cents) : "免费") + ' · ' + statusChip(r.status) + '</div>';
+        if (r.status === "已发放" && r.delivery) {
+          html += '<div>网盘链接：<a href="' + esc(r.delivery.url || "") + '" target="_blank" rel="noopener noreferrer">' + esc(r.delivery.url || "") + '</a> <button class="copy-link" type="button" data-copy="' + esc(r.delivery.url || "") + '">复制</button></div>' +
+            '<div>提取码：<b>' + esc(r.delivery.code || "") + '</b> <button class="copy-link" type="button" data-copy="' + esc(r.delivery.code || "") + '">复制</button></div>';
+        } else if (r.status === "待核对") {
+          html += '<div style="color:var(--ink-sub);">店主还没核对到账，稍后再来查查～（记得转账备注单号）</div>';
+        } else if (r.status === "已核对") {
+          html += '<div style="color:var(--ink-sub);">到账已确认，正在整理网盘链接，快了！</div>';
+        } else {
+          html += '<div style="color:var(--ink-sub);">这张单子被驳回了，有疑问请在点菜便签/讨论区留言。</div>';
+        }
+        el.innerHTML = html + '</div>';
+      }
+
+      async function doLookup(no, token) {
+        try {
+          var r = unwrap(await cloud.database.rpc("soda_order_lookup", { p_order_no: no, p_token: token }));
+          paintLookup(r);
+        } catch (err) {
+          $("lkResult").innerHTML = '<div style="color:var(--ink-sub);font-style:italic;font-size:0.88rem;margin-top:0.6rem;">查询失败：' + esc((err && err.message) || "网络异常") + '</div>';
+        }
+      }
+
+      function copyText(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { toast("已复制：" + text); }, function () { fallbackCopy(text); });
+        } else fallbackCopy(text);
+      }
+      function fallbackCopy(text) {
+        var ta = document.createElement("textarea");
+        ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand("copy"); toast("已复制：" + text); } catch (e) { toast("复制失败，请手动复制"); }
+        document.body.removeChild(ta);
+      }
+
+      /* ---------- 赞赏码 ---------- */
+      async function loadSettings() {
+        try {
+          var data = unwrap(await cloud.database.from("soda_settings").select("key,value")) || [];
+          var map = {};
+          data.forEach(function (r) { map[r.key] = r.value; });
+          var qr = map.wechat_qr || "";
+          if (qr) {
+            $("qrImg").src = qr; $("qrSlot").hidden = false;
+            $("tipImg").src = qr; $("tip").hidden = false;
+            $("tipImg").onerror = function () { $("tip").hidden = true; };
+          }
+        } catch (e) {}
+      }
+
+      /* ---------- 取餐码查询 ---------- */
+      function pickupChip(s) {
+        var map = { "待核对": ["wait", "🍳 备餐中 · 待店主核对赞赏"], "已核对": ["ok", "👍 已核对 · 准备出餐"], "已发放": ["done", "✅ 已出餐 · 可凭凭证领取"], "已驳回": ["no", "🚫 已取消"] };
+        var m = map[s] || ["wait", "🍳 备餐中"];
+        return '<span class="order-status ' + m[0] + '">' + esc(m[1]) + '</span>';
+      }
+
+      function paintPickup(r) {
+        var el = $("pkResult");
+        if (!r || !r.found) {
+          el.innerHTML = '<div class="dl-box" style="margin-top:0;">没查到这张取餐码，确认一下 4 位数字再试试～</div>';
+          return;
+        }
+        var books = Array.isArray(r.books) ? r.books : [];
+        var names = books.map(function (b) { return "《" + (b.title || b.code) + "》"; }).join("、") || (r.item_count + " 道菜");
+        el.innerHTML = '<div class="dl-box">' +
+          '<div class="pickup-title">' + esc(r.order_no) + ' · ' + pickupChip(r.status) + '</div>' +
+          '<div style="margin-bottom:0.35rem;">点了 ' + esc(r.item_count || 1) + ' 道 · ' + ((Number(r.total_cents) || 0) > 0 ? fmtYuan(r.total_cents) : "免费") + '</div>' +
+          '<div style="color:var(--ink-sub);font-size:0.88rem;">' + esc(names) + '</div>' +
+          '<div style="color:var(--ink-sub);font-size:0.82rem;margin-top:0.4rem;">' + new Date(r.created_at).toLocaleString("zh-CN", { hour12: false }) + ' 下单' +
+          (r.status === "已发放" ? ' · 网盘链接请在「🧾 我的订单」里用单号 + 凭证领取' : '') + '</div>' +
+          '</div>';
+      }
+
+      async function doPickup() {
+        var code = ($("pkInput").value || "").replace(/\D/g, "").slice(0, 4);
+        if (code.length !== 4) { toast("取餐码是 4 位数字哦～"); return; }
+        $("pkResult").innerHTML = '<div style="color:var(--ink-sub);font-style:italic;font-size:0.88rem;">正在翻找小票…</div>';
+        try {
+          var r = unwrap(await cloud.database.rpc("soda_pickup_lookup", { p_code: code }));
+          paintPickup(r);
+        } catch (err) {
+          $("pkResult").innerHTML = '<div style="color:var(--ink-sub);font-style:italic;font-size:0.88rem;">查询失败：' + esc((err && err.message) || "网络异常") + '</div>';
+        }
+      }
+
+      /* ---------- 筛选 / 主题 / 面板 ---------- */
+      function applyFilter() {
+        var secMain = $("section-main"), secDessert = $("section-dessert");
+        if (state.filter === "all") { secMain.classList.remove("hidden"); secDessert.classList.remove("hidden"); }
+        else if (state.filter === "main") { secMain.classList.remove("hidden"); secDessert.classList.add("hidden"); }
+        else { secMain.classList.add("hidden"); secDessert.classList.remove("hidden"); }
+      }
+
+      function toggleTheme() {
+        var body = document.body;
+        body.classList.toggle("dark-mode");
+        var dark = body.classList.contains("dark-mode");
+        $("themeToggle").textContent = dark ? "☀️" : "🌙";
+        try { localStorage.setItem("sodaTheme", dark ? "dark" : "light"); } catch (e) {}
+      }
+
+      function togglePanel(panelId) {
+        var panel = $(panelId);
+        document.querySelectorAll(".panel").forEach(function (p) { if (p.id !== panelId) p.classList.remove("open"); });
+        panel.classList.toggle("open");
+      }
+
+      function closeModal() {
+        $("successModal").classList.remove("show");
+        togglePanel("orderPanel");
+      }
+
+      /* ---------- 事件绑定 ---------- */
+      function scrollToId(id) {
+        var el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      document.querySelectorAll("[data-nav]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var t = btn.getAttribute("data-nav");
+          if (t === "rank") togglePanel("rankPanel");
+          else if (t === "tip") scrollToId("tip");
+          else scrollToId(t);
+        });
+      });
+
+      document.querySelectorAll("[data-tabnav]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var t = btn.getAttribute("data-tabnav");
+          if (t === "home") window.scrollTo({ top: 0, behavior: "smooth" });
+          else if (t === "rank") togglePanel("rankPanel");
+          else if (t === "cart") togglePanel("cartPanel");
+          else if (t === "pickup") scrollToId("pickup");
+          else if (t === "tip") scrollToId("tip");
+        });
+      });
+
+      $("logoHome").addEventListener("click", function (e) { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); });
+      $("cartPill").addEventListener("click", function () { togglePanel("cartPanel"); });
+      $("pkBtn").addEventListener("click", doPickup);
+      $("pkInput").addEventListener("keydown", function (e) { if (e.key === "Enter") doPickup(); });
+      $("pkInput").addEventListener("input", function () { this.value = this.value.replace(/\D/g, "").slice(0, 4); });
+
+      document.querySelector(".filter-group").addEventListener("click", function (e) {
+        var btn = e.target.closest("[data-filter]");
+        if (!btn) return;
+        document.querySelectorAll(".filter-group .btn-sticker").forEach(function (b) { b.classList.remove("active"); });
+        btn.classList.add("active");
+        state.filter = btn.getAttribute("data-filter");
+        applyFilter();
+      });
+
+      $("themeToggle").addEventListener("click", toggleTheme);
+      $("rankFloat").addEventListener("click", function () { togglePanel("rankPanel"); });
+      $("cartFloat").addEventListener("click", function () { togglePanel("cartPanel"); });
+      $("orderFloat").addEventListener("click", function () { togglePanel("orderPanel"); });
+      $("lkBtn").addEventListener("click", function () {
+        var no = $("lkNo").value.trim().toUpperCase();
+        var token = $("lkToken").value.trim().toUpperCase();
+        if (!no || !token) { toast("单号和凭证都要填哦～"); return; }
+        doLookup(no, token);
+      });
+      $("lkToken").addEventListener("keydown", function (e) { if (e.key === "Enter") $("lkBtn").click(); });
+      $("myOrders").addEventListener("click", function (e) {
+        var btn = e.target.closest("[data-quick]");
+        if (!btn) return;
+        var o = myOrders()[Number(btn.getAttribute("data-quick"))];
+        if (!o) return;
+        $("lkNo").value = o.order_no;
+        $("lkToken").value = o.query_token || "";
+        if (o.query_token) doLookup(o.order_no, o.query_token);
+        else toast("这张单子没存下凭证，请手动输入。");
+      });
+      $("lkResult").addEventListener("click", function (e) {
+        var btn = e.target.closest("[data-copy]");
+        if (btn) copyText(btn.getAttribute("data-copy"));
+      });
+      $("okCopy").addEventListener("click", function () {
+        var r = state.lastOrder || {};
+        if (!r.order_no) return;
+        copyText(r.order_no + " 取餐码" + (r.pickup_code || "") + " " + (r.query_token || ""));
+      });
+      document.querySelectorAll("[data-close]").forEach(function (btn) {
+        btn.addEventListener("click", function () { togglePanel(btn.getAttribute("data-close")); });
+      });
+
+      $("grid-main").addEventListener("click", onCardClick);
+      $("grid-dessert").addEventListener("click", onCardClick);
+      function onCardClick(e) {
+        var btn = e.target.closest(".order-btn");
+        if (!btn || btn.disabled) return;
+        var card = btn.closest(".book-card");
+        if (!card) return;
+        var code = card.getAttribute("data-code");
+        var b = byCode[code];
+        if (b && isOrderable(b)) addToCart(code);
+        else voteOnce(code);
+      }
+
+      async function voteOnce(code) {
+        if (!state.online) { toast("还没连上云端，稍等一下再投票。"); return; }
+        var last = Number(localStorage.getItem("sodaLastVote") || 0);
+        if (Date.now() - last < 8000) { toast("刚投过一票，等几秒再来。"); return; }
+        try {
+          localStorage.setItem("sodaLastVote", String(Date.now()));
+          unwrap(await cloud.database.from("soda_ballots").insert({ picks: [code], item_count: 1 }));
+          toast("已投出一票，谢谢催更 ♡");
+          await refreshLive();
+        } catch (err) {
+          toast("投票失败：" + ((err && err.message) || "网络异常") + "，请稍后再试。");
+        }
+      }
+
+      $("cartList").addEventListener("click", function (e) {
+        var btn = e.target.closest("[data-remove]");
+        if (!btn) return;
+        removeFromCart(btn.getAttribute("data-remove"));
+      });
+
+      $("submitBtn").addEventListener("click", submitOrder);
+      $("okClose").addEventListener("click", closeModal);
+      $("successModal").addEventListener("click", function (e) { if (e.target === $("successModal")) closeModal(); });
+      document.addEventListener("keydown", function (e) { if (e.key === "Escape") $("successModal").classList.remove("show"); });
+
+      var backTop = $("backToTop");
+      backTop.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+      window.addEventListener("scroll", function () {
+        if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) backTop.classList.add("show");
+        else backTop.classList.remove("show");
+      });
+      document.addEventListener("visibilitychange", function () { if (!document.hidden) refreshLive(); });
+
+      /* ---------- 启动 ---------- */
+      (function boot() {
+        try { if (localStorage.getItem("sodaTheme") === "dark") { document.body.classList.add("dark-mode"); $("themeToggle").textContent = "☀️"; } } catch (e) {}
+        if (!cloud) {
+          $("liveTxt").textContent = "云端组件加载失败，请刷新重试";
+          $("grid-main").innerHTML = '<div class="grid-note">菜单没能从云端取回来，请刷新页面。</div>';
+          return;
+        }
+        (async function () {
+          try {
+            await loadBooks();
+            await refreshLive();
+            loadSettings();
+            paintMyOrders();
+            setInterval(refreshLive, 6000);
+          } catch (err) {
+            $("liveTxt").textContent = "菜单加载失败，请刷新";
+            $("grid-main").innerHTML = '<div class="grid-note">菜单没能从云端取回来，请刷新重试。</div>';
+          }
+        })();
+      })();
+    })();
+    </script>
+</body>
+</html>
