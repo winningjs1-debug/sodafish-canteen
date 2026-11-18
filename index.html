@@ -2,6 +2,57 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
+<script>
+  /* sodaSelfWrap: 沙箱自包装，让云端拿到 Origin: null */
+  (function () {
+    try {
+      var h = location.hostname || "";
+      var direct = /(^|\.)workbuddy\.host$/i.test(h) || h === "localhost" || h === "127.0.0.1" || h === "[::1]" || h === "";
+      if (direct) return;
+      if (/[?&]sodaframe=1/.test(location.search)) return;
+      var q = "?sodaframe=1" + (location.search ? "&" + location.search.slice(1) : "");
+      var src = (location.pathname || "/") + q + (location.hash || "");
+      var t = (document.title || "SodaFish 小食堂").replace(/[<>]/g, "");
+      document.open();
+      document.write(
+        '<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8">' +
+        '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+        '<title>' + t + '</title>' +
+        '<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ctext y=\'.9em\' font-size=\'90\'%3E%F0%9F%90%9F%3C/text%3E%3C/svg%3E">' +
+        '<style>html,body{margin:0;padding:0;height:100%;background:#f7f2e7}' +
+        'iframe{display:block;width:100%;height:100vh;height:100dvh;border:0}</style></head><body>' +
+        '<iframe src="' + src.replace(/"/g, "&quot;") + '" ' +
+        'sandbox="allow-scripts allow-forms allow-popups allow-modals allow-downloads" ' +
+        'allow="clipboard-write" title="' + t + '"></iframe></body></html>'
+      );
+      document.close();
+    } catch (e) {}
+  })();
+  </script>
+<!-- sodaSelfWrap -->
+<script>
+  /* sodaStorageShim: 沙箱内 localStorage 不可用时退化为内存存储 */
+  (function () {
+    try { window.localStorage.getItem("__soda_t__"); } catch (e) {
+      var mk = function () {
+        var m = {};
+        return {
+          getItem: function (k) { return Object.prototype.hasOwnProperty.call(m, k) ? m[k] : null; },
+          setItem: function (k, v) { m[k] = String(v); },
+          removeItem: function (k) { delete m[k]; },
+          clear: function () { m = {}; },
+          key: function (i) { return Object.keys(m)[i] || null; }
+        };
+      };
+      try {
+        Object.defineProperty(window, "localStorage", { value: mk(), configurable: true });
+        Object.defineProperty(window, "sessionStorage", { value: mk(), configurable: true });
+      } catch (e2) {}
+    }
+  })();
+  </script>
+<!-- sodaStorageShim -->
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SodaFish 小食堂 · 复古车票风</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%90%9F%3C/text%3E%3C/svg%3E">
