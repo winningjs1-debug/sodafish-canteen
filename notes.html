@@ -1,16 +1,877 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SodaFish 小食堂 · 点菜便签</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%90%9F%3C/text%3E%3C/svg%3E">
-<style>
-html,body{margin:0;padding:0;height:100%;background:#f7f2e7}
-iframe{display:block;width:100%;height:100vh;height:100dvh;border:0}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SodaFish 小食堂 · 点菜便签</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%9D%3C/text%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Ma+Shan+Zheng&family=Klee+One:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-paper: #f4efe6;
+            --card-bg: #fffdf9;
+            --ink-main: #3d342c;
+            --ink-sub: #85796b;
+            --tape-green: rgba(171, 202, 178, 0.7);
+            --tape-pink: rgba(233, 175, 175, 0.7);
+            --line-dashed: #d9d0c2;
+            --font-en: 'Great Vibes', cursive;
+            --font-cn: 'Ma Shan Zheng', cursive;
+            --font-body: 'Klee One', 'KaiTi', serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-paper);
+            background-image: repeating-linear-gradient(0deg, transparent, transparent 29px, #e8e1d5 29px, #e8e1d5 30px);
+            font-family: var(--font-body);
+            color: var(--ink-main);
+            padding: 2rem 1.2rem;
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+        .container { max-width: 760px; margin: 0 auto; }
+
+        /* 顶部标题区 */
+        header { text-align: center; margin-bottom: 2.5rem; position: relative; }
+        .title-wrap { display: flex; align-items: baseline; justify-content: center; gap: 1rem; }
+        .title-en { font-family: var(--font-en); font-size: 3.5rem; color: #5c7a6b; transform: rotate(-2deg); line-height: 1; }
+        .title-cn { font-family: var(--font-cn); font-size: 2.2rem; }
+        header p { margin-top: 0.8rem; color: var(--ink-sub); font-size: 0.95rem; }
+        header::before { content: '📝'; position: absolute; left: 8%; top: 15px; font-size: 1.8rem; transform: rotate(-15deg); opacity: 0.7; }
+        header::after { content: '🥢'; position: absolute; right: 8%; top: 15px; font-size: 1.8rem; transform: rotate(10deg); opacity: 0.7; }
+
+        /* 表单卡片 */
+        .note-card {
+            background: var(--card-bg);
+            border: 1px dashed var(--line-dashed);
+            border-radius: 8px;
+            padding: 2rem 1.8rem;
+            position: relative;
+            box-shadow: 3px 4px 0 rgba(0,0,0,0.04);
+            margin-bottom: 2.5rem;
+        }
+        .note-card::before { content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 50px; height: 18px; background: var(--tape-pink); border-radius: 2px; opacity: 0.8; }
+        .note-card h3 { font-family: var(--font-cn); font-size: 1.3rem; margin-bottom: 1.5rem; text-align: center; }
+
+        /* 表单输入 */
+        .form-row { display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .input-group { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 0.4rem; }
+        .input-group label { font-size: 0.9rem; color: var(--ink-sub); }
+        .input-group input {
+            width: 100%; padding: 0.7rem 0.9rem;
+            border: 1px solid var(--line-dashed); border-radius: 4px;
+            background: #fdfbf7; font-family: var(--font-body); font-size: 1rem; color: var(--ink-main);
+            outline: none; transition: border-color 0.2s;
+        }
+        .input-group input:focus { border-color: #a8b8a0; }
+        .btn-submit {
+            width: 100%; padding: 0.8rem; margin-top: 0.5rem;
+            border: 1px dashed var(--ink-sub); border-radius: 6px;
+            background: var(--tape-green); color: var(--ink-main);
+            font-family: var(--font-cn); font-size: 1.1rem; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 2px 4px 8px rgba(0,0,0,0.08); }
+
+        /* 便签列表 */
+        .list-section { margin-top: 1rem; }
+        .list-title { font-family: var(--font-cn); font-size: 1.2rem; display: inline-block; padding: 0.2rem 1.2rem; background: var(--tape-pink); border-radius: 3px; margin-bottom: 1.2rem; }
+        .ticket-list { display: flex; flex-direction: column; gap: 0.8rem; }
+
+        .ticket-item {
+            background: var(--card-bg); border: 1px dashed var(--line-dashed); border-radius: 4px;
+            padding: 0.8rem 1.2rem; display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.95rem; position: relative;
+            /* 防止长书名撑破容器 */
+            word-break: break-all;
+        }
+        .ticket-item::before { content: '✂'; position: absolute; left: -10px; top: 50%; transform: translateY(-50%); color: var(--line-dashed); font-size: 0.8rem; }
+
+        .ticket-book { font-family: var(--font-cn); font-size: 1.1rem; flex: 1; padding-right: 1rem; }
+        .ticket-author { color: var(--ink-sub); font-size: 0.85rem; white-space: nowrap; }
+
+        .empty-msg { text-align: center; color: var(--ink-sub); font-style: italic; padding: 2rem 0; }
+
+        /* 弹窗 */
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: var(--ink-main); color: #fff; padding: 0.6rem 1.5rem; border-radius: 20px;
+            font-size: 0.9rem; opacity: 0; visibility: hidden; transition: all 0.3s; z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
+        /* ================= 多设备自适应媒体查询 ================= */
+
+        /* 平板及中等屏幕 */
+        @media (max-width: 1024px) {
+            .title-en { font-size: 3.2rem; }
+            .title-cn { font-size: 2rem; }
+            header::before, header::after { left: 4%; right: 4%; }
+        }
+
+        /* 大屏手机 / 平板竖屏 */
+        @media (max-width: 768px) {
+            body { padding: 1.5rem 1rem; }
+            .title-en { font-size: 2.8rem; }
+            .title-cn { font-size: 1.8rem; }
+            /* 隐藏两侧的涂鸦，防止遮挡标题 */
+            header::before, header::after { display: none; }
+            header p { font-size: 0.85rem; margin-top: 1rem; }
+
+            .note-card { padding: 1.5rem 1.2rem; }
+            .note-card h3 { font-size: 1.2rem; margin-bottom: 1rem; }
+
+            /* 输入框自适应换行 */
+            .form-row { gap: 0.8rem; }
+            .input-group { min-width: 100%; }
+        }
+
+        /* 小屏手机 (例如 iPhone SE等窄屏) */
+        @media (max-width: 480px) {
+            body { padding: 1rem 0.8rem; }
+
+            .title-wrap { flex-direction: column; gap: 0.2rem; align-items: center; }
+            .title-en { font-size: 2.5rem; }
+            .title-cn { font-size: 1.6rem; }
+
+            .note-card { padding: 1.2rem 1rem; }
+            .btn-submit { font-size: 1rem; padding: 0.7rem; }
+
+            .list-title { font-size: 1.1rem; padding: 0.2rem 1rem; }
+
+            /* 移动端便签内容如果太长，允许换行显示 */
+            .ticket-item { padding: 0.8rem 1rem; flex-direction: column; align-items: flex-start; gap: 0.4rem; }
+            .ticket-book { padding-right: 0; }
+            .ticket-author { align-self: flex-end; }
+            .ticket-item::before { left: -8px; }
+
+            .toast { width: 90%; text-align: center; bottom: 20px; font-size: 0.85rem; }
+        }
+    </style>
+    <style>
+        /* ===== 新增能力所需样式：全部沿用原纸片/虚线/胶带语言 ===== */
+        /* 智能总结 */
+        .smart-card { background: var(--card-bg); border: 1px dashed var(--line-dashed); border-radius: 8px; padding: 1.6rem 1.8rem; position: relative; box-shadow: 3px 4px 0 rgba(0,0,0,0.04); margin-bottom: 2.5rem; }
+        .smart-card::before { content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 50px; height: 18px; background: var(--tape-green); border-radius: 2px; opacity: 0.8; }
+        .smart-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.8rem; margin-bottom: 1rem; }
+        .smart-head h3 { font-family: var(--font-cn); font-size: 1.25rem; }
+        .smart-head .live { font-size: 0.72rem; color: var(--ink-sub); letter-spacing: 1px; }
+        .smart-head .live i { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #8fb096; margin-right: 5px; vertical-align: middle; }
+        .smart-head .live.off i { background: #c98d8d; }
+        .smart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(108px, 1fr)); gap: 0.8rem; margin-bottom: 1.1rem; }
+        .smart-cell { border: 1px dashed var(--line-dashed); border-radius: 4px; padding: 0.55rem 0.7rem; background: #fdfbf7; }
+        .smart-cell b { display: block; font-family: var(--font-cn); font-size: 1.35rem; line-height: 1.3; }
+        .smart-cell span { font-size: 0.78rem; color: var(--ink-sub); letter-spacing: 0.5px; }
+        .smart-text { font-size: 0.93rem; line-height: 1.85; color: var(--ink-main); border-top: 1px dashed var(--line-dashed); padding-top: 0.9rem; }
+        .smart-text em { font-style: normal; color: #b06a5a; }
+        .bars { display: flex; flex-direction: column; gap: 0.45rem; margin: 0.2rem 0 0.4rem; }
+        .bar-row { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--ink-sub); }
+        .bar-row .nm { min-width: 74px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .bar-row .track { flex: 1; height: 7px; background: #efe9dc; border-radius: 10px; overflow: hidden; }
+        .bar-row .track i { display: block; height: 100%; background: var(--tape-pink); border-radius: 10px; transition: width 0.6s ease; }
+        .bar-row .n { min-width: 26px; text-align: right; font-size: 0.76rem; }
+
+        /* 评分星 */
+        .stars { display: flex; align-items: center; gap: 0.15rem; padding: 0.15rem 0; }
+        .star { background: none; border: none; cursor: pointer; font-size: 1.5rem; line-height: 1; color: #ddd4c5; padding: 0 0.1rem; transition: color 0.15s, transform 0.15s; }
+        .star:hover { transform: translateY(-2px); }
+        .star.on { color: #d98b6f; }
+        .star-txt { font-size: 0.82rem; color: var(--ink-sub); margin-left: 0.5rem; }
+
+        /* 链接 / 封面预览 */
+        .link-row { display: flex; gap: 0.5rem; align-items: stretch; }
+        .link-row input { flex: 1; }
+        .btn-mini { white-space: nowrap; padding: 0 0.9rem; border: 1px dashed var(--ink-sub); border-radius: 4px; background: transparent; color: var(--ink-main); font-family: var(--font-body); font-size: 0.86rem; cursor: pointer; transition: background 0.2s; }
+        .btn-mini:hover { background: var(--tape-green); }
+        .btn-mini:disabled { opacity: 0.55; cursor: progress; }
+        .cover-row { display: flex; gap: 1rem; align-items: flex-start; margin-top: 0.9rem; }
+        .cover-box { width: 78px; height: 104px; flex: none; border-radius: 3px; overflow: hidden; position: relative; }
+        .cover-box a, .cover-box .cover-plain { display: block; width: 100%; height: 100%; text-decoration: none; }
+        .cover-img { width: 100%; height: 100%; object-fit: cover; display: block; border: 1px solid var(--line-dashed); border-radius: 3px; box-shadow: 2px 3px 0 rgba(0,0,0,0.06); background: #fdfbf7; }
+        .cover-fb { width: 100%; height: 100%; border: 1px dashed var(--line-dashed); border-radius: 3px; background: repeating-linear-gradient(0deg, #fdfbf7, #fdfbf7 12px, #f6f1e6 12px, #f6f1e6 13px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; color: var(--ink-sub); font-family: var(--font-cn); font-size: 1.1rem; line-height: 1.1; }
+        .cover-fb small { font-family: var(--font-body); font-size: 0.62rem; letter-spacing: 1px; }
+        .cover-tip { font-size: 0.82rem; color: var(--ink-sub); line-height: 1.7; }
+        .cover-tip b { color: #6b7f66; font-weight: 600; }
+        .cover-tip .warn { color: #b06a5a; }
+
+        textarea.note-input { width: 100%; padding: 0.7rem 0.9rem; border: 1px solid var(--line-dashed); border-radius: 4px; background: #fdfbf7; font-family: var(--font-body); font-size: 0.96rem; color: var(--ink-main); outline: none; resize: vertical; line-height: 1.7; }
+        textarea.note-input:focus { border-color: #a8b8a0; }
+
+        /* 便签条目（增强：封面 / 平台 / 评分 / 简介） */
+        .note-item { display: flex; gap: 1rem; align-items: flex-start; }
+        .note-item .cover-box { width: 66px; height: 88px; }
+        .note-main { flex: 1; min-width: 0; }
+        .note-head { display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+        .note-head .ticket-book { flex: none; padding-right: 0; word-break: break-word; }
+        .platform-tag { font-size: 0.74rem; letter-spacing: 0.5px; color: var(--ink-sub); border: 1px dashed var(--line-dashed); border-radius: 20px; padding: 0.05rem 0.55rem; text-decoration: none; }
+        .platform-tag:hover { color: var(--ink-main); background: #f7f2e8; }
+        .note-sub { display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap; margin-top: 0.15rem; }
+        .note-sub .ticket-author { padding-right: 0; }
+        .rating-stars { color: #d98b6f; font-size: 0.9rem; letter-spacing: 2px; }
+        .note-intro { font-size: 0.9rem; color: var(--ink-sub); margin-top: 0.4rem; line-height: 1.7; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
+        .note-time { font-size: 0.76rem; color: var(--ink-sub); opacity: 0.85; white-space: nowrap; }
+
+        /* 讨论区 */
+        .disc-list { display: flex; flex-direction: column; gap: 0.7rem; margin-bottom: 1.2rem; }
+        .disc-item { background: var(--card-bg); border: 1px dashed var(--line-dashed); border-radius: 4px; padding: 0.7rem 1rem; position: relative; word-break: break-word; }
+        .disc-item::before { content: '💬'; position: absolute; left: -9px; top: 12px; font-size: 0.72rem; opacity: 0.55; }
+        .disc-meta { display: flex; justify-content: space-between; gap: 0.8rem; font-size: 0.76rem; color: var(--ink-sub); margin-bottom: 0.15rem; }
+        .disc-body { font-size: 0.94rem; line-height: 1.7; }
+        .disc-book { display: inline-block; font-size: 0.74rem; color: #7a6a55; background: #f7f1e4; border-radius: 20px; padding: 0.02rem 0.5rem; margin-right: 0.4rem; }
+        .disc-form { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: stretch; }
+        .disc-form input[type="text"] { flex: 1 1 140px; padding: 0.6rem 0.8rem; border: 1px solid var(--line-dashed); border-radius: 4px; background: #fdfbf7; font-family: var(--font-body); font-size: 0.94rem; color: var(--ink-main); outline: none; }
+        .disc-form select { padding: 0.6rem 0.6rem; border: 1px solid var(--line-dashed); border-radius: 4px; background: #fdfbf7; font-family: var(--font-body); font-size: 0.9rem; color: var(--ink-main); outline: none; max-width: 168px; }
+        .disc-form button { border: 1px dashed var(--ink-sub); border-radius: 4px; background: var(--tape-green); color: var(--ink-main); font-family: var(--font-cn); font-size: 0.98rem; padding: 0 1.2rem; cursor: pointer; }
+        .hint-line { font-size: 0.8rem; color: var(--ink-sub); margin-bottom: 0.8rem; }
+        .foot-link { text-align: center; margin-top: 2.5rem; font-size: 0.82rem; color: var(--ink-sub); }
+        .foot-link a { color: var(--ink-sub); text-decoration: none; border-bottom: 1px dashed var(--line-dashed); margin: 0 0.4rem; }
+        .foot-link a:hover { color: var(--ink-main); }
+        @media (max-width: 480px) {
+            .note-item { flex-direction: row; }
+            .note-item .cover-box { width: 58px; height: 78px; }
+            .smart-card { padding: 1.2rem 1rem; }
+            .disc-form select { max-width: 100%; }
+        }
+    </style>
 </head>
 <body>
-<iframe src="app-notes.html" sandbox="allow-scripts allow-forms allow-popups allow-modals allow-downloads" title="SodaFish 小食堂 · 点菜便签" allow="clipboard-write"></iframe>
+    <div class="container">
+        <header>
+            <div class="title-wrap">
+                <span class="title-en">SodaFish</span>
+                <span class="title-cn">点菜便签</span>
+            </div>
+            <p>✦ 留下你想吃的“书”，贴上封面、给个分，聊聊它 ♡</p>
+        </header>
+
+        <!-- 智能总结 -->
+        <div class="smart-card">
+            <div class="smart-head">
+                <h3>🤖 智能总结</h3>
+                <span class="live off" id="liveTag"><i></i><span id="liveTxt">正在连接…</span></span>
+            </div>
+            <div class="smart-grid">
+                <div class="smart-cell"><b id="sNotes">0</b><span>张便签</span></div>
+                <div class="smart-cell"><b id="sAvg">—</b><span>平均评分</span></div>
+                <div class="smart-cell"><b id="sPlatform">—</b><span>最热平台</span></div>
+                <div class="smart-cell"><b id="sComments">0</b><span>条讨论</span></div>
+            </div>
+            <div class="bars" id="bars"></div>
+            <div class="smart-text" id="smartText">正在汇总大家的点菜便签…</div>
+        </div>
+
+        <div class="note-card">
+            <h3>📋 写一张点菜便签</h3>
+            <div class="form-row">
+                <div class="input-group">
+                    <label>书名</label>
+                    <input type="text" id="bookName" placeholder="例：《岁月间》" maxlength="60">
+                </div>
+                <div class="input-group">
+                    <label>作者 / 推荐人</label>
+                    <input type="text" id="bookAuthor" placeholder="例：巫哲" maxlength="30">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="input-group" style="min-width:100%;">
+                    <label>首发平台链接（贴进来会自动识别封面与简介）</label>
+                    <div class="link-row">
+                        <input type="url" id="bookUrl" placeholder="例：https://www.jjwxc.net/onebook.php?novelid=..." maxlength="400">
+                        <button class="btn-mini" type="button" id="detectBtn">识别封面</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cover-row">
+                <div class="cover-box" id="coverBox">
+                    <div class="cover-plain"><div class="cover-fb">封面<small>COVER</small></div></div>
+                </div>
+                <div style="flex:1;min-width:0;">
+                    <div class="cover-tip" id="coverTip">粘贴首发平台链接后，自动识别该书的封面、平台与简介；<br>点封面可直接跳回首发平台。</div>
+                    <div class="input-group" style="margin-top:0.7rem;min-width:0;">
+                        <label style="font-size:0.8rem;">封面图链接（识别不到时手填，可不填）</label>
+                        <input type="url" id="coverUrl" placeholder="https://.../cover.jpg" maxlength="400">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row" style="margin-top:1rem;">
+                <div class="input-group" style="min-width:100%;">
+                    <label>评分推荐</label>
+                    <div class="stars" id="stars" role="group" aria-label="评分">
+                        <button class="star" type="button" data-v="1" aria-label="1 星">★</button>
+                        <button class="star" type="button" data-v="2" aria-label="2 星">★</button>
+                        <button class="star" type="button" data-v="3" aria-label="3 星">★</button>
+                        <button class="star" type="button" data-v="4" aria-label="4 星">★</button>
+                        <button class="star on" type="button" data-v="5" aria-label="5 星">★</button>
+                        <span class="star-txt" id="starTxt">5 星 · 强推！</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="input-group" style="min-width:100%;">
+                    <label>小说简介 / 推荐理由</label>
+                    <textarea class="note-input" id="bookIntro" rows="3" maxlength="300" placeholder="一句话说说它讲什么、为什么想吃它～"></textarea>
+                </div>
+            </div>
+
+            <button class="btn-submit" type="button" id="submitBtn">✎ 贴到留言板上</button>
+        </div>
+
+        <div class="list-section">
+            <div class="list-title">📌 已贴的便签（<span id="count">0</span> 本）</div>
+            <div class="ticket-list" id="noteList">
+                <div class="empty-msg">还没有便签，来写第一张吧～</div>
+            </div>
+        </div>
+
+        <div class="list-section" style="margin-top:2.5rem;">
+            <div class="list-title" style="background:var(--tape-green);">💬 智能讨论区 · <span id="discCount">0</span> 条</div>
+            <p class="hint-line" id="discHint">聊聊这些书：哪本值得排第一？谁的封面最好看？</p>
+            <div class="disc-list" id="discList">
+                <div class="empty-msg">还没有人说话，来开个头～</div>
+            </div>
+            <div class="disc-form">
+                <input type="text" id="discNick" placeholder="昵称（可不填）" maxlength="16">
+                <select id="discBook"><option value="">不指定书</option></select>
+                <input type="text" id="discBody" placeholder="说点什么…" maxlength="200">
+                <button type="button" id="discBtn">发送</button>
+            </div>
+        </div>
+
+        <p class="foot-link">
+            <a href="index.html">← 回小食堂点单</a>
+            <a href="admin.html">店主入口</a>
+        </p>
+    </div>
+
+    <div class="toast" id="toast">✓ 已收到，谢谢推荐 ♡</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tencent-ai/workbuddy-cloud-sdk@dev/lib/index.global.js"></script>
+    <script>
+    (function () {
+      "use strict";
+
+      var PUBLIC_CONFIG = {
+        endpoint: "https://wbapp-gs3eugedcgdizs2ix64qgs.app.workbuddy.host",
+        oauthRelayBaseUrl: "https://www.workbuddy.cn/v2/as/genie-baas/oauth",
+        publishableKey: "wbpk_Gs3EuGedCgdIzs2IX64QGS_Kyb4JtTIK9OPGi50x9MUNnUfVgw5UyYQ"
+      };
+
+      var cloud = null;
+      try {
+        cloud = WorkBuddyCloud.createWorkBuddyCloud({
+          endpoint: PUBLIC_CONFIG.endpoint,
+          oauthRelayBaseUrl: PUBLIC_CONFIG.oauthRelayBaseUrl,
+          publishableKey: PUBLIC_CONFIG.publishableKey
+        });
+      } catch (e) { cloud = null; }
+
+      var $ = function (id) { return document.getElementById(id); };
+      var esc = function (s) {
+        return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+          return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c];
+        });
+      };
+      var unwrap = function (r) { if (r && r.error) throw r.error; return r ? r.data : null; };
+
+      /* ---------- 平台识别 ---------- */
+      var PLATFORMS = [
+        { key: "jjwxc.net", name: "晋江文学城" },
+        { key: "jjwxc.com", name: "晋江文学城" },
+        { key: "gongzicp.com", name: "长佩文学" },
+        { key: "changpei", name: "长佩文学" },
+        { key: "afdian.net", name: "爱发电" },
+        { key: "lofter.com", name: "LOFTER" },
+        { key: "qidian.com", name: "起点中文网" },
+        { key: "fanqienovel.com", name: "番茄小说" },
+        { key: "zongheng.com", name: "纵横中文网" },
+        { key: "ciweimao.com", name: "刺猬猫" },
+        { key: "17k.com", name: "17K小说网" },
+        { key: "hongxiu.com", name: "红袖添香" },
+        { key: "po18", name: "PO18" },
+        { key: "haitang", name: "海棠文学城" },
+        { key: "aox3", name: "爱下电子书" },
+        { key: "weibo.com", name: "微博" },
+        { key: "zhihu.com", name: "知乎" },
+        { key: "douban.com", name: "豆瓣" },
+        { key: "kdocs.cn", name: "金山文档" },
+        { key: "docs.qq.com", name: "腾讯文档" }
+      ];
+
+      function hostOf(u) {
+        try { return new URL(u).hostname.toLowerCase(); } catch (e) { return ""; }
+      }
+      function platformOf(u) {
+        var h = hostOf(u);
+        if (!h) return "";
+        for (var i = 0; i < PLATFORMS.length; i++) {
+          if (h.indexOf(PLATFORMS[i].key) > -1) return PLATFORMS[i].name;
+        }
+        return h.replace(/^www\./, "");
+      }
+      function safeUrl(u) {
+        var s = String(u || "").trim();
+        if (!s) return "";
+        if (!/^https?:\/\//i.test(s)) s = "https://" + s;
+        try { return new URL(s).href; } catch (e) { return ""; }
+      }
+
+      /* ---------- 抓取封面 / 简介（多通道降级） ---------- */
+      function withTimeout(promise, ms) {
+        return Promise.race([
+          promise,
+          new Promise(function (_, rej) { setTimeout(function () { rej(new Error("timeout")); }, ms); })
+        ]);
+      }
+      async function getJSON(url, ms) {
+        var r = await withTimeout(fetch(url, { mode: "cors" }), ms);
+        if (!r.ok) throw new Error("http " + r.status);
+        return r.json();
+      }
+      async function getText(url, ms) {
+        var r = await withTimeout(fetch(url, { mode: "cors" }), ms);
+        if (!r.ok) throw new Error("http " + r.status);
+        return r.text();
+      }
+
+      function metaFromHTML(html, base) {
+        function pick(re) {
+          var m = html.match(re);
+          return m ? m[1].trim() : "";
+        }
+        var img = pick(/<meta[^>]+property=["']og:image(?::url)?["'][^>]+content=["']([^"']+)["']/i)
+          || pick(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image(?::url)?["']/i)
+          || pick(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i);
+        var title = pick(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i)
+          || (html.match(/<title[^>]*>([\s\S]*?)<\/title>/i) || [])[1] || "";
+        var desc = pick(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i)
+          || pick(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i);
+        var abs = "";
+        if (img) { try { abs = new URL(img, base).href; } catch (e) { abs = img; } }
+        return { image: abs, title: title.replace(/\s+/g, " ").trim(), desc: desc.replace(/\s+/g, " ").trim() };
+      }
+
+      /* 部分平台封面可由书目 ID 直接拼出，最稳 */
+      function presetCover(url) {
+        var h = hostOf(url);
+        if (h.indexOf("jjwxc") > -1) {
+          var m = url.match(/novelid=(\d+)/i) || url.match(/\/book2\/(\d+)/i);
+          if (m) return "https://i9-static.jjwxc.net/novelimage.php?novelid=" + m[1];
+        }
+        if (h.indexOf("gongzicp") > -1) { /* 长佩无稳定直链，交给 meta 抓取 */ }
+        return "";
+      }
+
+      function looksLikeLogo(u) {
+        return /logo|icon|avatar|default/i.test(u || "");
+      }
+
+      async function detectFromUrl(rawUrl) {
+        var url = safeUrl(rawUrl);
+        if (!url) return null;
+        var out = { image: "", title: "", desc: "", via: "" };
+        var pre = presetCover(url);
+        if (pre) { out.image = pre; out.via = "preset"; }
+
+        try {
+          var j = await getJSON("https://api.microlink.io/?meta=true&url=" + encodeURIComponent(url), 8000);
+          if (j && j.status === "success" && j.data) {
+            var img = (j.data.image && j.data.image.url) || "";
+            if (!out.image && img && !looksLikeLogo(img)) out.image = img;
+            out.title = j.data.title || "";
+            out.desc = j.data.description || "";
+            out.via = out.via || "microlink";
+          }
+        } catch (e) {}
+
+        if (!out.image) {
+          try {
+            var html = await getText("https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(url), 6000);
+            var m = metaFromHTML(html, url);
+            if (m.image && !looksLikeLogo(m.image)) out.image = m.image;
+            out.title = out.title || m.title;
+            out.desc = out.desc || m.desc;
+            out.via = out.via || "html";
+          } catch (e2) {}
+        }
+        if (!out.image) {
+          try {
+            var txt = await getText("https://r.jina.ai/" + url, 6000);
+            var im = txt.match(/!\[[^\]]*\]\((https?:\/\/[^\s)]+)\)/);
+            if (im && !looksLikeLogo(im[1])) { out.image = im[1]; out.via = "jina"; }
+          } catch (e3) {}
+        }
+        return out;
+      }
+
+      /* ---------- 状态 ---------- */
+      var state = { notes: [], comments: [], rating: 5, detect: null, online: false, sending: false, posting: false };
+
+      function toast(msg) {
+        var t = $("toast");
+        t.textContent = msg;
+        t.classList.add("show");
+        clearTimeout(toast._t);
+        toast._t = setTimeout(function () { t.classList.remove("show"); }, 2600);
+      }
+      function stars(n) { return "★★★★★".slice(0, n) + "☆☆☆☆☆".slice(0, 5 - n); }
+      function timeAgo(iso) {
+        var d = new Date(iso);
+        if (isNaN(d.getTime())) return "";
+        var diff = Math.max(0, (Date.now() - d.getTime()) / 1000);
+        if (diff < 60) return "刚刚";
+        if (diff < 3600) return Math.floor(diff / 60) + " 分钟前";
+        if (diff < 86400) return Math.floor(diff / 3600) + " 小时前";
+        return (d.getMonth() + 1) + "/" + d.getDate();
+      }
+
+      /* ---------- 封面渲染 ---------- */
+      function coverHTML(n, big) {
+        var cls = big ? "cover-box" : "cover-box";
+        var fb = '<div class="cover-fb">' + esc((n.book || "书").replace(/[《》]/g, "").slice(0, 1)) + '<small>NO COVER</small></div>';
+        var inner;
+        if (n.cover_url) {
+          var proxied = "https://images.weserv.nl/?url=" + encodeURIComponent(n.cover_url.replace(/^https?:\/\//, ""));
+          inner = '<img class="cover-img" src="' + esc(n.cover_url) + '" alt="' + esc(n.book) + ' 封面" loading="lazy" referrerpolicy="no-referrer" data-proxy="' + esc(proxied) + '" data-fb="1" onerror="SodaCover.err(this)"><div class="cover-fb" style="display:none;">' + esc((n.book || "书").replace(/[《》]/g, "").slice(0, 1)) + '<small>NO COVER</small></div>';
+        } else {
+          inner = fb;
+        }
+        var href = safeUrl(n.url);
+        if (href) {
+          return '<div class="' + cls + '"><a href="' + esc(href) + '" target="_blank" rel="noopener noreferrer" title="打开首发平台">' + inner + '</a></div>';
+        }
+        return '<div class="' + cls + '"><div class="cover-plain">' + inner + '</div></div>';
+      }
+
+      window.SodaCover = {
+        err: function (img) {
+          var proxy = img.getAttribute("data-proxy");
+          if (proxy && !img.getAttribute("data-retried")) {
+            img.setAttribute("data-retried", "1");
+            img.src = proxy;
+            return;
+          }
+          img.style.display = "none";
+          var fb = img.parentNode.querySelector(".cover-fb");
+          if (fb) fb.style.display = "flex";
+        }
+      };
+
+      /* ---------- 渲染便签 ---------- */
+      function renderNotes() {
+        var listEl = $("noteList");
+        $("count").textContent = state.notes.length;
+        if (!state.notes.length) {
+          listEl.innerHTML = '<div class="empty-msg">还没有便签，来写第一张吧～</div>';
+        } else {
+          listEl.innerHTML = state.notes.map(function (n) {
+            var plat = n.platform || platformOf(n.url);
+            var href = safeUrl(n.url);
+            var platTag = plat
+              ? (href ? '<a class="platform-tag" href="' + esc(href) + '" target="_blank" rel="noopener noreferrer">' + esc(plat) + ' ↗</a>'
+                      : '<span class="platform-tag">' + esc(plat) + '</span>')
+              : "";
+            return '<div class="ticket-item note-item">' +
+              coverHTML(n) +
+              '<div class="note-main">' +
+                '<div class="note-head"><span class="ticket-book">' + esc(n.book) + '</span>' + platTag + '</div>' +
+                '<div class="note-sub">' +
+                  '<span class="ticket-author">' + esc(n.author || "匿名食客") + '</span>' +
+                  '<span class="rating-stars" title="' + (n.rating || 5) + ' 星">' + stars(n.rating || 5) + '</span>' +
+                  '<span class="note-time">' + timeAgo(n.created_at) + '</span>' +
+                '</div>' +
+                (n.intro ? '<p class="note-intro">' + esc(n.intro) + '</p>' : "") +
+              '</div>' +
+            '</div>';
+          }).join("");
+        }
+        renderDiscBookOptions();
+      }
+
+      function renderDiscBookOptions() {
+        var sel = $("discBook");
+        var cur = sel.value;
+        sel.innerHTML = '<option value="">不指定书</option>' + state.notes.map(function (n) {
+          return '<option value="' + esc(n.book) + '">' + esc(n.book) + '</option>';
+        }).join("");
+        if (cur) sel.value = cur;
+      }
+
+      /* ---------- 智能总结 ---------- */
+      function renderSmart() {
+        var notes = state.notes;
+        var avg = 0, sum = 0, cnt = {};
+        notes.forEach(function (n) {
+          sum += Number(n.rating) || 0;
+          var p = n.platform || platformOf(n.url) || "未标注平台";
+          cnt[p] = (cnt[p] || 0) + 1;
+        });
+        avg = notes.length ? (sum / notes.length) : 0;
+        $("sNotes").textContent = notes.length;
+        $("sAvg").textContent = notes.length ? avg.toFixed(1) + " ★" : "—";
+        $("sComments").textContent = state.comments.length;
+
+        var plats = Object.keys(cnt).map(function (k) { return { name: k, n: cnt[k] }; }).sort(function (a, b) { return b.n - a.n; });
+        $("sPlatform").textContent = plats.length ? plats[0].name : "—";
+        $("sPlatform").style.fontSize = plats.length && plats[0].name.length > 5 ? "1rem" : "";
+
+        var maxN = plats.length ? plats[0].n : 1;
+        $("bars").innerHTML = plats.slice(0, 4).map(function (p) {
+          return '<div class="bar-row"><span class="nm">' + esc(p.name) + '</span>' +
+            '<span class="track"><i style="width:' + Math.round(p.n / maxN * 100) + '%"></i></span>' +
+            '<span class="n">' + p.n + '</span></div>';
+        }).join("");
+
+        if (!notes.length) {
+          $("smartText").textContent = "还没有便签。贴第一张之后，这里会自动汇总平台分布、平均评分，以及大家最想看的那几本。";
+          return;
+        }
+        var top = notes.slice().sort(function (a, b) { return (b.rating || 0) - (a.rating || 0); }).slice(0, 3);
+        var topNames = top.map(function (n) { return n.book; }).join("、");
+        var platText = plats.slice(0, 2).map(function (p) { return p.name + " " + p.n + " 本"; }).join("、");
+        var best = top[0];
+        var txt = "目前共 <em>" + notes.length + "</em> 张便签，平均 <em>" + avg.toFixed(1) + " ★</em>；平台以 " + esc(platText) + " 为主。" +
+          "评分最高的是 <em>" + esc(best.book) + "</em>（" + (best.rating || 5) + "★" + (best.author ? " · " + esc(best.author) : "") + "）";
+        if (top.length > 1) txt += "，其次是 " + esc(top.slice(1).map(function (n) { return n.book; }).join("、"));
+        txt += "。";
+        if (state.comments.length) {
+          var hotBook = hotCommentBook();
+          txt += "讨论区已有 <em>" + state.comments.length + "</em> 条留言" + (hotBook ? "，聊得最多的是 <em>" + esc(hotBook) + "</em>" : "") + "。";
+        } else {
+          txt += "讨论区还空着，你可以第一个开聊。";
+        }
+        $("smartText").innerHTML = txt;
+      }
+
+      function hotCommentBook() {
+        var cnt = {};
+        state.comments.forEach(function (c) {
+          if (c.book) cnt[c.book] = (cnt[c.book] || 0) + 1;
+          else {
+            state.notes.forEach(function (n) {
+              var t = String(n.book || "").replace(/[《》]/g, "");
+              if (t && String(c.body || "").indexOf(t) > -1) cnt[n.book] = (cnt[n.book] || 0) + 1;
+            });
+          }
+        });
+        var arr = Object.keys(cnt).sort(function (a, b) { return cnt[b] - cnt[a]; });
+        return arr.length ? arr[0] : "";
+      }
+
+      /* ---------- 讨论区 ---------- */
+      function renderComments() {
+        var el = $("discList");
+        $("discCount").textContent = state.comments.length;
+        if (!state.comments.length) {
+          el.innerHTML = '<div class="empty-msg">还没有人说话，来开个头～</div>';
+          return;
+        }
+        el.innerHTML = state.comments.map(function (c) {
+          return '<div class="disc-item">' +
+            '<div class="disc-meta"><span>' + esc(c.nickname || "匿名食客") + '</span><span>' + timeAgo(c.created_at) + '</span></div>' +
+            '<div class="disc-body">' + (c.book ? '<span class="disc-book">' + esc(c.book) + '</span>' : "") + esc(c.body) + '</div>' +
+          '</div>';
+        }).join("");
+      }
+
+      /* ---------- 数据 ---------- */
+      async function loadAll() {
+        if (!cloud) return;
+        try {
+          var res = await Promise.all([
+            cloud.database.from("soda_notes").select("*").order("created_at", { ascending: false }).limit(200),
+            cloud.database.from("soda_comments").select("*").order("created_at", { ascending: false }).limit(200)
+          ]);
+          state.notes = unwrap(res[0]) || [];
+          state.comments = unwrap(res[1]) || [];
+          state.online = true;
+          $("liveTag").classList.remove("off");
+          $("liveTxt").textContent = "实时 · " + new Date().toLocaleTimeString("zh-CN", { hour12: false });
+          renderNotes(); renderSmart(); renderComments();
+        } catch (err) {
+          state.online = false;
+          $("liveTag").classList.add("off");
+          $("liveTxt").textContent = "离线 · 稍后重试";
+        }
+      }
+
+      /* ---------- 提交便签 ---------- */
+      async function submitNote() {
+        if (state.sending) return;
+        var book = $("bookName").value.trim();
+        var author = $("bookAuthor").value.trim();
+        var url = safeUrl($("bookUrl").value);
+        var manualCover = safeUrl($("coverUrl").value);
+        var intro = $("bookIntro").value.trim();
+
+        if (!book) { toast("请填写书名～"); $("bookName").focus(); return; }
+        if (state.notes.some(function (n) { return String(n.book).replace(/[《》\s]/g, "") === book.replace(/[《》\s]/g, ""); })) {
+          toast("这道菜已经点过啦～"); return;
+        }
+        if ($("bookUrl").value.trim() && !url) { toast("链接格式不对，检查一下～"); return; }
+
+        state.sending = true;
+        var btn = $("submitBtn");
+        var old = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = "正在贴便签…";
+
+        try {
+          var cover = manualCover || (state.detect && state.detect.image) || "";
+          var plat = platformOf(url);
+          if (url && !cover) {
+            btn.textContent = "正在识别封面…";
+            var d = await detectFromUrl(url);
+            if (d && d.image) { cover = d.image; }
+            if (d && d.desc && !intro) intro = d.desc.slice(0, 300);
+          }
+          await cloud.database.from("soda_notes").insert({
+            book: book,
+            author: author || null,
+            platform: plat || null,
+            url: url || null,
+            cover_url: cover || null,
+            rating: state.rating || 5,
+            intro: intro || null
+          }).select();
+
+          $("bookName").value = ""; $("bookAuthor").value = ""; $("bookUrl").value = "";
+          $("coverUrl").value = ""; $("bookIntro").value = "";
+          resetCover(); setRating(5);
+          toast("✓ 已收到，谢谢推荐 ♡");
+          await loadAll();
+        } catch (err) {
+          var msg = (err && err.code === "23505") ? "这本书已经有人贴过了～" : "提交失败：" + ((err && (err.message || err.code)) || "网络异常");
+          toast(msg);
+        } finally {
+          state.sending = false;
+          btn.disabled = false;
+          btn.textContent = old;
+        }
+      }
+
+      function resetCover() {
+        state.detect = null;
+        $("coverBox").innerHTML = '<div class="cover-plain"><div class="cover-fb">封面<small>COVER</small></div></div>';
+        $("coverTip").innerHTML = "粘贴首发平台链接后，自动识别该书的封面、平台与简介；<br>点封面可直接跳回首发平台。";
+      }
+
+      function showCover(d) {
+        var url = safeUrl($("bookUrl").value);
+        var box = $("coverBox");
+        if (!d || !d.image) {
+          resetCover();
+          $("coverTip").innerHTML = "<span class='warn'>没能自动取到封面</span>（有些平台会拦截外部抓取）。可以把封面图链接填到下面，或直接提交，会先用书名占位。";
+          return;
+        }
+        var img = '<img class="cover-img" src="' + esc(d.image) + '" alt="封面" referrerpolicy="no-referrer" data-proxy="' +
+          esc("https://images.weserv.nl/?url=" + encodeURIComponent(d.image.replace(/^https?:\/\//, ""))) +
+          '" onerror="SodaCover.err(this)">' +
+          '<div class="cover-fb" style="display:none;">封面<small>NO COVER</small></div>';
+        box.innerHTML = (url ? '<a href="' + esc(url) + '" target="_blank" rel="noopener noreferrer" title="打开首发平台">' + img + '</a>' : '<div class="cover-plain">' + img + '</div>');
+        var plat = platformOf(url);
+        $("coverTip").innerHTML = "<b>✓ 已识别封面</b>" + (plat ? " · 平台：<b>" + esc(plat) + "</b>" : "") + (d.title ? "<br>原标题：" + esc(d.title).slice(0, 60) : "") + "<br>点封面可跳转首发平台。";
+      }
+
+      function fillFromDetect(d) {
+        if (!d) return;
+        if (d.title) {
+          var m = d.title.match(/《([^》]{1,60})》/);
+          if (m && !$("bookName").value.trim()) $("bookName").value = "《" + m[1] + "》";
+        }
+        if (d.desc && !$("bookIntro").value.trim()) $("bookIntro").value = d.desc.slice(0, 300);
+      }
+
+      /* ---------- 评分 ---------- */
+      var RATING_TXT = { 1: "1 星 · 不太行", 2: "2 星 · 一般般", 3: "3 星 · 可以尝", 4: "4 星 · 挺想吃", 5: "5 星 · 强推！" };
+      function setRating(v) {
+        state.rating = v;
+        var bs = document.querySelectorAll("#stars .star");
+        for (var i = 0; i < bs.length; i++) {
+          bs[i].classList.toggle("on", Number(bs[i].getAttribute("data-v")) <= v);
+        }
+        $("starTxt").textContent = RATING_TXT[v] || "";
+      }
+
+      /* ---------- 讨论 ---------- */
+      async function postComment() {
+        if (state.posting) return;
+        var body = $("discBody").value.trim();
+        if (!body) { toast("说点什么再发～"); $("discBody").focus(); return; }
+        state.posting = true;
+        try {
+          await cloud.database.from("soda_comments").insert({
+            nickname: $("discNick").value.trim().slice(0, 16) || null,
+            body: body.slice(0, 200),
+            book: $("discBook").value || null
+          }).select();
+          $("discBody").value = "";
+          toast("✓ 已发出 ♡");
+          await loadAll();
+        } catch (err) {
+          toast("发送失败：" + ((err && (err.message || err.code)) || "网络异常"));
+        } finally {
+          state.posting = false;
+        }
+      }
+
+      /* ---------- 事件 ---------- */
+      $("stars").addEventListener("click", function (e) {
+        var b = e.target.closest(".star");
+        if (b) setRating(Number(b.getAttribute("data-v")));
+      });
+      $("detectBtn").addEventListener("click", async function () {
+        var url = safeUrl($("bookUrl").value);
+        if (!url) { toast("先贴上首发平台链接～"); $("bookUrl").focus(); return; }
+        var btn = this;
+        btn.disabled = true; btn.textContent = "识别中…";
+        $("coverTip").textContent = "正在读取封面，最多等 20 秒…";
+        try {
+          var d = await detectFromUrl(url);
+          state.detect = d;
+          showCover(d);
+          fillFromDetect(d);
+          if (!d || !d.image) toast("没取到封面，可手填封面图链接");
+        } finally {
+          btn.disabled = false; btn.textContent = "识别封面";
+        }
+      });
+      var autoT = null;
+      $("bookUrl").addEventListener("input", function () {
+        clearTimeout(autoT);
+        var url = safeUrl(this.value);
+        if (!url) { resetCover(); return; }
+        var plat = platformOf(url);
+        if (plat) $("coverTip").innerHTML = "识别到平台：<b>" + esc(plat) + "</b>，正在读封面…";
+        autoT = setTimeout(async function () {
+          var d = await detectFromUrl(url);
+          state.detect = d;
+          if (safeUrl($("bookUrl").value) !== url) return;
+          showCover(d);
+          fillFromDetect(d);
+        }, 700);
+      });
+      $("submitBtn").addEventListener("click", submitNote);
+      $("discBtn").addEventListener("click", postComment);
+      $("discBody").addEventListener("keydown", function (e) { if (e.key === "Enter") postComment(); });
+
+      /* ---------- 启动 ---------- */
+      setRating(5);
+      if (!cloud) {
+        $("liveTxt").textContent = "云端加载失败，请刷新";
+        $("smartText").textContent = "云端组件没有加载成功，请检查网络后刷新页面。";
+        return;
+      }
+      (async function boot() {
+        await loadAll();
+        setInterval(loadAll, 6000);
+      })();
+    })();
+    </script>
 </body>
 </html>
