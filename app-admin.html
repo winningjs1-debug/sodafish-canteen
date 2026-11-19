@@ -371,6 +371,11 @@ textarea.search{resize:vertical;line-height:1.6}
       <button class="btn sm" id="avatarPick" type="button">上传图片</button>
       <button class="btn primary" id="avatarSave" type="button">保存头像</button>
       <p class="note" id="avatarMsg"></p>
+      <h3 style="margin-top:6px">店内公告板</h3>
+      <p class="note">写的话会展示在主页招牌旁边的公告板上（留空则不显示公告板）：</p>
+      <textarea class="search" id="noticeText" rows="4" maxlength="500" placeholder="比如：本周五晚 8 点上新 🍮 前 10 位半票！欢迎常来～" style="width:100%;resize:vertical"></textarea>
+      <button class="btn primary" id="noticeSave" type="button">保存公告</button>
+      <p class="note" id="noticeMsg"></p>
       <h3 style="margin-top:6px">说明</h3>
       <p class="note">读者下单拿单号+凭证 → 扫码赞赏并备注单号 → 你在这里核对 → 填网盘链接与提取码点「确认发放」→ 读者在菜单页「🧾 我的订单」凭凭证领取。</p>
     </aside>
@@ -569,7 +574,7 @@ textarea.search{resize:vertical;line-height:1.6}
   };
   var unwrap = function (r) { if (r && r.error) throw r.error; return r ? r.data : null; };
 
-  var state = { ballots: [], books: {}, bookRows: [], tally: {}, overview: {}, notes: [], comments: [], shop: [], qr: "", avatar: "", tab: "orders", filter: "all", q: "", ready: false, editing: null };
+  var state = { ballots: [], books: {}, bookRows: [], tally: {}, overview: {}, notes: [], comments: [], shop: [], qr: "", avatar: "", notice: "", tab: "orders", filter: "all", q: "", ready: false, editing: null };
 
   /* ---------- 口令 ---------- */
   function unlock() {
@@ -620,6 +625,7 @@ textarea.search{resize:vertical;line-height:1.6}
       sv.forEach(function (r) { settings[r.key] = r.value; });
       state.qr = settings.wechat_qr || "";
       state.avatar = settings.admin_avatar || "";
+      state.notice = settings.shop_notice || "";
       $("errBox").hidden = true;
       $("liveTxt").textContent = "实时 · " + new Date().toLocaleTimeString("zh-CN", { hour12: false });
       render();
@@ -672,6 +678,8 @@ textarea.search{resize:vertical;line-height:1.6}
       $("avatarImg").src = state.avatar; $("avatarImg").hidden = false; $("avatarFb").hidden = true;
       $("avatarImg").onerror = function () { $("avatarImg").hidden = true; $("avatarFb").hidden = false; };
     }
+    /* 店内公告：只在输入框还空着时回填，避免覆盖正在编辑的内容 */
+    if (!$("noticeText").value && state.notice) $("noticeText").value = state.notice;
 
     var q = state.q.toLowerCase();
     var list = state.shop.filter(function (s) {
@@ -1003,7 +1011,8 @@ textarea.search{resize:vertical;line-height:1.6}
     reader.onload = function () {
       var img = new Image();
       img.onload = function () {
-        var maxW = 420, maxH = 640;
+        /* 高清封面：分辨率提到 760×1140，画质不足时逐步降质量兜底，不超云端上限 */
+        var maxW = 760, maxH = 1140;
         var scale = Math.min(maxW / img.width, maxH / img.height, 1);
         var cw = Math.max(1, Math.round(img.width * scale));
         var ch = Math.max(1, Math.round(img.height * scale));
@@ -1013,7 +1022,12 @@ textarea.search{resize:vertical;line-height:1.6}
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, cw, ch);
         ctx.drawImage(img, 0, 0, cw, ch);
-        cb(cv.toDataURL("image/jpeg", 0.8));
+        var LIMIT = 650000, qs = [0.85, 0.78, 0.7, 0.6];
+        for (var i = 0; i < qs.length; i++) {
+          var data = cv.toDataURL("image/jpeg", qs[i]);
+          if (data.length <= LIMIT) { cb(data); return; }
+        }
+        cb(cv.toDataURL("image/jpeg", 0.5));
       };
       img.onerror = function () { cb(null); };
       img.src = reader.result;
@@ -1235,6 +1249,21 @@ textarea.search{resize:vertical;line-height:1.6}
       $("avatarImg").onerror = function () { $("avatarImg").hidden = true; $("avatarFb").hidden = false; };
     } catch (err) {
       $("avatarMsg").textContent = "保存失败：" + ((err && err.message) || "网络异常");
+    }
+  });
+
+  /* 店内公告板：保存到 soda_settings.shop_notice，主页招牌旁的公告板实时展示 */
+  $("noticeSave").addEventListener("click", async function () {
+    var v = ($("noticeText").value || "").trim();
+    if (!v) { $("noticeMsg").textContent = "写点公告再保存（清空保存可下架公告板）。"; return; }
+    $("noticeMsg").textContent = "保存中…";
+    try {
+      var r = unwrap(await cloud.database.rpc("soda_admin_set_setting", { p_pass: ADMIN_PASS, p_key: "shop_notice", p_value: v }));
+      if (r && r.error) { $("noticeMsg").textContent = r.error; return; }
+      state.notice = v;
+      $("noticeMsg").textContent = "已保存，主页公告板马上更新 ♡";
+    } catch (err) {
+      $("noticeMsg").textContent = "保存失败：" + ((err && err.message) || "网络异常");
     }
   });
 
