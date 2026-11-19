@@ -165,7 +165,7 @@
         body.dark-mode .price-wait { background: rgba(168, 123, 90, 0.2); color: #d4b08f; border-color: rgba(232, 220, 200, 0.2); }
         body.dark-mode .price-new { background: rgba(209, 91, 91, 0.2); color: #f09b9b; border-color: rgba(244, 194, 194, 0.2); }
         body.dark-mode .price-free { background: rgba(0, 137, 123, 0.2); color: #74d4c7; border-color: rgba(178, 223, 219, 0.2); }
-        .bookmark-ribbon { position: absolute; top: -1px; right: 15px; width: 20px; height: 30px; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%); opacity: 0.8; box-shadow: 1px 2px 3px rgba(0,0,0,0.1); }
+        .bookmark-ribbon { position: absolute; top: -1px; right: 15px; width: 20px; height: 30px; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%); opacity: 0.8; box-shadow: 1px 2px 3px rgba(0,0,0,0.1); z-index: 6; }
         .ribbon-pink { background: #d49a9a; } .ribbon-blue { background: #a2b9c4; } .ribbon-green { background: #9abca2; } .ribbon-yellow { background: #dcc197; }
         .order-btn { margin-top: 1rem; padding: 0.4rem 0; font-family: var(--font-body); font-size: 0.95rem; font-weight: bold; border: 1px dashed var(--ink-sub); border-radius: 20px; background: transparent; color: var(--ink-main); cursor: pointer; transition: all 0.2s; width: 100%; }
         .order-btn:hover { background: var(--wrapper-border); } .order-btn.added { background: var(--primary); color: #fff; border-style: solid; border-color: var(--primary); cursor: not-allowed; opacity: 0.8; }
@@ -370,7 +370,9 @@
         .cover-box img { width: 100%; height: 100%; object-fit: contain; object-position: center; display: block; background: transparent; }
         /* 窄屏下让封面随卡片自适应，避免被 max-height 挤压 */
         @media (max-width: 560px) {
-            .cover-box { max-height: none; }
+            .cover-box { aspect-ratio: 4 / 5; max-height: 185px; }
+            .book-card { padding-bottom: 1rem; }
+            .book-note { margin-top: 0.5rem; padding-top: 0.5rem; }
             /* 两列窄卡防重叠：编号标签缩小左移、图钉缩小、丝带收窄，三者互不接触 */
             .menu-tag { top: -10px; left: 8px; padding: 0.15rem 0.55rem; font-size: 0.7rem; letter-spacing: 0.5px; }
             .book-card::before { font-size: 0.9rem; top: -9px; filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.18)); }
@@ -412,6 +414,7 @@
         .tip-section::before { content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(2deg); width: 64px; height: 18px; background: var(--tape-yellow, rgba(220,193,151,0.75)); background: rgba(220,193,151,0.75); border-radius: 2px; }
         .tip-section h3 { font-family: var(--font-chinese-title); font-size: 1.45rem; margin-bottom: 0.5rem; }
         .tip-section p { color: var(--ink-sub); font-size: 0.92rem; }
+        .tip-open-btn { margin-top: 1.2rem; font-size: 1.02rem; padding: 0.55rem 1.8rem; }
 
         /* 移动端底部 tab */
         .tabbar-mobile {
@@ -432,8 +435,9 @@
         @media (max-width: 900px) {
             .layout2col { grid-template-columns: 1fr; }
             .filter-card { position: static; }
-            .filter-card .filter-group { flex-direction: row; flex-wrap: wrap; }
-            .filter-card .btn-sticker { flex: none; justify-content: center; }
+            /* 两列等宽网格：全部上菜/只要主菜 一排，只要甜点对齐在全部上菜正下方 */
+            .filter-card .filter-group { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.55rem; }
+            .filter-card .btn-sticker { justify-content: center; width: 100%; }
             .filter-mini { display: none; }
         }
         @media (max-width: 768px) {
@@ -562,11 +566,8 @@
 
         <section class="tip-section" id="tip" hidden>
             <h3>☕ 请主厨喝杯汽水</h3>
-            <p>每道菜都是主厨手工精排的，如果吃得开心，长按识别赞赏码请主厨喝杯汽水吧 ♡</p>
-            <div class="qr-slot" style="margin:1.2rem auto 0.6rem; max-width:220px;">
-                <img id="tipImg" alt="主厨赞赏码" referrerpolicy="no-referrer">
-                <p class="qr-cap">长按识别 · 微信扫码赞赏</p>
-            </div>
+            <p>每道菜都是主厨手工精排的，如果吃得开心，点下方按钮打开赞赏码请主厨喝杯汽水吧 ♡</p>
+            <button class="btn-sticker tip-open-btn" type="button" id="tipOpenBtn">🎫 打开赞赏码</button>
         </section>
 
         <footer>✦ SodaFish 私人食堂 · 翻页留香 ✦<br><a class="shop-link" href="notes.html">去写点菜便签 →</a> &nbsp; <a class="shop-link" href="admin.html">店主入口 →</a></footer>
@@ -1125,8 +1126,7 @@
           state.qr = qr;
           if (qr) {
             $("qrImg").src = qr; $("qrSlot").hidden = false;
-            $("tipImg").src = qr; $("tip").hidden = false;
-            $("tipImg").onerror = function () { $("tip").hidden = true; };
+            $("tip").hidden = false;
           }
           /* 店铺招牌：店主头像（后台「店主头像」上传的 admin_avatar） */
           var av = map.admin_avatar || "";
@@ -1168,6 +1168,8 @@
         if (!btn) return;
         showTipModal(btn.getAttribute("data-tiporder"), false);
       });
+      /* 底部赞赏区：点击按钮弹出赞赏码弹窗（可 × / 遮罩 / Esc 关闭） */
+      $("tipOpenBtn").addEventListener("click", function () { showTipModal("", false); });
       function pickupChip(s) {
         var map = { "待核对": ["wait", "🍳 备餐中 · 待店主核对赞赏"], "已核对": ["ok", "👍 已核对 · 准备出餐"], "已发放": ["done", "✅ 已出餐 · 可凭凭证领取"], "已驳回": ["no", "🚫 已取消"] };
         var m = map[s] || ["wait", "🍳 备餐中"];
