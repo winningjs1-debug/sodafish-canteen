@@ -130,12 +130,12 @@
         }
         .shop-sign .sign-utensil svg { width: 100%; height: 100%; display: block; }
         .shop-sign .sign-knife {
-            top: 28px; width: 34px; height: 78px;
-            left: calc(50% - 90px); transform: rotate(-10deg);
+            top: 30px; width: 24px; height: 72px;
+            left: calc(50% - 82px); transform: rotate(-10deg);
         }
         .shop-sign .sign-fork {
-            top: 30px; width: 29px; height: 74px;
-            left: calc(50% + 55px); transform: rotate(10deg);
+            top: 32px; width: 24px; height: 70px;
+            left: calc(50% + 56px); transform: rotate(10deg);
         }
         .shop-sign:hover .sign-knife, .shop-sign:focus .sign-knife { transform: rotate(-16deg) translateY(-2px); }
         .shop-sign:hover .sign-fork, .shop-sign:focus .sign-fork { transform: rotate(16deg) translateY(-2px); }
@@ -146,8 +146,8 @@
         body.dark-mode .shop-sign .sign-frame::after { border-color: rgba(220, 193, 151, 0.3); }
         @media (max-width: 560px) {
             .shop-sign .sign-frame { width: 72px; height: 72px; }
-            .shop-sign .sign-knife { top: 28px; width: 27px; height: 62px; left: calc(50% - 74px); }
-            .shop-sign .sign-fork { top: 30px; width: 23px; height: 58px; left: calc(50% + 46px); }
+            .shop-sign .sign-knife { top: 30px; width: 19px; height: 57px; left: calc(50% - 68px); }
+            .shop-sign .sign-fork { top: 33px; width: 19px; height: 55px; left: calc(50% + 47px); }
             .shop-sign .sign-fb { font-size: 2rem; }
             .shop-sign .sign-tape { width: 52px; }
             .shop-sign { margin-bottom: 0; }
@@ -158,8 +158,8 @@
         body.dark-mode .title-english { color: #86a895; }
         .title-chinese { font-family: var(--font-chinese-title); font-size: 3rem; letter-spacing: 2px; position: relative; }
         .title-chinese::after { content: '〰〰〰'; position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); font-size: 1.5rem; color: #c98d8d; letter-spacing: -2px; }
-        header p { color: var(--ink-sub); font-size: 0.58rem; margin-top: 2rem; letter-spacing: 1.6px; white-space: nowrap; }
-        @media (max-width: 560px) { header p { font-size: 0.5rem; letter-spacing: 1px; margin-top: 1.4rem; } }
+        header p { color: var(--ink-sub); font-size: clamp(13px, 3.4vw, 17px); margin-top: 2rem; letter-spacing: 1.8px; white-space: nowrap; }
+        @media (max-width: 560px) { header p { font-size: clamp(13px, 3.5vw, 15px); letter-spacing: 1.2px; margin-top: 1.4rem; } }
         header::before { content: '🐟'; position: absolute; left: 10%; top: 20px; font-size: 2.5rem; transform: rotate(-20deg); opacity: 0.8; }
         header::after { content: '🍰'; position: absolute; right: 10%; top: 20px; font-size: 2.5rem; transform: rotate(15deg); opacity: 0.8; }
         .list-section { margin-bottom: 3.5rem; position: relative; } .list-section.hidden { display: none; }
@@ -222,8 +222,8 @@
         .success-box button { padding: 0.5rem 2rem; border-radius: 20px; border: 1px dashed var(--ink-sub); background: transparent; cursor: pointer; font-family: var(--font-body); color: var(--ink-main); }
         #backToTop { position: fixed; bottom: 25px; right: 32px; width: 45px; height: 45px; border-radius: 50%; background: var(--card-bg); color: var(--ink-main); border: 1px dashed var(--ink-sub); font-size: 1.3rem; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 2px 3px 10px rgba(0,0,0,0.1); opacity: 0; visibility: hidden; transform: translateY(20px); transition: all 0.3s; z-index: 100; }
         #backToTop.show { opacity: 1; visibility: visible; transform: translateY(0); }
-        footer { text-align: center; margin-top: 4rem; font-family: var(--font-chinese-title); font-size: 0.68rem; color: var(--ink-sub); letter-spacing: 1.8px; border-top: 2px dashed var(--wrapper-border); padding-top: 2rem; white-space: nowrap; }
-        @media (max-width: 560px) { footer { font-size: 0.55rem; margin-top: 2.6rem; padding-top: 1.5rem; letter-spacing: 1.4px; } }
+        footer { text-align: center; margin-top: 4rem; font-family: var(--font-chinese-title); font-size: clamp(13.5px, 3.6vw, 17.5px); color: var(--ink-sub); letter-spacing: 1.8px; border-top: 2px dashed var(--wrapper-border); padding-top: 2rem; white-space: nowrap; }
+        @media (max-width: 560px) { footer { font-size: clamp(13.5px, 3.7vw, 15.5px); margin-top: 2.6rem; padding-top: 1.5rem; letter-spacing: 1.2px; } }
 
         /* ================= 版本一专属：复古车票餐牌 ================= */
         .menu-tag {
@@ -623,12 +623,12 @@
             <div class="shop-head">
                 <a class="shop-sign" href="admin.html" id="shopSign" title="店主后台 · 进店打理">
                     <span class="sign-tape"></span>
-                    <span class="sign-utensil sign-knife" aria-hidden="true"><svg viewBox="0 0 16 34" xmlns="http://www.w3.org/2000/svg"><path d="M8 1 C11 5.5 12 11 10.2 16 L9.4 16.2 L9.4 33 L6.8 33 L6.8 16.2 L5.8 16 C4 11 5 5.5 8 1 Z" fill="currentColor"/></svg></span>
+                    <span class="sign-utensil sign-knife" aria-hidden="true"><svg viewBox="0 0 24 72" xmlns="http://www.w3.org/2000/svg"><path d="M8.9 27.6V12.6C8.9 6.8 10.3 2.9 13 1.5C15.7 4.3 16.9 9.2 16.6 14.7C16.3 20 15.2 24.6 14.1 27.6Z" fill="currentColor"/><path d="M10.6 4.6C9.9 9 9.7 14.6 10 19.8" fill="none" stroke="var(--card-bg)" stroke-width="0.6" stroke-linecap="round" opacity="0.3"/><path d="M14.9 6.2C15.9 10.4 16.1 15 15.7 19.6" fill="none" stroke="var(--card-bg)" stroke-width="0.5" stroke-linecap="round" opacity="0.25"/><rect x="7.9" y="27.6" width="8.2" height="3" rx="1" fill="currentColor"/><path d="M8.6 28.9h6.8M8.6 29.9h6.8" fill="none" stroke="var(--card-bg)" stroke-width="0.4" opacity="0.35"/><path d="M9.6 30.6C8.9 35 8.8 41 9.3 47C9.7 53 9.7 59 9.8 63.8C9.9 67.4 10.8 69.6 12 69.6C13.2 69.6 14.1 67.4 14.2 63.8C14.3 59 14.3 53 14.7 47C15.2 41 15.1 35 14.4 30.6Z" fill="currentColor"/><path d="M10.6 34v30" fill="none" stroke="var(--card-bg)" stroke-width="0.65" stroke-linecap="round" opacity="0.26"/><circle cx="12" cy="38.6" r="1.05" fill="var(--card-bg)" opacity="0.5"/><circle cx="12" cy="57.4" r="1.05" fill="var(--card-bg)" opacity="0.5"/></svg></span>
                     <span class="sign-frame">
                         <img id="signAvatar" alt="店主头像" hidden referrerpolicy="no-referrer">
                         <span class="sign-fb" id="signFb">🐟</span>
                     </span>
-                    <span class="sign-utensil sign-fork" aria-hidden="true"><svg viewBox="0 0 14 34" xmlns="http://www.w3.org/2000/svg"><path d="M2.6 1 L2.6 9.5 C2.6 12.6 4.4 14.6 5.7 15 L5.7 33 L8.3 33 L8.3 15 C9.6 14.6 11.4 12.6 11.4 9.5 L11.4 1 L9.9 1 L9.9 9 L8.3 9 L8.3 1 L5.7 1 L5.7 9 L4.1 9 L4.1 1 Z" fill="currentColor"/></svg></span>
+                    <span class="sign-utensil sign-fork" aria-hidden="true"><svg viewBox="0 0 24 72" xmlns="http://www.w3.org/2000/svg"><rect x="5.6" y="2.2" width="2" height="13.8" rx="1" fill="currentColor"/><rect x="9.2" y="2.2" width="2" height="15.2" rx="1" fill="currentColor"/><rect x="12.8" y="2.2" width="2" height="15.2" rx="1" fill="currentColor"/><rect x="16.4" y="2.2" width="2" height="13.8" rx="1" fill="currentColor"/><path d="M5.6 13.5H18.4C18.4 19.8 15.6 23.6 12 24.2C8.4 23.6 5.6 19.8 5.6 13.5Z" fill="currentColor"/><path d="M9.8 23.6C10.4 27 10.4 29 10.2 31.4H13.8C13.6 29 13.6 27 14.2 23.6Z" fill="currentColor"/><rect x="7.8" y="31.4" width="8.4" height="2.2" rx="1.1" fill="currentColor" opacity="0.6"/><path d="M9.6 33.6C8.9 38 8.8 44 9.3 50C9.7 55 9.7 60 9.8 63.6C9.9 67.2 10.8 69.4 12 69.4C13.2 69.4 14.1 67.2 14.2 63.6C14.3 60 14.3 55 14.7 50C15.2 44 15.1 38 14.4 33.6Z" fill="currentColor"/><path d="M10.6 37v28" fill="none" stroke="var(--card-bg)" stroke-width="0.65" stroke-linecap="round" opacity="0.26"/><circle cx="12" cy="41.6" r="1.05" fill="var(--card-bg)" opacity="0.5"/><circle cx="12" cy="58.4" r="1.05" fill="var(--card-bg)" opacity="0.5"/></svg></span>
                     <span class="sign-label">店主掌勺 · 进店打理</span>
                 </a>
             </div>
