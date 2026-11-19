@@ -122,12 +122,32 @@
             border: 1px dashed var(--ink-sub); padding: 0.15rem 0.8rem; border-radius: 20px;
             box-shadow: 2px 2px 0 rgba(0,0,0,0.05); white-space: nowrap;
         }
+        /* 招牌两侧的餐刀与餐叉：手绘风剪影，与虚线圆框同色，高度接近头像框 */
+        .shop-sign { position: relative; }
+        .shop-sign .sign-utensil {
+            position: absolute; pointer-events: none;
+            color: var(--ink-sub); opacity: 0.8;
+        }
+        .shop-sign .sign-utensil svg { width: 100%; height: 100%; display: block; }
+        .shop-sign .sign-knife {
+            top: 28px; width: 34px; height: 78px;
+            left: calc(50% - 90px); transform: rotate(-10deg);
+        }
+        .shop-sign .sign-fork {
+            top: 30px; width: 29px; height: 74px;
+            left: calc(50% + 55px); transform: rotate(10deg);
+        }
+        .shop-sign:hover .sign-knife, .shop-sign:focus .sign-knife { transform: rotate(-16deg) translateY(-2px); }
+        .shop-sign:hover .sign-fork, .shop-sign:focus .sign-fork { transform: rotate(16deg) translateY(-2px); }
+        .sign-frame, .sign-knife, .sign-fork { transition: transform 0.25s ease; }
         .shop-sign:hover .sign-frame, .shop-sign:focus .sign-frame { transform: scale(1.07) rotate(3deg); box-shadow: 4px 6px 0 rgba(0,0,0,0.1); }
         .shop-sign:hover .sign-label { color: var(--ink-main); }
         body.dark-mode .shop-sign .sign-tape { background: rgba(220, 193, 151, 0.35); }
         body.dark-mode .shop-sign .sign-frame::after { border-color: rgba(220, 193, 151, 0.3); }
         @media (max-width: 560px) {
             .shop-sign .sign-frame { width: 72px; height: 72px; }
+            .shop-sign .sign-knife { top: 28px; width: 27px; height: 62px; left: calc(50% - 74px); }
+            .shop-sign .sign-fork { top: 30px; width: 23px; height: 58px; left: calc(50% + 46px); }
             .shop-sign .sign-fb { font-size: 2rem; }
             .shop-sign .sign-tape { width: 52px; }
             .shop-sign { margin-bottom: 0; }
@@ -138,7 +158,8 @@
         body.dark-mode .title-english { color: #86a895; }
         .title-chinese { font-family: var(--font-chinese-title); font-size: 3rem; letter-spacing: 2px; position: relative; }
         .title-chinese::after { content: '〰〰〰'; position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); font-size: 1.5rem; color: #c98d8d; letter-spacing: -2px; }
-        header p { color: var(--ink-sub); font-size: 1rem; margin-top: 2rem; letter-spacing: 2px; }
+        header p { color: var(--ink-sub); font-size: 0.58rem; margin-top: 2rem; letter-spacing: 1.6px; white-space: nowrap; }
+        @media (max-width: 560px) { header p { font-size: 0.5rem; letter-spacing: 1px; margin-top: 1.4rem; } }
         header::before { content: '🐟'; position: absolute; left: 10%; top: 20px; font-size: 2.5rem; transform: rotate(-20deg); opacity: 0.8; }
         header::after { content: '🍰'; position: absolute; right: 10%; top: 20px; font-size: 2.5rem; transform: rotate(15deg); opacity: 0.8; }
         .list-section { margin-bottom: 3.5rem; position: relative; } .list-section.hidden { display: none; }
@@ -201,7 +222,8 @@
         .success-box button { padding: 0.5rem 2rem; border-radius: 20px; border: 1px dashed var(--ink-sub); background: transparent; cursor: pointer; font-family: var(--font-body); color: var(--ink-main); }
         #backToTop { position: fixed; bottom: 25px; right: 32px; width: 45px; height: 45px; border-radius: 50%; background: var(--card-bg); color: var(--ink-main); border: 1px dashed var(--ink-sub); font-size: 1.3rem; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 2px 3px 10px rgba(0,0,0,0.1); opacity: 0; visibility: hidden; transform: translateY(20px); transition: all 0.3s; z-index: 100; }
         #backToTop.show { opacity: 1; visibility: visible; transform: translateY(0); }
-        footer { text-align: center; margin-top: 4rem; font-family: var(--font-chinese-title); font-size: 1.2rem; color: var(--ink-sub); letter-spacing: 2px; border-top: 2px dashed var(--wrapper-border); padding-top: 2rem; }
+        footer { text-align: center; margin-top: 4rem; font-family: var(--font-chinese-title); font-size: 0.68rem; color: var(--ink-sub); letter-spacing: 1.8px; border-top: 2px dashed var(--wrapper-border); padding-top: 2rem; white-space: nowrap; }
+        @media (max-width: 560px) { footer { font-size: 0.55rem; margin-top: 2.6rem; padding-top: 1.5rem; letter-spacing: 1.4px; } }
 
         /* ================= 版本一专属：复古车票餐牌 ================= */
         .menu-tag {
@@ -544,7 +566,20 @@
             text-align: center; padding: 1.5rem 2.1rem; border: 1px dashed var(--ink-sub); border-radius: 10px;
             background: var(--card-bg); box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.05); max-width: 78vw;
         }
-        .soda-boot-card .emoji { font-size: 2rem; display: block; animation: sodaFloat 1.6s ease-in-out infinite; }
+        .soda-boot-card .boot-av {
+            width: 64px; height: 64px; margin: 0 auto; border-radius: 50%;
+            border: 2px dashed var(--ink-sub); padding: 5px; background: var(--card-bg);
+            display: flex; align-items: center; justify-content: center;
+            position: relative; overflow: hidden;
+            animation: sodaFloat 1.6s ease-in-out infinite;
+        }
+        /* 内圈邮票齿孔细线，与招牌头像同款 */
+        .soda-boot-card .boot-av::after {
+            content: ''; position: absolute; inset: 2px; border-radius: 50%;
+            border: 1px dashed rgba(120, 96, 68, 0.35); pointer-events: none;
+        }
+        .soda-boot-card .boot-av img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; }
+        .soda-boot-card .boot-fb { font-size: 1.7rem; line-height: 1; }
         .soda-boot-card .txt { font-family: var(--font-chinese-title); font-size: 1.05rem; color: var(--ink-main); letter-spacing: 1px; display: block; margin-top: 0.45rem; }
         .soda-boot-card .sub { font-family: 'Space Mono', monospace; font-size: 0.64rem; letter-spacing: 2px; color: var(--ink-sub); display: block; margin-top: 0.25rem; }
         .soda-boot-card .retry {
@@ -557,7 +592,10 @@
 <body>
     <div id="sodaBoot">
         <div class="soda-boot-card">
-            <span class="emoji">🐟</span>
+            <span class="boot-av">
+                <img id="sodaBootAvatar" alt="店主头像" hidden referrerpolicy="no-referrer">
+                <span class="boot-fb" id="sodaBootFb">🐟</span>
+            </span>
             <span class="txt" id="sodaBootTxt">正在摆桌…</span>
             <span class="sub" id="sodaBootSub">WELCOME TO SODAFISH</span>
             <button class="retry" type="button" id="sodaBootRetry" hidden>重新连接</button>
@@ -585,10 +623,12 @@
             <div class="shop-head">
                 <a class="shop-sign" href="admin.html" id="shopSign" title="店主后台 · 进店打理">
                     <span class="sign-tape"></span>
+                    <span class="sign-utensil sign-knife" aria-hidden="true"><svg viewBox="0 0 16 34" xmlns="http://www.w3.org/2000/svg"><path d="M8 1 C11 5.5 12 11 10.2 16 L9.4 16.2 L9.4 33 L6.8 33 L6.8 16.2 L5.8 16 C4 11 5 5.5 8 1 Z" fill="currentColor"/></svg></span>
                     <span class="sign-frame">
                         <img id="signAvatar" alt="店主头像" hidden referrerpolicy="no-referrer">
                         <span class="sign-fb" id="signFb">🐟</span>
                     </span>
+                    <span class="sign-utensil sign-fork" aria-hidden="true"><svg viewBox="0 0 14 34" xmlns="http://www.w3.org/2000/svg"><path d="M2.6 1 L2.6 9.5 C2.6 12.6 4.4 14.6 5.7 15 L5.7 33 L8.3 33 L8.3 15 C9.6 14.6 11.4 12.6 11.4 9.5 L11.4 1 L9.9 1 L9.9 9 L8.3 9 L8.3 1 L5.7 1 L5.7 9 L4.1 9 L4.1 1 Z" fill="currentColor"/></svg></span>
                     <span class="sign-label">店主掌勺 · 进店打理</span>
                 </a>
             </div>
@@ -1230,6 +1270,13 @@
           /* 店铺招牌：店主头像（后台「店主头像」上传的 admin_avatar） */
           var av = map.admin_avatar || "";
           if (av) {
+            try { localStorage.setItem("sodaBootAvatar", av); } catch (e) {}
+            /* 启动屏还在转圈时，实时把头像喂给它 */
+            var bimg = $("sodaBootAvatar"), bfb = $("sodaBootFb");
+            if (bimg && bimg.hidden && bimg.src !== av) {
+              bimg.src = av; bimg.hidden = false; if (bfb) bfb.hidden = true;
+              bimg.onerror = function () { bimg.hidden = true; if (bfb) bfb.hidden = false; };
+            }
             var si = $("signAvatar");
             si.src = av; si.hidden = false; $("signFb").hidden = true;
             si.onerror = function () { si.hidden = true; $("signFb").hidden = false; };
@@ -1536,6 +1583,15 @@
         var wantDark = forceDark;
         try { wantDark = forceDark || localStorage.getItem("sodaTheme") === "dark"; } catch (e) { wantDark = forceDark; }
         if (wantDark) { document.body.classList.add("dark-mode"); $("themeToggle").textContent = "☀️"; }
+        /* 启动屏加载图标：优先用上次缓存的店主头像（会浮动），没缓存则回退 🐟 */
+        try {
+          var bav = localStorage.getItem("sodaBootAvatar");
+          if (bav) {
+            var bimg0 = $("sodaBootAvatar"), bfb0 = $("sodaBootFb");
+            bimg0.src = bav; bimg0.hidden = false; bfb0.hidden = true;
+            bimg0.onerror = function () { bimg0.hidden = true; bfb0.hidden = false; };
+          }
+        } catch (e) {}
         window.addEventListener("error", function () { if (!bootDone) bootFail("页面加载出了点状况"); });
         var rb = $("sodaBootRetry");
         if (rb) rb.addEventListener("click", function () { location.reload(); });
