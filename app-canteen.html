@@ -228,7 +228,7 @@
 
         @media (max-width: 1024px) { .grid-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.2rem; } .wrapper { padding: 2rem 1.5rem; } .title-english { font-size: 4rem; } .title-chinese { font-size: 2.6rem; } }
         @media (max-width: 768px) { body { padding: 1.5rem 1rem; } .toolbar { justify-content: center; flex-direction: column; padding: 0; } .filter-group { justify-content: center; width: 100%; } .filter-group .btn-sticker { flex: none; justify-content: center; } .title-english { font-size: 3rem; } .title-chinese { font-size: 2rem; } header::before, header::after { display: none; } .panel { max-width: 100%; right: -100%; } }
-        @media (max-width: 480px) { body { padding: 1rem 0.5rem; } .wrapper { padding: 1.5rem 1rem; } .title-english { font-size: 2.5rem; } .title-chinese { font-size: 1.6rem; } .grid-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; } .book-card { padding: 1.6rem 0.8rem 1.1rem; } .book-name { font-size: 1.12rem; } .book-note { font-size: 0.85rem; } .float-group { bottom: 80px; right: 15px; gap: 10px; } .cart-float, .rank-float { width: 45px; height: 45px; font-size: 1.3rem; } #backToTop { bottom: 15px; right: 18px; width: 40px; height: 40px; } }
+        @media (max-width: 480px) { body { padding: 1rem 0.5rem; } .wrapper { padding: 1.5rem 1rem; } .title-english { font-size: 2.5rem; } .title-chinese { font-size: 1.6rem; } .grid-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; } .book-card { padding: 1.6rem 0.8rem 1.1rem; } .book-name { font-size: 1.12rem; } .book-note { font-size: 0.85rem; } .menu-tag { padding: 0.12rem 0.45rem; font-size: 0.66rem; top: -9px; left: 6px; } .book-card::before { font-size: 0.82rem; top: -8px; } .bookmark-ribbon { right: 7px; width: 12px; height: 20px; } .float-group { bottom: 80px; right: 15px; gap: 10px; } .cart-float, .rank-float { width: 45px; height: 45px; font-size: 1.3rem; } #backToTop { bottom: 15px; right: 18px; width: 40px; height: 40px; } }
     </style>
     <style>
         /* ===== 实时数据接入所需的最小补充：沿用原纸张/车票语言，不改既有观感 ===== */
@@ -371,6 +371,10 @@
         /* 窄屏下让封面随卡片自适应，避免被 max-height 挤压 */
         @media (max-width: 560px) {
             .cover-box { max-height: none; }
+            /* 两列窄卡防重叠：编号标签缩小左移、图钉缩小、丝带收窄，三者互不接触 */
+            .menu-tag { top: -10px; left: 8px; padding: 0.15rem 0.55rem; font-size: 0.7rem; letter-spacing: 0.5px; }
+            .book-card::before { font-size: 0.9rem; top: -9px; filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.18)); }
+            .bookmark-ribbon { right: 9px; width: 13px; height: 22px; opacity: 0.75; }
         }
         .cover-fb { text-align: center; color: #a08d6f; }
         body.dark-mode .cover-fb { color: #8d7f6a; }
