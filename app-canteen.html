@@ -178,6 +178,12 @@
         .book-note { font-size: 0.95rem; color: var(--ink-sub); border-top: 1px dashed var(--wrapper-border); padding-top: 0.8rem; margin-top: 0.8rem; flex-grow: 1; }
         .price-badge, .status-badge { font-size: 0.85rem; padding: 0.15rem 0.6rem; border-radius: 20px; font-weight: bold; border: 1px solid transparent; }
         .status-badge { border-radius: 4px; transform: rotate(-2deg); }
+        /* 出餐进度标签（菜单卡的二级分类）：已出餐 / 烹饪中，与上架状态分开显示 */
+        .stage-chip { font-size: 0.74rem; padding: 0.1rem 0.5rem; border-radius: 20px; border: 1px dashed var(--wrapper-border); color: var(--ink-sub); white-space: nowrap; letter-spacing: 0.3px; }
+        .stage-chip.stage-done { color: #4a7452; border-color: #c1d4c5; background: rgba(74, 116, 82, 0.07); }
+        .stage-chip.stage-cooking { color: #b5564f; border-color: #e3b8b4; background: rgba(209, 91, 91, 0.06); }
+        body.dark-mode .stage-chip.stage-done { color: #83c496; border-color: rgba(193, 212, 197, 0.3); background: rgba(74, 116, 82, 0.16); }
+        body.dark-mode .stage-chip.stage-cooking { color: #f0a19c; border-color: rgba(240, 155, 155, 0.3); background: rgba(209, 91, 91, 0.14); }
         .status-done { background: #eaf3ec; color: #4a7452; border-color: #c1d4c5; } .status-ready { background: #e1ecf4; color: #3b6b8c; border-color: #bcd3e1; } .status-wip { background: #fff3e0; color: #d17d32; border-color: #ffe0b2; }
         .price-wait { background: #fdf5e6; color: #a87b5a; border-color: #e8dcc8; } .price-new { background: #ffe4e1; color: #d15b5b; border-color: #f4c2c2; } .price-free { background: #e0f2f1; color: #00897b; border-color: #b2dfdb; }
         body.dark-mode .status-done { background: rgba(74, 116, 82, 0.3); color: #83c496; border-color: rgba(193, 212, 197, 0.3); }
@@ -379,6 +385,34 @@
         .filter-card .btn-sticker { justify-content: flex-start; }
         .filter-mini { margin-top: 1rem; padding-top: 0.9rem; border-top: 1px dashed var(--wrapper-border); font-size: 0.8rem; color: var(--ink-sub); line-height: 1.9; }
         .filter-mini b { font-family: 'Space Mono', monospace; color: var(--ink-main); }
+        /* 菜单搜索框：复古虚线胶囊 + 放大镜 */
+        .menu-search { position: relative; display: flex; align-items: center; margin-bottom: 0.9rem; }
+        .menu-search .ms-ico { position: absolute; left: 0.62rem; font-size: 0.82rem; opacity: 0.75; pointer-events: none; line-height: 1; }
+        .menu-search-input {
+            width: 100%; font-family: var(--font-body); font-size: 0.86rem; letter-spacing: 0.3px;
+            padding: 0.5rem 1.8rem 0.5rem 1.95rem; border: 1px dashed var(--ink-sub); border-radius: 20px;
+            background: transparent; color: var(--ink-main); outline: none; transition: all 0.2s;
+        }
+        .menu-search-input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+        .menu-search-input:focus { border-style: solid; border-color: var(--primary); box-shadow: 2px 2px 0 rgba(0,0,0,0.05); }
+        .menu-search-input::placeholder { color: var(--ink-sub); opacity: 0.8; }
+        .ms-clear {
+            position: absolute; right: 0.32rem; width: 1.25rem; height: 1.25rem; padding: 0; border: none; border-radius: 50%;
+            background: var(--tape-green); color: var(--ink-main); font-size: 0.66rem; line-height: 1; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .ms-clear:hover { filter: brightness(0.95); }
+        /* 二级分类：出餐状态（与一级分类同款贴纸按钮，中间虚线分隔） */
+        .filter-sub { margin-top: 1rem; padding-top: 0.85rem; border-top: 1px dashed var(--wrapper-border); }
+        .filter-sub-title { font-family: var(--font-chinese-title); font-size: 0.84rem; color: var(--ink-sub); letter-spacing: 1px; margin-bottom: 0.55rem; }
+        .stage-group { flex-direction: column; display: flex; gap: 0.5rem; flex-wrap: nowrap; }
+        .filter-sub .btn-sticker { justify-content: flex-start; font-size: 0.88rem; padding: 0.4rem 0.95rem; }
+        /* 过滤后隐藏的卡片 + 空态提示 */
+        .book-card[hidden] { display: none !important; }
+        .menu-empty {
+            margin: 1.2rem 0 0; padding: 1.6rem 1rem; text-align: center; border: 1px dashed var(--ink-sub); border-radius: 8px;
+            background: var(--card-bg); color: var(--ink-sub); font-family: var(--font-chinese-title); letter-spacing: 1px; font-size: 0.95rem;
+        }
 
         /* 大封面卡：在原 book-card 上加封面区 */
         .cover-box {
@@ -540,6 +574,11 @@
             .filter-card .filter-group { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.55rem; }
             .filter-card .btn-sticker { justify-content: center; width: 100%; }
             .filter-mini { display: none; }
+            .filter-sub { margin-top: 0.85rem; padding-top: 0.75rem; }
+            .stage-group { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.45rem; }
+            .filter-sub .btn-sticker { justify-content: center; font-size: 0.8rem; padding: 0.38rem 0.3rem; }
+            .menu-search { margin-bottom: 0.7rem; }
+            .menu-search-input { font-size: 0.82rem; padding: 0.45rem 1.7rem 0.45rem 1.8rem; }
         }
         @media (max-width: 768px) {
             body { padding-bottom: 4.6rem !important; }
@@ -645,13 +684,27 @@
         <div class="layout2col">
             <aside class="filter-card">
                 <h4>🍽️ 今天吃什么</h4>
+                <div class="menu-search">
+                    <span class="ms-ico" aria-hidden="true">🔍</span>
+                    <input class="menu-search-input" id="menuSearch" type="search" autocomplete="off" placeholder="搜索书籍 · 菜名 / 编号">
+                    <button class="ms-clear" id="menuSearchClear" type="button" aria-label="清空搜索" hidden>✕</button>
+                </div>
                 <div class="filter-group">
                     <button class="btn-sticker active" data-filter="all">🍽️ 全部上菜</button>
                     <button class="btn-sticker" data-filter="main">🐟 只要主菜</button>
                     <button class="btn-sticker" data-filter="dessert">🍰 只要甜点</button>
                 </div>
+                <div class="filter-sub">
+                    <div class="filter-sub-title">⏱️ 出餐状态</div>
+                    <div class="stage-group" id="stageGroup">
+                        <button class="btn-sticker active" data-stage="all">🍽️ 全部状态</button>
+                        <button class="btn-sticker" data-stage="done">🍳 已出餐</button>
+                        <button class="btn-sticker" data-stage="cooking">🔥 烹饪中</button>
+                    </div>
+                </div>
                 <div class="filter-mini" id="filterMini">
                     主菜 <b id="miniMain">0</b> 道 · 甜点 <b id="miniDessert">0</b> 道<br>
+                    已出餐 <b id="miniDone">0</b> 道 · 烹饪中 <b id="miniCooking">0</b> 道<br>
                     累计票数 <b id="miniVotes">0</b> · 小票 <b id="miniBallots">0</b> 张
                 </div>
             </aside>
@@ -664,6 +717,7 @@
                     <div class="section-title dessert">🍰 饭后甜点 · 免费小食</div>
                     <div class="grid-cards" id="grid-dessert"></div>
                 </section>
+                <div class="menu-empty" id="menuEmpty" hidden>🔍 这一格还没找到菜，换个关键词或切换分类试试～</div>
             </div>
         </div>
 
@@ -869,6 +923,8 @@
         online: false,
         sending: false,
         filter: "all",
+        stage: "all",
+        q: "",
         covers: {},
         qr: ""
       };
@@ -888,6 +944,12 @@
       }
 
       function isOrderable(b) { return b.status === "已完成"; }
+      /* 出餐进度：后台设置优先（done/cooking），未设置则按上架状态推断 */
+      function stageOf(b) {
+        if (b && (b.stage === "done" || b.stage === "cooking")) return b.stage;
+        return isOrderable(b) ? "done" : "cooking";
+      }
+      function stageLabel(st) { return st === "done" ? "🍳 已出餐" : "🔥 烹饪中"; }
       function pickLabel(b) {
         if (isOrderable(b)) return "+ 加入餐盘";
         if (b.category === "main") return b.status === "未完成" ? "+ 催更投票" : "+ 投票求上新";
@@ -919,7 +981,9 @@
         }
         var stCls = b.status === "已完成" ? "status-done" : (b.status === "未上架" ? "status-ready" : "status-wip");
         var added = state.cart.indexOf(b.code) > -1;
-        return '<div class="book-card" data-code="' + esc(b.code) + '">' +
+        var stage = stageOf(b);
+        var key = (b.title + " " + b.code + " " + (b.intro || b.note || "") + " " + (b.status || "")).toLowerCase();
+        return '<div class="book-card" data-code="' + esc(b.code) + '" data-stage="' + stage + '" data-search="' + esc(key) + '">' +
           '<div class="bookmark-ribbon ' + ribbonOf(b) + '"></div>' +
           '<div class="menu-tag ' + TAG[i % 3] + '">' + esc(b.code) + '</div>' +
           coverHTML(b) +
@@ -927,6 +991,7 @@
           '<div class="book-meta">' +
             priceHtml +
             '<span class="status-badge ' + stCls + '">' + esc(b.status || "") + '</span>' +
+            '<span class="stage-chip stage-' + stage + '">' + stageLabel(stage) + '</span>' +
             '<span class="vote-chip" data-vote="' + esc(b.code) + '">0 票</span>' +
           '</div>' +
           '<div class="book-note">' + esc(b.intro || b.note || "") + '</div>' +
@@ -961,8 +1026,12 @@
         var o = state.overview || {};
         var main = 0, dessert = 0;
         state.books.forEach(function (b) { if (b.category === "main") main++; else dessert++; });
+        var done = 0, cooking = 0;
+        state.books.forEach(function (b) { if (stageOf(b) === "done") done++; else cooking++; });
         $("miniMain").textContent = main;
         $("miniDessert").textContent = dessert;
+        if ($("miniDone")) $("miniDone").textContent = done;
+        if ($("miniCooking")) $("miniCooking").textContent = cooking;
         $("miniVotes").textContent = o.votes || 0;
         $("miniBallots").textContent = o.ballots || 0;
       }
@@ -1342,6 +1411,30 @@
         if (state.filter === "all") { secMain.classList.remove("hidden"); secDessert.classList.remove("hidden"); }
         else if (state.filter === "main") { secMain.classList.remove("hidden"); secDessert.classList.add("hidden"); }
         else { secMain.classList.add("hidden"); secDessert.classList.remove("hidden"); }
+
+        /* 二级分类（已出餐/烹饪中）+ 搜索关键词，逐卡过滤 */
+        var q = String(state.q || "").trim().toLowerCase();
+        var shown = 0;
+        var cards = document.querySelectorAll(".book-card");
+        for (var i = 0; i < cards.length; i++) {
+          var card = cards[i];
+          var sec = card.closest(".list-section");
+          var secVisible = sec && !sec.classList.contains("hidden");
+          var stageOk = state.stage === "all" || card.getAttribute("data-stage") === state.stage;
+          var qOk = !q || (card.getAttribute("data-search") || "").indexOf(q) > -1;
+          var vis = secVisible && stageOk && qOk;
+          card.hidden = !vis;
+          if (vis) shown++;
+        }
+        var empty = $("menuEmpty");
+        if (empty) {
+          empty.hidden = shown > 0;
+          if (shown === 0) {
+            var tip = q ? '🔍 没搜到「' + esc(state.q.trim()) + '」这本书，换个关键词试试～'
+                        : '🍳 这一格暂时没有菜，切换分类看看吧～';
+            empty.innerHTML = tip;
+          }
+        }
       }
 
       function toggleTheme() {
@@ -1403,6 +1496,26 @@
         btn.classList.add("active");
         state.filter = btn.getAttribute("data-filter");
         applyFilter();
+      });
+
+      $("stageGroup").addEventListener("click", function (e) {
+        var btn = e.target.closest("[data-stage]");
+        if (!btn) return;
+        document.querySelectorAll("#stageGroup .btn-sticker").forEach(function (b) { b.classList.remove("active"); });
+        btn.classList.add("active");
+        state.stage = btn.getAttribute("data-stage");
+        applyFilter();
+      });
+
+      var searchEl = $("menuSearch"), clearEl = $("menuSearchClear");
+      searchEl.addEventListener("input", function () {
+        state.q = this.value;
+        clearEl.hidden = !this.value;
+        applyFilter();
+      });
+      searchEl.addEventListener("keydown", function (e) { if (e.key === "Escape") { this.value = ""; state.q = ""; clearEl.hidden = true; applyFilter(); } });
+      clearEl.addEventListener("click", function () {
+        searchEl.value = ""; state.q = ""; clearEl.hidden = true; searchEl.focus(); applyFilter();
       });
 
       $("themeToggle").addEventListener("click", toggleTheme);
