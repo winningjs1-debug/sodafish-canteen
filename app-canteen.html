@@ -566,20 +566,7 @@
             text-align: center; padding: 1.5rem 2.1rem; border: 1px dashed var(--ink-sub); border-radius: 10px;
             background: var(--card-bg); box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.05); max-width: 78vw;
         }
-        .soda-boot-card .boot-av {
-            width: 64px; height: 64px; margin: 0 auto; border-radius: 50%;
-            border: 2px dashed var(--ink-sub); padding: 5px; background: var(--card-bg);
-            display: flex; align-items: center; justify-content: center;
-            position: relative; overflow: hidden;
-            animation: sodaFloat 1.6s ease-in-out infinite;
-        }
-        /* 内圈邮票齿孔细线，与招牌头像同款 */
-        .soda-boot-card .boot-av::after {
-            content: ''; position: absolute; inset: 2px; border-radius: 50%;
-            border: 1px dashed rgba(120, 96, 68, 0.35); pointer-events: none;
-        }
-        .soda-boot-card .boot-av img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; }
-        .soda-boot-card .boot-fb { font-size: 1.7rem; line-height: 1; }
+        .soda-boot-card .boot-emoji { font-size: 2rem; line-height: 1; display: block; animation: sodaFloat 1.6s ease-in-out infinite; }
         .soda-boot-card .txt { font-family: var(--font-chinese-title); font-size: 1.05rem; color: var(--ink-main); letter-spacing: 1px; display: block; margin-top: 0.45rem; }
         .soda-boot-card .sub { font-family: 'Space Mono', monospace; font-size: 0.64rem; letter-spacing: 2px; color: var(--ink-sub); display: block; margin-top: 0.25rem; }
         .soda-boot-card .retry {
@@ -592,10 +579,7 @@
 <body>
     <div id="sodaBoot">
         <div class="soda-boot-card">
-            <span class="boot-av">
-                <img id="sodaBootAvatar" alt="店主头像" hidden referrerpolicy="no-referrer">
-                <span class="boot-fb" id="sodaBootFb">🐟</span>
-            </span>
+            <span class="boot-emoji">🐟</span>
             <span class="txt" id="sodaBootTxt">正在摆桌…</span>
             <span class="sub" id="sodaBootSub">WELCOME TO SODAFISH</span>
             <button class="retry" type="button" id="sodaBootRetry" hidden>重新连接</button>
@@ -1270,13 +1254,6 @@
           /* 店铺招牌：店主头像（后台「店主头像」上传的 admin_avatar） */
           var av = map.admin_avatar || "";
           if (av) {
-            try { localStorage.setItem("sodaBootAvatar", av); } catch (e) {}
-            /* 启动屏还在转圈时，实时把头像喂给它 */
-            var bimg = $("sodaBootAvatar"), bfb = $("sodaBootFb");
-            if (bimg && bimg.hidden && bimg.src !== av) {
-              bimg.src = av; bimg.hidden = false; if (bfb) bfb.hidden = true;
-              bimg.onerror = function () { bimg.hidden = true; if (bfb) bfb.hidden = false; };
-            }
             var si = $("signAvatar");
             si.src = av; si.hidden = false; $("signFb").hidden = true;
             si.onerror = function () { si.hidden = true; $("signFb").hidden = false; };
@@ -1583,15 +1560,6 @@
         var wantDark = forceDark;
         try { wantDark = forceDark || localStorage.getItem("sodaTheme") === "dark"; } catch (e) { wantDark = forceDark; }
         if (wantDark) { document.body.classList.add("dark-mode"); $("themeToggle").textContent = "☀️"; }
-        /* 启动屏加载图标：优先用上次缓存的店主头像（会浮动），没缓存则回退 🐟 */
-        try {
-          var bav = localStorage.getItem("sodaBootAvatar");
-          if (bav) {
-            var bimg0 = $("sodaBootAvatar"), bfb0 = $("sodaBootFb");
-            bimg0.src = bav; bimg0.hidden = false; bfb0.hidden = true;
-            bimg0.onerror = function () { bimg0.hidden = true; bfb0.hidden = false; };
-          }
-        } catch (e) {}
         window.addEventListener("error", function () { if (!bootDone) bootFail("页面加载出了点状况"); });
         var rb = $("sodaBootRetry");
         if (rb) rb.addEventListener("click", function () { location.reload(); });
