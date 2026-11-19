@@ -414,7 +414,85 @@
         .tip-section::before { content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(2deg); width: 64px; height: 18px; background: var(--tape-yellow, rgba(220,193,151,0.75)); background: rgba(220,193,151,0.75); border-radius: 2px; }
         .tip-section h3 { font-family: var(--font-chinese-title); font-size: 1.45rem; margin-bottom: 0.5rem; }
         .tip-section p { color: var(--ink-sub); font-size: 0.92rem; }
-        .tip-open-btn { margin-top: 1.2rem; font-size: 1.02rem; padding: 0.55rem 1.8rem; }
+        /* 店主头像 + 消息气泡：像店主在门口招呼客人 */
+        .tip-head { display: flex; align-items: center; justify-content: center; gap: 0.85rem; margin: 1.15rem auto 0.15rem; }
+        .tip-avatar {
+            position: relative; width: 58px; height: 58px; flex: none;
+            border-radius: 50%; border: 2px dashed var(--ink-sub); padding: 5px;
+            background: var(--card-bg); display: flex; align-items: center; justify-content: center;
+            transform: rotate(-3deg); box-shadow: 2px 3px 0 rgba(0,0,0,0.06);
+        }
+        .tip-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; }
+        .tip-avatar .tip-fb { font-size: 1.7rem; line-height: 1; }
+        /* 头像邮票化：胶带贴顶，与店铺招牌呼应 */
+        .tip-avatar::before {
+            content: ''; position: absolute; top: -7px; left: 50%; transform: translateX(-50%) rotate(3deg);
+            width: 26px; height: 10px; border-radius: 2px; z-index: 2;
+            background: var(--tape-green, rgba(171,202,178,0.7)); opacity: 0.85;
+            box-shadow: 1px 1px 0 rgba(0,0,0,0.05);
+        }
+        body.dark-mode .tip-avatar::before { opacity: 0.5; }
+        .tip-bubble {
+            position: relative; background: rgba(220,193,151,0.28); border: 1px dashed var(--ink-sub);
+            border-radius: 14px; padding: 0.55rem 1rem; font-family: var(--font-chinese-title);
+            font-size: 1.02rem; letter-spacing: 1px; color: var(--ink-main); transform: rotate(0.8deg); max-width: 15rem;
+        }
+        .tip-bubble::before {
+            content: ''; position: absolute; left: -6px; top: 50%; transform: translateY(-50%) rotate(45deg);
+            width: 10px; height: 10px; background: rgba(220,193,151,0.28);
+            border-left: 1px dashed var(--ink-sub); border-bottom: 1px dashed var(--ink-sub);
+        }
+        body.dark-mode .tip-bubble { background: rgba(220,193,151,0.12); }
+        @media (max-width: 560px) {
+            .tip-head { gap: 0.6rem; }
+            .tip-avatar { width: 48px; height: 48px; }
+            .tip-avatar .tip-fb { font-size: 1.4rem; }
+            .tip-bubble { font-size: 0.92rem; padding: 0.45rem 0.8rem; }
+        }
+        /* 模拟对话：招呼 → 赞赏码 → 回礼，三幕依次淡入（一次性动画，稳定不重影） */
+        @keyframes tipChatIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .tip-head { animation: tipChatIn 0.45s ease 0.05s both; }
+        .tip-stamp { animation: tipChatIn 0.45s ease 0.22s both; }
+        .tip-reply { animation: tipChatIn 0.45s ease 0.4s both; }
+        @media (prefers-reduced-motion: reduce) { .tip-head, .tip-stamp, .tip-reply { animation: none; } }
+        /* 第二幕：右侧回礼气泡（与第一幕左右呼应，像聊天往来） */
+        .tip-reply { display: flex; align-items: center; justify-content: center; gap: 0.85rem; margin: 0.9rem auto 0; }
+        .tip-avatar-r { transform: rotate(3deg); }
+        .tip-avatar-r::before { transform: translateX(-50%) rotate(-3deg); background: var(--tape-pink, rgba(233,175,175,0.7)); }
+        .tip-bubble-r {
+            background: rgba(233,175,175,0.32); transform: rotate(-0.8deg); max-width: 17rem;
+        }
+        .tip-bubble-r::before {
+            content: ''; position: absolute; left: auto; right: -6px; top: 50%; transform: translateY(-50%) rotate(45deg);
+            width: 10px; height: 10px; background: rgba(233,175,175,0.32);
+            border-right: 1px dashed var(--ink-sub); border-top: 1px dashed var(--ink-sub);
+        }
+        body.dark-mode .tip-bubble-r { background: rgba(233,175,175,0.14); }
+        body.dark-mode .tip-avatar-r::before { opacity: 0.5; }
+        /* 赞赏码邮票框（胶带贴顶） */
+        .tip-stamp {
+            position: relative; margin: 1.1rem auto 0.6rem; max-width: 220px;
+            background: var(--card-bg); border: 1px dashed var(--ink-sub); border-radius: 8px;
+            padding: 1rem 1rem 0.8rem; box-shadow: 2px 3px 0 rgba(0,0,0,0.05);
+        }
+        .tip-stamp img { max-width: 180px; max-height: 180px; border-radius: 6px; display: inline-block; }
+        /* 邮票双框：内圈虚线细框，仿邮票齿孔内衬 */
+        .tip-stamp::after {
+            content: ''; position: absolute; inset: 5px; border: 1px dashed var(--ink-sub);
+            border-radius: 5px; pointer-events: none; opacity: 0.55;
+        }
+        .tip-stamp .qr-cap { letter-spacing: 0.5px; white-space: nowrap; }
+        .tip-stamp .ts-tape {
+            position: absolute; top: -9px; left: 50%; transform: translateX(-50%) rotate(-2deg);
+            width: 56px; height: 15px; border-radius: 2px;
+            background: var(--tape-yellow, rgba(220,193,151,0.75)); opacity: 0.85;
+        }
+        @media (max-width: 560px) {
+            .tip-reply { gap: 0.6rem; }
+            .tip-reply .tip-avatar { width: 48px; height: 48px; }
+            .tip-reply .tip-fb { font-size: 1.4rem; }
+            .tip-bubble-r { font-size: 0.92rem; padding: 0.45rem 0.8rem; }
+        }
 
         /* 移动端底部 tab */
         .tabbar-mobile {
@@ -566,8 +644,26 @@
 
         <section class="tip-section" id="tip" hidden>
             <h3>☕ 请主厨喝杯汽水</h3>
-            <p>每道菜都是主厨手工精排的，如果吃得开心，点下方按钮打开赞赏码请主厨喝杯汽水吧 ♡</p>
-            <button class="btn-sticker tip-open-btn" type="button" id="tipOpenBtn">🎫 打开赞赏码</button>
+            <p>每道菜都是主厨手工精排的，如果吃得开心，扫下面的赞赏码请主厨喝杯汽水吧 ♡</p>
+            <div class="tip-head">
+                <span class="tip-avatar">
+                    <img id="tipAvatar" alt="店主头像" hidden referrerpolicy="no-referrer">
+                    <span class="tip-fb" id="tipFb">🐟</span>
+                </span>
+                <span class="tip-bubble">欢迎请鱼主厨喝汽水~</span>
+            </div>
+            <div class="tip-stamp">
+                <span class="ts-tape"></span>
+                <img id="tipImg" alt="主厨赞赏码" referrerpolicy="no-referrer">
+                <p class="qr-cap">长按识别 · 请主厨喝杯汽水</p>
+            </div>
+            <div class="tip-reply">
+                <span class="tip-avatar tip-avatar-r">
+                    <img id="tipAvatar2" alt="店主头像" hidden referrerpolicy="no-referrer">
+                    <span class="tip-fb" id="tipFb2">🐟</span>
+                </span>
+                <span class="tip-bubble tip-bubble-r">谢谢支持，鱼主厨努力产出中！</span>
+            </div>
         </section>
 
         <footer>✦ SodaFish 私人食堂 · 翻页留香 ✦<br><a class="shop-link" href="notes.html">去写点菜便签 →</a> &nbsp; <a class="shop-link" href="admin.html">店主入口 →</a></footer>
@@ -1126,6 +1222,8 @@
           state.qr = qr;
           if (qr) {
             $("qrImg").src = qr; $("qrSlot").hidden = false;
+            $("tipImg").src = qr;
+            $("tipImg").onerror = function () { $("tip").hidden = true; };
             $("tip").hidden = false;
           }
           /* 店铺招牌：店主头像（后台「店主头像」上传的 admin_avatar） */
@@ -1134,6 +1232,13 @@
             var si = $("signAvatar");
             si.src = av; si.hidden = false; $("signFb").hidden = true;
             si.onerror = function () { si.hidden = true; $("signFb").hidden = false; };
+            /* 赞赏区气泡旁的店主头像（左右两个对话行共用） */
+            ["tipAvatar", "tipAvatar2"].forEach(function (id) {
+              var ta = $(id);
+              ta.src = av; ta.hidden = false;
+              $(id === "tipAvatar" ? "tipFb" : "tipFb2").hidden = true;
+              ta.onerror = function () { ta.hidden = true; $(id === "tipAvatar" ? "tipFb" : "tipFb2").hidden = false; };
+            });
           }
           /* 店内公告板：后台「店内公告板」写的 shop_notice，留空不显示 */
           var nb = (map.shop_notice || "").trim();
@@ -1168,8 +1273,6 @@
         if (!btn) return;
         showTipModal(btn.getAttribute("data-tiporder"), false);
       });
-      /* 底部赞赏区：点击按钮弹出赞赏码弹窗（可 × / 遮罩 / Esc 关闭） */
-      $("tipOpenBtn").addEventListener("click", function () { showTipModal("", false); });
       function pickupChip(s) {
         var map = { "待核对": ["wait", "🍳 备餐中 · 待店主核对赞赏"], "已核对": ["ok", "👍 已核对 · 准备出餐"], "已发放": ["done", "✅ 已出餐 · 可凭凭证领取"], "已驳回": ["no", "🚫 已取消"] };
         var m = map[s] || ["wait", "🍳 备餐中"];
@@ -1246,7 +1349,7 @@
         btn.addEventListener("click", function () {
           var t = btn.getAttribute("data-nav");
           if (t === "rank") togglePanel("rankPanel");
-          else if (t === "tip") scrollToId("tip");
+          else if (t === "tip") { if (!showTipModal("", false)) scrollToId("tip"); }
           else scrollToId(t);
         });
       });
@@ -1258,7 +1361,7 @@
           else if (t === "rank") togglePanel("rankPanel");
           else if (t === "cart") togglePanel("cartPanel");
           else if (t === "pickup") scrollToId("pickup");
-          else if (t === "tip") scrollToId("tip");
+          else if (t === "tip") { if (!showTipModal("", false)) scrollToId("tip"); }
         });
       });
 
