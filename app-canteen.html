@@ -66,9 +66,38 @@
            沿用车票风：胶带、虚线、邮票齿孔圆框、轻轻摇摆，不引入新风格。 */
         .shop-sign {
             display: flex; flex-direction: column; align-items: center; gap: 0.45rem;
-            margin: 0.4rem auto 1.7rem; width: max-content; text-decoration: none;
+            margin: 0.4rem 0 0; width: max-content; text-decoration: none;
             transform-origin: top center; animation: signSway 5.5s ease-in-out infinite;
         }
+        /* 招牌独立居中 */
+        .shop-head {
+            display: flex; justify-content: center;
+            margin-bottom: 1.4rem;
+        }
+        /* 店内公告板：软木板风车票便签，贴在大标题正下方居中 */
+        .notice-board {
+            position: relative; background: var(--card-bg); border: 2px dashed var(--ink-sub);
+            border-radius: 8px; padding: 1rem 1.3rem 0.9rem; width: min(560px, 92%); max-width: 100%;
+            margin: 1.15rem auto 0; box-shadow: 3px 4px 0 rgba(0,0,0,0.06);
+            transform: rotate(-0.8deg); text-align: left;
+            background-image: linear-gradient(transparent 95%, var(--card-line) 100%);
+            background-size: 100% 1.6rem; background-position: 0 2.3rem;
+        }
+        .notice-board .nb-tape {
+            position: absolute; top: -9px; left: 50%; transform: translateX(-50%) rotate(-2deg);
+            width: 58px; height: 15px; border-radius: 2px; opacity: 0.85;
+            background: var(--tape-pink); box-shadow: 1px 1px 0 rgba(0,0,0,0.05);
+        }
+        .notice-board .nb-title {
+            font-family: var(--font-chinese-title); font-size: 0.95rem; letter-spacing: 1.5px;
+            margin-bottom: 0.45rem; padding-bottom: 0.35rem; border-bottom: 1px dashed var(--wrapper-border);
+        }
+        .notice-board .nb-body {
+            font-size: 0.85rem; color: var(--ink-main); line-height: 1.6;
+            white-space: pre-wrap; word-break: break-word; max-height: 7.2rem; overflow-y: auto;
+        }
+        body.dark-mode .notice-board .nb-tape { opacity: 0.5; }
+
         @keyframes signSway { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-1.8deg); } }
         .shop-sign .sign-tape {
             width: 64px; height: 16px; border-radius: 2px; transform: rotate(-3deg); opacity: 0.85;
@@ -101,7 +130,7 @@
             .shop-sign .sign-frame { width: 72px; height: 72px; }
             .shop-sign .sign-fb { font-size: 2rem; }
             .shop-sign .sign-tape { width: 52px; }
-            .shop-sign { margin-bottom: 1.3rem; }
+            .shop-sign { margin-bottom: 0; }
         }
 
         .header-title-wrap { display: flex; align-items: baseline; justify-content: center; gap: 1.5rem; }
@@ -117,7 +146,7 @@
         .section-title::before { content: ''; position: absolute; top: -6px; left: 10px; width: 30px; height: 12px; background: rgba(255,255,255,0.4); border: 1px solid rgba(0,0,0,0.05); transform: rotate(-10deg); }
         .section-title.main-course { background: var(--tape-green); transform: rotate(-1deg); border: 1px dashed #85a38e; }
         .section-title.dessert { background: var(--tape-pink); transform: rotate(1deg); border: 1px dashed #cc9292; }
-        .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.8rem; }
+        .grid-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.8rem; }
         .book-card { background: var(--card-bg); border: 1px dashed var(--wrapper-border); border-radius: 6px; padding: 2.2rem 1.4rem 1.6rem; position: relative; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s; box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.05); background-image: linear-gradient(transparent 95%, var(--card-line) 100%); background-size: 100% 1.7rem; background-position: 0 1.4rem; display: flex; flex-direction: column; }
         .book-card:hover { transform: translateY(-6px) rotate(-1deg); box-shadow: 5px 8px 15px rgba(0, 0, 0, 0.08); z-index: 2; }
         .book-card::before { content: '📍'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-size: 1.2rem; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2)); opacity: 0.8; z-index: 10; }
@@ -197,9 +226,9 @@
         .tag-b { background: #e3ecd9; color: #566c4f; border-bottom-color: #b8c9b1; }
         .tag-c { background: #fce4e4; color: #8c5a5a; border-bottom-color: #dbabab; }
 
-        @media (max-width: 1024px) { .grid-cards { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.2rem; } .wrapper { padding: 2rem 1.5rem; } .title-english { font-size: 4rem; } .title-chinese { font-size: 2.6rem; } }
-        @media (max-width: 768px) { body { padding: 1.5rem 1rem; } .toolbar { justify-content: center; flex-direction: column; padding: 0; } .filter-group { justify-content: center; width: 100%; } .filter-group .btn-sticker { flex: 1 1 auto; min-width: 0; justify-content: center; } .title-english { font-size: 3rem; } .title-chinese { font-size: 2rem; } header::before, header::after { display: none; } .panel { max-width: 100%; right: -100%; } }
-        @media (max-width: 480px) { body { padding: 1rem 0.5rem; } .wrapper { padding: 1.5rem 1rem; } .title-english { font-size: 2.5rem; } .title-chinese { font-size: 1.6rem; } .grid-cards { grid-template-columns: 1fr; gap: 1rem; } .book-card { padding: 2rem 1rem 1.2rem; } .float-group { bottom: 80px; right: 15px; gap: 10px; } .cart-float, .rank-float { width: 45px; height: 45px; font-size: 1.3rem; } #backToTop { bottom: 15px; right: 18px; width: 40px; height: 40px; } }
+        @media (max-width: 1024px) { .grid-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.2rem; } .wrapper { padding: 2rem 1.5rem; } .title-english { font-size: 4rem; } .title-chinese { font-size: 2.6rem; } }
+        @media (max-width: 768px) { body { padding: 1.5rem 1rem; } .toolbar { justify-content: center; flex-direction: column; padding: 0; } .filter-group { justify-content: center; width: 100%; } .filter-group .btn-sticker { flex: none; justify-content: center; } .title-english { font-size: 3rem; } .title-chinese { font-size: 2rem; } header::before, header::after { display: none; } .panel { max-width: 100%; right: -100%; } }
+        @media (max-width: 480px) { body { padding: 1rem 0.5rem; } .wrapper { padding: 1.5rem 1rem; } .title-english { font-size: 2.5rem; } .title-chinese { font-size: 1.6rem; } .grid-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; } .book-card { padding: 1.6rem 0.8rem 1.1rem; } .book-name { font-size: 1.12rem; } .book-note { font-size: 0.85rem; } .float-group { bottom: 80px; right: 15px; gap: 10px; } .cart-float, .rank-float { width: 45px; height: 45px; font-size: 1.3rem; } #backToTop { bottom: 15px; right: 18px; width: 40px; height: 40px; } }
     </style>
     <style>
         /* ===== 实时数据接入所需的最小补充：沿用原纸张/车票语言，不改既有观感 ===== */
@@ -262,7 +291,8 @@
         @media (max-width: 900px) {
             .top-nav { gap: 0.3rem; }
             .top-nav .btn-sticker { padding: 0.28rem 0.6rem; font-size: 0.8rem; }
-            .filter-card .btn-sticker { flex: 1 1 auto; min-width: 0; }
+            .filter-card .filter-group { justify-content: center; }
+            .filter-card .btn-sticker { flex: none; }
         }
         @media (max-width: 768px) {
             .panel-header { padding: 1.1rem 1.2rem; font-size: 1.15rem; }
@@ -272,8 +302,9 @@
             .pickup-title { font-size: 1.05rem; line-height: 1.5; }
             .pickup-title .order-status { margin-top: 0.3rem; }
             #okPickup { font-size: 1.45rem; letter-spacing: 6px; }
+            /* 图标按钮固定自然尺寸，居中换行，不再拉伸撑满 */
             .hero-actions { gap: 0.55rem; }
-            .hero-actions .btn-sticker { padding: 0.42rem 0.9rem; font-size: 0.88rem; }
+            .hero-actions .btn-sticker { flex: none; padding: 0.42rem 0.9rem; font-size: 0.88rem; }
             .section-title { font-size: 1.2rem; padding: 0.35rem 1.2rem; }
         }
         @media (max-width: 560px) {
@@ -286,8 +317,8 @@
             .qr-slot img { max-width: 150px; max-height: 150px; }
         }
         @media (max-width: 480px) {
-            .hero-actions { flex-direction: column; align-items: stretch; max-width: 320px; margin-left: auto; margin-right: auto; }
-            .filter-card .btn-sticker { font-size: 0.88rem; padding: 0.4rem 0.7rem; }
+            .hero-actions { gap: 0.5rem; }
+            .filter-card .btn-sticker { flex: none; font-size: 0.88rem; padding: 0.4rem 0.7rem; }
             .logo-stamp .logo-txt { font-size: 1rem; }
             .logo-stamp .logo-sub { font-size: 0.56rem; }
         }
@@ -398,7 +429,7 @@
             .layout2col { grid-template-columns: 1fr; }
             .filter-card { position: static; }
             .filter-card .filter-group { flex-direction: row; flex-wrap: wrap; }
-            .filter-card .btn-sticker { flex: 1 1 auto; min-width: 0; justify-content: center; }
+            .filter-card .btn-sticker { flex: none; justify-content: center; }
             .filter-mini { display: none; }
         }
         @media (max-width: 768px) {
@@ -408,7 +439,7 @@
             .topbar-inner { justify-content: space-between; }
             .float-group { display: none; }
             .tabbar-mobile { display: flex; }
-            .grid-cards { grid-template-columns: 1fr; }
+            .grid-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
             .pickup-row { flex-direction: column; }
             .pickup-input { width: 100%; }
         }
@@ -464,15 +495,22 @@
     </div>
     <div class="wrapper">
         <header>
-            <a class="shop-sign" href="admin.html" id="shopSign" title="店主后台 · 进店打理">
-                <span class="sign-tape"></span>
-                <span class="sign-frame">
-                    <img id="signAvatar" alt="店主头像" hidden referrerpolicy="no-referrer">
-                    <span class="sign-fb" id="signFb">🐟</span>
-                </span>
-                <span class="sign-label">店主掌勺 · 进店打理</span>
-            </a>
+            <div class="shop-head">
+                <a class="shop-sign" href="admin.html" id="shopSign" title="店主后台 · 进店打理">
+                    <span class="sign-tape"></span>
+                    <span class="sign-frame">
+                        <img id="signAvatar" alt="店主头像" hidden referrerpolicy="no-referrer">
+                        <span class="sign-fb" id="signFb">🐟</span>
+                    </span>
+                    <span class="sign-label">店主掌勺 · 进店打理</span>
+                </a>
+            </div>
             <div class="header-title-wrap"><div class="title-english">SodaFish</div><div class="title-chinese">小食堂</div></div>
+            <div class="notice-board" id="noticeBoard" hidden>
+                <span class="nb-tape"></span>
+                <div class="nb-title">📋 店内公告</div>
+                <div class="nb-body" id="noticeBody"></div>
+            </div>
             <p>✦ 记录每一次文字与味蕾的相遇 ✦</p>
             <div class="live-line"><span class="live-dot off" id="liveDot"></span><span id="liveTxt">正在连接小食堂…</span></div>
             <div class="hero-actions">
@@ -1092,6 +1130,12 @@
             var si = $("signAvatar");
             si.src = av; si.hidden = false; $("signFb").hidden = true;
             si.onerror = function () { si.hidden = true; $("signFb").hidden = false; };
+          }
+          /* 店内公告板：后台「店内公告板」写的 shop_notice，留空不显示 */
+          var nb = (map.shop_notice || "").trim();
+          if (nb) {
+            $("noticeBody").textContent = nb;
+            $("noticeBoard").hidden = false;
           }
         } catch (e) {}
       }
