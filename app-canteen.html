@@ -155,7 +155,7 @@
         .tag-c { background: #fce4e4; color: #8c5a5a; border-bottom-color: #dbabab; }
 
         @media (max-width: 1024px) { .grid-cards { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.2rem; } .wrapper { padding: 2rem 1.5rem; } .title-english { font-size: 4rem; } .title-chinese { font-size: 2.6rem; } }
-        @media (max-width: 768px) { body { padding: 1.5rem 1rem; } .toolbar { justify-content: center; flex-direction: column; padding: 0; } .filter-group { justify-content: center; width: 100%; } .btn-sticker { flex: 1; justify-content: center; } .btn-theme { flex: none; } .title-english { font-size: 3rem; } .title-chinese { font-size: 2rem; } header::before, header::after { display: none; } .panel { max-width: 100%; right: -100%; } }
+        @media (max-width: 768px) { body { padding: 1.5rem 1rem; } .toolbar { justify-content: center; flex-direction: column; padding: 0; } .filter-group { justify-content: center; width: 100%; } .filter-group .btn-sticker { flex: 1 1 auto; min-width: 0; justify-content: center; } .title-english { font-size: 3rem; } .title-chinese { font-size: 2rem; } header::before, header::after { display: none; } .panel { max-width: 100%; right: -100%; } }
         @media (max-width: 480px) { body { padding: 1rem 0.5rem; } .wrapper { padding: 1.5rem 1rem; } .title-english { font-size: 2.5rem; } .title-chinese { font-size: 1.6rem; } .grid-cards { grid-template-columns: 1fr; gap: 1rem; } .book-card { padding: 2rem 1rem 1.2rem; } .float-group { bottom: 80px; right: 15px; gap: 10px; } .cart-float, .rank-float { width: 45px; height: 45px; font-size: 1.3rem; } #backToTop { bottom: 15px; right: 18px; width: 40px; height: 40px; } }
     </style>
     <style>
@@ -203,6 +203,51 @@
         .my-order-item { display: flex; justify-content: space-between; align-items: center; gap: 0.6rem; padding: 0.6rem 0; border-bottom: 1px dashed var(--wrapper-border); font-size: 0.88rem; }
         .copy-link { background: none; border: none; color: #3b6b8c; cursor: pointer; font-size: 0.8rem; text-decoration: underline; padding: 0; font-family: var(--font-body); }
         .success-box button { margin: 0 0.3rem; }
+
+        /* ===== 弹窗 × 关闭 + 按钮排布（沿用原虚线圆按钮风格） ===== */
+        .modal-x { position: absolute; top: 12px; right: 12px; width: 34px; height: 34px; border: 1px dashed var(--ink-sub); border-radius: 50%; background: var(--card-bg); color: var(--ink-sub); font-size: 0.95rem; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; z-index: 2; }
+        .modal-x:hover { color: var(--ink-main); transform: rotate(90deg) scale(1.06); }
+        .success-box .stamp { right: 56px; }
+        .ok-btn-row { display: flex; gap: 0.6rem; justify-content: center; align-items: center; flex-wrap: wrap; margin-top: 0.8rem; }
+        .ok-btn-row button { margin: 0; white-space: nowrap; }
+        .ok-tip-btn { background: rgba(220,193,151,0.55); }
+        body.dark-mode .ok-tip-btn { background: rgba(220,193,151,0.22); }
+
+        /* ===== 多端自适应：按钮不压缩变形 ===== */
+        .btn-sticker, .pickup-btn, .submit-order-btn, .order-btn, .modal-x { white-space: nowrap; }
+        .btn-sticker { flex: none; }
+        @media (max-width: 900px) {
+            .top-nav { gap: 0.3rem; }
+            .top-nav .btn-sticker { padding: 0.28rem 0.6rem; font-size: 0.8rem; }
+            .filter-card .btn-sticker { flex: 1 1 auto; min-width: 0; }
+        }
+        @media (max-width: 768px) {
+            .panel-header { padding: 1.1rem 1.2rem; font-size: 1.15rem; }
+            .panel-body { padding: 1.2rem; }
+            .panel-footer { padding: 1.2rem; }
+            .my-order-item { flex-wrap: wrap; }
+            .pickup-title { font-size: 1.05rem; line-height: 1.5; }
+            .pickup-title .order-status { margin-top: 0.3rem; }
+            #okPickup { font-size: 1.45rem; letter-spacing: 6px; }
+            .hero-actions { gap: 0.55rem; }
+            .hero-actions .btn-sticker { padding: 0.42rem 0.9rem; font-size: 0.88rem; }
+            .section-title { font-size: 1.2rem; padding: 0.35rem 1.2rem; }
+        }
+        @media (max-width: 560px) {
+            .success-box { padding: 2.6rem 1.1rem 1.6rem; width: 94vw; max-width: 360px; }
+            .success-box h3 { font-size: 1.45rem; }
+            .success-box p { margin-bottom: 1.2rem; }
+            .success-box p.slip-no { margin-bottom: 0.6rem; }
+            .ok-btn-row { flex-direction: column; }
+            .ok-btn-row button { width: 100%; }
+            .qr-slot img { max-width: 150px; max-height: 150px; }
+        }
+        @media (max-width: 480px) {
+            .hero-actions { flex-direction: column; align-items: stretch; max-width: 320px; margin-left: auto; margin-right: auto; }
+            .filter-card .btn-sticker { font-size: 0.88rem; padding: 0.4rem 0.7rem; }
+            .logo-stamp .logo-txt { font-size: 1rem; }
+            .logo-stamp .logo-sub { font-size: 0.56rem; }
+        }
     </style>
     <style>
         /* ===== 鸡排店骨架装修：粘性顶栏 / hero 横幅 / 筛选侧卡 / 大封面卡 / 取餐码查询 / 赞赏区 / 移动底部 tab =====
@@ -276,6 +321,9 @@
         .pickup-btn:hover { transform: translateY(-2px); box-shadow: 2px 4px 8px rgba(0,0,0,0.08); }
         .pickup-hint { font-size: 0.82rem; color: var(--ink-sub); margin-top: 0.7rem; }
         .pickup-result { margin-top: 1rem; }
+        .pickup-tip-btn { margin-top: 0.2rem; font-family: var(--font-body); font-size: 0.85rem; padding: 0.35rem 1rem; border-radius: 20px; border: 1px dashed var(--ink-sub); background: rgba(220,193,151,0.55); color: var(--ink-main); cursor: pointer; transition: all 0.2s; white-space: nowrap; max-width: 100%; }
+        .pickup-tip-btn:hover { transform: translateY(-2px); box-shadow: 2px 4px 8px rgba(0,0,0,0.08); }
+        body.dark-mode .pickup-tip-btn { background: rgba(220,193,151,0.22); }
         .pickup-title { font-family: var(--font-chinese-title); font-size: 1.2rem; margin-bottom: 0.3rem; }
 
         /* 赞赏主厨区 */
@@ -307,7 +355,7 @@
             .layout2col { grid-template-columns: 1fr; }
             .filter-card { position: static; }
             .filter-card .filter-group { flex-direction: row; flex-wrap: wrap; }
-            .filter-card .btn-sticker { flex: 1; justify-content: center; }
+            .filter-card .btn-sticker { flex: 1 1 auto; min-width: 0; justify-content: center; }
             .filter-mini { display: none; }
         }
         @media (max-width: 768px) {
@@ -479,30 +527,34 @@
     </div>
     <div class="success-modal" id="successModal">
         <div class="success-box">
+            <button class="modal-x" type="button" data-closemodal="successModal" title="关闭">✕</button>
             <div class="stamp">已下单</div>
             <h3>单子送到后厨啦！</h3>
             <p class="slip-no" id="okNo">SF-0000 · 1 道</p>
             <p>🎫 取餐码：<b id="okPickup" style="display:inline-block;font-family:'Space Mono',monospace;font-size:1.7rem;letter-spacing:10px;color:#d15b5b;">····</b><br>
             <span style="font-size:0.85rem;">（页面顶部「🎫 取餐码查询」输码即可查进度）</span></p>
-            <p>查询凭证：<b class="slip-no" id="okToken" style="display:inline;">--------</b><br>想要请主厨喝杯汽水的话，扫下面的赞赏码随心打赏就好，<b>备注这个单号</b>方便对账；店主核对后到「🧾 我的订单」凭凭证领取网盘链接。</p>
-            <div class="qr-slot" id="okQrSlot" style="margin:0 0 1.2rem;" hidden>
-                <img id="okQrImg" alt="主厨赞赏码" referrerpolicy="no-referrer">
-                <p class="qr-cap">长按识别 · 请主厨喝杯汽水</p>
+            <p>查询凭证：<b class="slip-no" id="okToken" style="display:inline;">--------</b><br>
+            <span style="font-size:0.85rem;">店主核对后，凭「单号 + 凭证」到「🧾 我的订单」领取网盘链接。打赏完全随心，不赏也欢迎常来 ♡</span></p>
+            <div class="ok-btn-row">
+                <button type="button" id="okCopy">复制单号和凭证</button>
             </div>
-            <button type="button" id="okCopy">复制单号和凭证</button>
-            <button type="button" id="okClose">太棒啦 (✿◡‿◡)</button>
+            <div class="ok-btn-row">
+                <button type="button" id="okTip" class="ok-tip-btn">☕ 想请主厨喝杯汽水（随心）</button>
+                <button type="button" id="okClose">先这样，开吃啦 ♡</button>
+            </div>
         </div>
     </div>
     <div class="success-modal" id="tipModal">
         <div class="success-box">
-            <div class="stamp">谢谢惠顾</div>
-            <h3>这顿还吃得开心吗？</h3>
+            <button class="modal-x" type="button" data-closemodal="tipModal" title="关闭">✕</button>
+            <div class="stamp">随心就好</div>
+            <h3>想请主厨喝杯汽水吗？</h3>
             <div class="qr-slot" id="tipModalSlot" style="margin:0.4rem auto 0.8rem;max-width:210px;">
                 <img id="tipModalImg" alt="主厨赞赏码" referrerpolicy="no-referrer">
-                <p class="qr-cap">长按识别 · 请主厨喝杯汽水</p>
+                <p class="qr-cap">长按识别 · 微信扫码赞赏</p>
             </div>
-            <p id="tipModalNote" style="margin-bottom:1.4rem;">扫上面的赞赏码支持一下主厨，随心就好 ♡</p>
-            <button type="button" id="tipModalClose">好嘞，收下啦</button>
+            <p id="tipModalNote" style="margin-bottom:1.4rem;">打赏完全自愿，喜欢的话扫上面的码支持一下主厨就好，不赏也没关系 ♡</p>
+            <button type="button" id="tipModalClose">不用啦，谢谢 ♡</button>
         </div>
     </div>
     <button id="backToTop" type="button">⬆️</button>
@@ -885,7 +937,6 @@
           });
           paintCart();
           paintMyOrders();
-          paintOkQr();
           $("successModal").classList.add("show");
           await refreshLive();
         } catch (err) {
@@ -983,20 +1034,12 @@
             $("qrImg").src = qr; $("qrSlot").hidden = false;
             $("tipImg").src = qr; $("tip").hidden = false;
             $("tipImg").onerror = function () { $("tip").hidden = true; };
-            paintOkQr();
           }
         } catch (e) {}
       }
 
-      function paintOkQr() {
-        var qr = state.qr || "";
-        if (!qr) { $("okQrSlot").hidden = true; return; }
-        $("okQrImg").src = qr;
-        $("okQrSlot").hidden = false;
-      }
-
-      /* 领取完成后自动弹出赞赏码；once=true 时同一单只弹一次 */
-      function showTipModal(orderNo, once) {
+      /* 赞赏完全自愿：弹窗只负责展示赞赏码，× / 遮罩 / 按钮均可关闭；once=true 时同一单只自动弹一次 */
+      function showTipModal(orderNo, once, note) {
         var qr = state.qr || "";
         if (!qr) return false;
         if (once) {
@@ -1004,14 +1047,21 @@
           tipShown[orderNo] = 1;
         }
         $("tipModalImg").src = qr;
-        $("tipModalNote").textContent = orderNo
-          ? ("订单 " + orderNo + " 已经出餐啦，扫上面的赞赏码支持一下主厨，随心就好 ♡")
-          : "扫上面的赞赏码支持一下主厨，随心就好 ♡";
+        $("tipModalNote").textContent = note
+          || (orderNo
+            ? ("订单 " + orderNo + " 已经出餐啦，喜欢的话扫上面的码支持一下主厨就好，不赏也没关系 ♡")
+            : "打赏完全自愿，喜欢的话扫上面的码支持一下主厨就好，不赏也没关系 ♡");
         $("tipModal").classList.add("show");
         return true;
       }
 
       /* ---------- 取餐码查询 ---------- */
+      /* 已出餐的单子：打赏入口做成自愿按钮，点了才弹赞赏码，可随时 × 关闭 */
+      $("pkResult").addEventListener("click", function (e) {
+        var btn = e.target.closest("[data-tiporder]");
+        if (!btn) return;
+        showTipModal(btn.getAttribute("data-tiporder"), false);
+      });
       function pickupChip(s) {
         var map = { "待核对": ["wait", "🍳 备餐中 · 待店主核对赞赏"], "已核对": ["ok", "👍 已核对 · 准备出餐"], "已发放": ["done", "✅ 已出餐 · 可凭凭证领取"], "已驳回": ["no", "🚫 已取消"] };
         var m = map[s] || ["wait", "🍳 备餐中"];
@@ -1032,6 +1082,9 @@
           '<div style="color:var(--ink-sub);font-size:0.88rem;">' + esc(names) + '</div>' +
           '<div style="color:var(--ink-sub);font-size:0.82rem;margin-top:0.4rem;">' + new Date(r.created_at).toLocaleString("zh-CN", { hour12: false }) + ' 下单' +
           (r.status === "已发放" ? ' · 网盘链接请在「🧾 我的订单」里用单号 + 凭证领取' : '') + '</div>' +
+          (r.status === "已发放" && state.qr
+            ? '<div style="margin-top:0.7rem;"><button type="button" class="pickup-tip-btn" data-tiporder="' + esc(r.order_no) + '">☕ 吃得开心？请主厨喝杯汽水（随心）</button></div>'
+            : '') +
           '</div>';
       }
 
@@ -1185,7 +1238,21 @@
 
       $("submitBtn").addEventListener("click", submitOrder);
       $("okClose").addEventListener("click", closeModal);
+      /* 下单成功弹窗里的「随心打赏」：自愿入口，点开赞赏码窗口，可随时 × 关闭 */
+      $("okTip").addEventListener("click", function () {
+        if (!state.qr) { toast("店主还没上传赞赏码哦～"); return; }
+        $("successModal").classList.remove("show");
+        showTipModal((state.lastOrder || {}).order_no || "", false,
+          "打赏完全自愿，喜欢的话扫上面的码支持一下主厨就好，不赏也没关系 ♡");
+      });
       $("tipModalClose").addEventListener("click", function () { $("tipModal").classList.remove("show"); });
+      /* 弹窗右上角 × 关闭（赞赏码窗口 / 下单成功弹窗通用） */
+      document.querySelectorAll(".modal-x").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var m = document.getElementById(btn.getAttribute("data-closemodal"));
+          if (m) m.classList.remove("show");
+        });
+      });
       $("tipModal").addEventListener("click", function (e) { if (e.target === $("tipModal")) $("tipModal").classList.remove("show"); });
       $("successModal").addEventListener("click", function (e) { if (e.target === $("successModal")) closeModal(); });
       document.addEventListener("keydown", function (e) { if (e.key === "Escape") { $("successModal").classList.remove("show"); $("tipModal").classList.remove("show"); } });
