@@ -61,6 +61,49 @@
         .btn-theme { border-radius: 50%; width: 40px; height: 40px; padding: 0; justify-content: center; font-size: 1.2rem; border-style: solid; }
         .wrapper { max-width: 1000px; margin: 0 auto; background: var(--wrapper-bg); padding: 3rem 2rem; border-radius: 12px; box-shadow: inset 0 0 20px rgba(255,255,255,0.05), 0 4px 20px rgba(0,0,0,0.03); border: 1px solid var(--wrapper-border); overflow: hidden; }
         header { text-align: center; margin-bottom: 3rem; position: relative; }
+
+        /* ===== 店铺招牌：店主头像挂饰（点进店主后台） =====
+           沿用车票风：胶带、虚线、邮票齿孔圆框、轻轻摇摆，不引入新风格。 */
+        .shop-sign {
+            display: flex; flex-direction: column; align-items: center; gap: 0.45rem;
+            margin: 0.4rem auto 1.7rem; width: max-content; text-decoration: none;
+            transform-origin: top center; animation: signSway 5.5s ease-in-out infinite;
+        }
+        @keyframes signSway { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-1.8deg); } }
+        .shop-sign .sign-tape {
+            width: 64px; height: 16px; border-radius: 2px; transform: rotate(-3deg); opacity: 0.85;
+            background: rgba(220, 193, 151, 0.75); box-shadow: 1px 1px 0 rgba(0,0,0,0.05);
+        }
+        .shop-sign .sign-frame {
+            width: 88px; height: 88px; border-radius: 50%; border: 2px dashed var(--ink-sub);
+            background: var(--card-bg); display: flex; align-items: center; justify-content: center;
+            padding: 6px; box-shadow: 3px 4px 0 rgba(0,0,0,0.07); position: relative;
+            overflow: hidden; transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        /* 内圈邮票齿孔细线 */
+        .shop-sign .sign-frame::after {
+            content: ''; position: absolute; inset: 3px; border-radius: 50%;
+            border: 1px dashed rgba(120, 96, 68, 0.35); pointer-events: none;
+        }
+        .shop-sign .sign-frame img { width: 100%; height: 100%; object-fit: cover; object-position: center; border-radius: 50%; display: block; }
+        .shop-sign .sign-fb { font-size: 2.4rem; line-height: 1; }
+        .shop-sign .sign-label {
+            font-family: var(--font-chinese-title); font-size: 0.8rem; letter-spacing: 2px;
+            color: var(--ink-sub); background: var(--card-bg);
+            border: 1px dashed var(--ink-sub); padding: 0.15rem 0.8rem; border-radius: 20px;
+            box-shadow: 2px 2px 0 rgba(0,0,0,0.05); white-space: nowrap;
+        }
+        .shop-sign:hover .sign-frame, .shop-sign:focus .sign-frame { transform: scale(1.07) rotate(3deg); box-shadow: 4px 6px 0 rgba(0,0,0,0.1); }
+        .shop-sign:hover .sign-label { color: var(--ink-main); }
+        body.dark-mode .shop-sign .sign-tape { background: rgba(220, 193, 151, 0.35); }
+        body.dark-mode .shop-sign .sign-frame::after { border-color: rgba(220, 193, 151, 0.3); }
+        @media (max-width: 560px) {
+            .shop-sign .sign-frame { width: 72px; height: 72px; }
+            .shop-sign .sign-fb { font-size: 2rem; }
+            .shop-sign .sign-tape { width: 52px; }
+            .shop-sign { margin-bottom: 1.3rem; }
+        }
+
         .header-title-wrap { display: flex; align-items: baseline; justify-content: center; gap: 1.5rem; }
         .title-english { font-family: var(--font-english); font-size: 4.5rem; color: #5c7a6b; text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.1), 2px 3px 5px rgba(0, 0, 0, 0.2); transform: rotate(-2deg); line-height: 1; }
         body.dark-mode .title-english { color: #86a895; }
@@ -421,6 +464,14 @@
     </div>
     <div class="wrapper">
         <header>
+            <a class="shop-sign" href="admin.html" id="shopSign" title="店主后台 · 进店打理">
+                <span class="sign-tape"></span>
+                <span class="sign-frame">
+                    <img id="signAvatar" alt="店主头像" hidden referrerpolicy="no-referrer">
+                    <span class="sign-fb" id="signFb">🐟</span>
+                </span>
+                <span class="sign-label">店主掌勺 · 进店打理</span>
+            </a>
             <div class="header-title-wrap"><div class="title-english">SodaFish</div><div class="title-chinese">小食堂</div></div>
             <p>✦ 记录每一次文字与味蕾的相遇 ✦</p>
             <div class="live-line"><span class="live-dot off" id="liveDot"></span><span id="liveTxt">正在连接小食堂…</span></div>
@@ -1034,6 +1085,13 @@
             $("qrImg").src = qr; $("qrSlot").hidden = false;
             $("tipImg").src = qr; $("tip").hidden = false;
             $("tipImg").onerror = function () { $("tip").hidden = true; };
+          }
+          /* 店铺招牌：店主头像（后台「店主头像」上传的 admin_avatar） */
+          var av = map.admin_avatar || "";
+          if (av) {
+            var si = $("signAvatar");
+            si.src = av; si.hidden = false; $("signFb").hidden = true;
+            si.onerror = function () { si.hidden = true; $("signFb").hidden = false; };
           }
         } catch (e) {}
       }
