@@ -356,6 +356,8 @@
             .ok-btn-row { flex-direction: column; }
             .ok-btn-row button { width: 100%; }
             .qr-slot img { max-width: 150px; max-height: 150px; }
+            /* 手机端窄卡按钮文字防出框：缩小字号 + 留出左右内边距 */
+            .order-btn { font-size: clamp(0.72rem, 3.4vw, 0.85rem); padding: 0.4rem 0.3rem; letter-spacing: 0; }
         }
         @media (max-width: 480px) {
             .hero-actions { gap: 0.5rem; }
