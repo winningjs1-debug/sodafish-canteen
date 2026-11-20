@@ -442,9 +442,12 @@ textarea.search{resize:vertical;line-height:1.6}
         <button class="sg" type="button" data-stage="done">🍳 已出餐</button>
       </div>
       <div class="pub-box">
-        <div class="pub-title">⏰ 定时上架</div>
-        <p class="note">选好时间点「保存到云端」即可。时间一到，这道菜会在主页菜单自动上架，并自动弹出「新菜上架」弹窗——不用再手动点上架。清除定时则恢复普通上架开关。</p>
+        <div class="pub-title">⏰ 定时上架 / 下架</div>
+        <p class="note">设好「上架时间」和「下架时间」点「保存到云端」即可：到上架时间主页自动上架并弹「新菜上架」弹窗，到下架时间自动下架、主页变为「暂不开放领餐」不能下单。只填上架时间、下架留空 = 一直有效；两个都清空 = 恢复手动上架开关。</p>
+        <label class="fl" style="margin-top:4px">上架时间（开始供应）</label>
         <input class="search" id="bePublishAt" type="datetime-local" style="width:100%">
+        <label class="fl" style="margin-top:4px">下架时间（留空 = 不过期）</label>
+        <input class="search" id="bePublishEnd" type="datetime-local" style="width:100%">
         <button class="btn sm" id="bePublishClear" type="button" style="margin-top:5px">清除定时</button>
       </div>
       <label class="fl">角标（可留空）</label>
@@ -522,16 +525,16 @@ textarea.search{resize:vertical;line-height:1.6}
   <!-- 定时上架 -->
   <div class="panel panel-single" id="panelPublish" hidden>
     <div class="pub-hero">
-      <div class="pub-title">⏰ 定时上架 · 提前设置，时间一到自动开饭</div>
-      <p>在下面给任意一道菜设好「上架时间」，点 <b>保存定时</b>。时间一到，这道菜会在<b>食堂主页自动上架</b>，并向读者<b>自动弹出「🎉 新菜上架」弹窗</b>——你不用守在屏幕前，也不用再手动点上架。想取消就点 <b>清除定时</b>。菜单管理里也能对单道菜单独设置。</p>
+      <div class="pub-title">⏰ 定时上架 / 下架 · 提前设置，到点自动开饭、到点自动收摊</div>
+      <p>在下面给任意一道菜设好「上架时间」和「下架时间」，点 <b>保存定时</b>。到上架时间，这道菜会在<b>食堂主页自动上架</b>，并向读者<b>自动弹出「🎉 新菜上架」弹窗</b>；到下架时间会<b>自动下架</b>，主页变为「暂不开放领餐」不能下单——你不用守在屏幕前。下架时间留空表示一直有效；想取消就点 <b>清除定时</b>。菜单管理里也能对单道菜单独设置。</p>
     </div>
     <div class="tablewrap">
       <table>
         <thead>
-          <tr><th>菜品</th><th>定时状态</th><th>设置上架时间</th><th>操作</th></tr>
+          <tr><th>菜品</th><th>定时状态</th><th>上架时间</th><th>下架时间（留空不过期）</th><th>操作</th></tr>
         </thead>
         <tbody id="pubRows">
-          <tr><td colspan="4" class="empty">读取中…</td></tr>
+          <tr><td colspan="5" class="empty">读取中…</td></tr>
         </tbody>
       </table>
     </div>
@@ -656,7 +659,7 @@ textarea.search{resize:vertical;line-height:1.6}
     try {
       var res = await Promise.all([
         cloud.database.from("soda_ballots").select("id,nickname,message,picks,item_count,created_at").order("created_at", { ascending: false }).limit(500),
-        cloud.database.from("soda_books").select("code,title,category,status,stage,badge,ribbon,note,intro,cover_url,platform_url,sort,active,publish_at").order("sort", { ascending: true }),
+        cloud.database.from("soda_books").select("code,title,category,status,stage,badge,ribbon,note,intro,cover_url,platform_url,sort,active,publish_at,unpublish_at").order("sort", { ascending: true }),
         cloud.database.rpc("soda_overview"),
         cloud.database.rpc("soda_tally"),
         cloud.database.from("soda_notes").select("*").order("created_at", { ascending: false }).limit(500),
@@ -753,12 +756,25 @@ textarea.search{resize:vertical;line-height:1.6}
     return (d.getMonth() + 1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes());
   }
   function pubChip(b) {
-    if (!b.publish_at) return "";
-    var t = new Date(b.publish_at).getTime();
-    if (isNaN(t)) return "";
-    var passed = t <= Date.now();
-    return '<div style="margin-top:3px"><span class="st ' + (passed ? "done" : "wait") + '" title="定时上架：到点后主页自动上架并弹窗">' +
-      (passed ? "⏰ 已到点自动上架" : "⏰ " + esc(shortTime(b.publish_at)) + " 自动上架") + '</span></div>';
+    if (!b.publish_at && !b.unpublish_at) return "";
+    var html = '<div style="margin-top:3px">';
+    if (b.publish_at) {
+      var t = new Date(b.publish_at).getTime();
+      if (!isNaN(t)) {
+        var passed = t <= Date.now();
+        html += '<span class="st ' + (passed ? "done" : "wait") + '" title="定时上架：到点后主页自动上架并弹窗">' +
+          (passed ? "⏰ 已到点自动上架" : "⏰ " + esc(shortTime(b.publish_at)) + " 自动上架") + '</span>';
+      }
+    }
+    if (b.unpublish_at) {
+      var u = new Date(b.unpublish_at).getTime();
+      if (!isNaN(u)) {
+        var upassed = u <= Date.now();
+        html += ' <span class="st ' + (upassed ? "no" : "wait") + '" title="定时下架：到点后主页自动下架，变为暂不开放领餐">' +
+          (upassed ? "🌙 已到点自动下架" : "🌙 " + esc(shortTime(b.unpublish_at)) + " 自动下架") + '</span>';
+      }
+    }
+    return html + '</div>';
   }
 
   function renderShop() {
@@ -977,7 +993,7 @@ textarea.search{resize:vertical;line-height:1.6}
     $("cmtFoot").textContent = "共 " + cs.length + " 条讨论，来自 " + Object.keys(joiners).length + " 位食客。";
   }
 
-  /* ---------- 定时上架面板 ---------- */
+  /* ---------- 定时上架/下架面板 ---------- */
   function renderPublish() {
     var rows = (state.bookRows || []).slice();
     var q = state.q.toLowerCase();
@@ -985,36 +1001,51 @@ textarea.search{resize:vertical;line-height:1.6}
       return ((b.code || "") + " " + (b.title || "") + " " + (b.note || "")).toLowerCase().indexOf(q) > -1;
     });
     /* 已定时的排前面按时间先后，未定时的按 sort */
-    var scheduled = rows.filter(function (b) { return b.publish_at; }).sort(function (a, b) { return new Date(a.publish_at) - new Date(b.publish_at); });
-    var rest = rows.filter(function (b) { return !b.publish_at; }).sort(function (a, b) { return (a.sort == null ? 100 : a.sort) - (b.sort == null ? 100 : b.sort); });
+    var scheduled = rows.filter(function (b) { return b.publish_at || b.unpublish_at; }).sort(function (a, b) { return new Date(a.publish_at || a.unpublish_at) - new Date(b.publish_at || b.unpublish_at); });
+    var rest = rows.filter(function (b) { return !b.publish_at && !b.unpublish_at; }).sort(function (a, b) { return (a.sort == null ? 100 : a.sort) - (b.sort == null ? 100 : b.sort); });
     var all = scheduled.concat(rest);
-    $("tabNPub").textContent = (state.bookRows || []).filter(function (b) { return b.publish_at; }).length;
+    $("tabNPub").textContent = (state.bookRows || []).filter(function (b) { return b.publish_at || b.unpublish_at; }).length;
 
     if (!all.length) {
-      $("pubRows").innerHTML = '<tr><td colspan="4" class="empty">还没有菜品。先到「菜单管理」新增一道，再来这里设定时。</td></tr>';
+      $("pubRows").innerHTML = '<tr><td colspan="5" class="empty">还没有菜品。先到「菜单管理」新增一道，再来这里设定时。</td></tr>';
       return;
     }
     $("pubRows").innerHTML = all.map(function (b) {
       var chip, countdown = "";
       if (b.publish_at) {
         var t = new Date(b.publish_at).getTime();
-        if (t <= Date.now()) {
-          chip = '<span class="st done" title="已到点：主页已自动上架并弹窗">✅ 已到点 · 主页已自动上架</span>';
-        } else {
-          var ms = t - Date.now(), h = Math.floor(ms / 3600e3), m = Math.floor((ms % 3600e3) / 60e3);
-          countdown = h >= 24 ? Math.floor(h / 24) + " 天 " + (h % 24) + " 小时后" : (h ? h + " 小时 " + m + " 分后" : m + " 分钟后");
-          chip = '<span class="st wait" title="到点后主页自动上架并弹窗">⏰ ' + esc(shortTime(b.publish_at)) + ' 自动上架 · ' + countdown + '</span>';
+        if (!isNaN(t)) {
+          if (t <= Date.now()) {
+            chip = '<span class="st done" title="已到点：主页已自动上架并弹窗">✅ 已到点 · 主页已自动上架</span>';
+          } else {
+            var ms = t - Date.now(), h = Math.floor(ms / 3600e3), m = Math.floor((ms % 3600e3) / 60e3);
+            countdown = h >= 24 ? Math.floor(h / 24) + " 天 " + (h % 24) + " 小时后" : (h ? h + " 小时 " + m + " 分后" : m + " 分钟后");
+            chip = '<span class="st wait" title="到点后主页自动上架并弹窗">⏰ ' + esc(shortTime(b.publish_at)) + ' 自动上架 · ' + countdown + '</span>';
+          }
         }
       } else {
         chip = '<span class="st" style="color:var(--muted-2)">未设置</span>';
+      }
+      if (b.unpublish_at) {
+        var u = new Date(b.unpublish_at).getTime();
+        if (!isNaN(u)) {
+          if (u <= Date.now()) {
+            chip += ' <span class="st no" title="已到下架时间：主页已自动下架，暂不开放领餐">🌙 已自动下架</span>';
+          } else {
+            var ums = u - Date.now(), uh = Math.floor(ums / 3600e3), umm = Math.floor((ums % 3600e3) / 60e3);
+            var ucd = uh >= 24 ? Math.floor(uh / 24) + " 天 " + (uh % 24) + " 小时后" : (uh ? uh + " 小时 " + umm + " 分后" : umm + " 分钟后");
+            chip += ' <span class="st wait" title="到点后主页自动下架，暂不开放领餐">🌙 ' + esc(shortTime(b.unpublish_at)) + ' 自动下架 · ' + ucd + '</span>';
+          }
+        }
       }
       return '<tr class="pub-row" data-code="' + esc(b.code) + '">' +
         '<td class="bookcell"><div class="t">《' + esc(b.title) + '》</div><div class="a no">' + esc(b.code) + ' · ' + (b.category === "dessert" ? "🍰 甜点" : "🐟 主菜") + (b.active ? " · 在架" : " · 下架") + '</div></td>' +
         '<td>' + chip + '</td>' +
         '<td><input class="search pub-time" type="datetime-local" data-pubtime="' + esc(b.code) + '" value="' + localInput(b.publish_at) + '"></td>' +
+        '<td><input class="search pub-time" type="datetime-local" data-pubend="' + esc(b.code) + '" value="' + localInput(b.unpublish_at) + '"></td>' +
         '<td class="act">' +
           '<button class="btn sm primary" type="button" data-pubsave="' + esc(b.code) + '">保存定时</button>' +
-          (b.publish_at ? '<button class="btn sm" type="button" data-pubclear="' + esc(b.code) + '">清除定时</button>' : '') +
+          (b.publish_at || b.unpublish_at ? '<button class="btn sm" type="button" data-pubclear="' + esc(b.code) + '">清除定时</button>' : '') +
         '</td>' +
         '</tr>';
     }).join("");
@@ -1027,11 +1058,16 @@ textarea.search{resize:vertical;line-height:1.6}
     var row = (state.bookRows || []).filter(function (b) { return b.code === code; })[0];
     if (!row) return;
     var clearing = btn.hasAttribute("data-pubclear");
-    var val = clearing ? "" : ((document.querySelector('[data-pubtime="' + code + '"]') || {}).value || "");
-    if (!clearing && !val) { alert("先选好上架时间再点「保存定时」哦。"); return; }
+    var vStart = clearing ? "" : ((document.querySelector('[data-pubtime="' + code + '"]') || {}).value || "");
+    var vEnd = clearing ? "" : ((document.querySelector('[data-pubend="' + code + '"]') || {}).value || "");
+    if (!clearing && !vStart && !vEnd) { alert("先选好上架时间（或下架时间）再点「保存定时」哦。"); return; }
+    if (!clearing && vStart && vEnd && new Date(vEnd).getTime() <= new Date(vStart).getTime()) { alert("下架时间要晚于上架时间哦。"); return; }
     btn.disabled = true;
     try {
-      var payload = rowPayload(row, { p_publish_at: clearing ? "" : new Date(val).toISOString() });
+      var payload = rowPayload(row, {
+        p_publish_at: vStart ? new Date(vStart).toISOString() : "",
+        p_unpublish_at: vEnd ? new Date(vEnd).toISOString() : ""
+      });
       var r = unwrap(await cloud.database.rpc("soda_admin_book_save", payload));
       if (r && r.error) { alert(r.error); return; }
       await load();
@@ -1124,6 +1160,7 @@ textarea.search{resize:vertical;line-height:1.6}
     $("beSort").value = b ? (b.sort == null ? 100 : b.sort) : nextSort();
     $("beActive").checked = b ? !!b.active : true;
     $("bePublishAt").value = localInput(b ? b.publish_at : "");
+    $("bePublishEnd").value = localInput(b ? b.unpublish_at : "");
     if (!b) $("beCode").value = nextCode();
     setCover(b ? b.cover_url : "");
     $("beMsg").textContent = "";
@@ -1145,7 +1182,8 @@ textarea.search{resize:vertical;line-height:1.6}
       p_platform: b.platform_url || "",
       p_sort: b.sort == null ? 100 : Number(b.sort),
       p_active: !!b.active,
-      p_publish_at: b.publish_at || ""
+      p_publish_at: b.publish_at || "",
+      p_unpublish_at: b.unpublish_at || ""
     };
     if (overrides) Object.keys(overrides).forEach(function (k) { p[k] = overrides[k]; });
     return p;
@@ -1167,7 +1205,8 @@ textarea.search{resize:vertical;line-height:1.6}
       p_platform: ($("bePlatform").value || "").trim(),
       p_sort: parseInt($("beSort").value, 10) || 100,
       p_active: $("beActive").checked,
-      p_publish_at: $("bePublishAt").value ? new Date($("bePublishAt").value).toISOString() : ""
+      p_publish_at: $("bePublishAt").value ? new Date($("bePublishAt").value).toISOString() : "",
+      p_unpublish_at: $("bePublishEnd").value ? new Date($("bePublishEnd").value).toISOString() : ""
     };
   }
 
@@ -1226,7 +1265,8 @@ textarea.search{resize:vertical;line-height:1.6}
 
   $("bePublishClear").addEventListener("click", function () {
     $("bePublishAt").value = "";
-    $("beMsg").textContent = "已清除定时上架时间，点「保存到云端」生效。";
+    $("bePublishEnd").value = "";
+    $("beMsg").textContent = "已清除定时上架/下架时间，点「保存到云端」生效。";
   });
 
   $("beSave").addEventListener("click", async function () {
@@ -1238,7 +1278,7 @@ textarea.search{resize:vertical;line-height:1.6}
     try {
       var r = unwrap(await cloud.database.rpc("soda_admin_book_save", p));
       if (r && r.error) { $("beMsg").textContent = r.error; return; }
-      $("beMsg").textContent = "已保存 " + (r && r.code ? r.code : p.p_code) + (p.p_publish_at ? " · ⏰ 定时上架已设好，到点主页自动上架弹窗" : "") + "，菜单页 6 秒内自动刷新。";
+      $("beMsg").textContent = "已保存 " + (r && r.code ? r.code : p.p_code) + (p.p_publish_at ? " · ⏰ 定时上架已设好，到点主页自动上架弹窗" : "") + (p.p_unpublish_at ? " · 到下架时间自动下架" : "") + "，菜单页 6 秒内自动刷新。";
       await load();
     } catch (err) {
       $("beMsg").textContent = "保存失败：" + ((err && err.message) || "网络异常");
