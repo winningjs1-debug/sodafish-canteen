@@ -34,9 +34,9 @@
         :root {
             --bg-color: #f4f6f9; --card-bg: #ffffff; --ink-main: #4f5a66; --ink-sub: #8e99a6;
             --line-color: rgba(168, 177, 190, 0.16); --card-line: #e9edf1;
-            --tape-green: rgba(189, 200, 213, 0.75); --tape-pink: rgba(211, 219, 228, 0.85);
+            --tape-green: rgba(171, 202, 178, 0.7); --tape-pink: rgba(233, 175, 175, 0.7);
             --wrapper-bg: rgba(255, 255, 255, 0.55); --wrapper-border: rgba(178, 187, 199, 0.55);
-            --primary: #a7b5c5; --bar-bg: #e5e9ee;
+            --primary: #d49a9a; --bar-bg: #e8e2d5;
             --font-english: 'Great Vibes', cursive; --font-chinese-title: 'Ma Shan Zheng', cursive;
             --font-body: 'Klee One', 'KaiTi', serif;
         }
@@ -177,8 +177,8 @@
         .list-section { margin-bottom: 3.5rem; position: relative; } .list-section.hidden { display: none; }
         .section-title { display: inline-block; font-family: var(--font-chinese-title); font-size: 1.5rem; padding: 0.4rem 2rem; border-radius: 4px; margin-bottom: 2rem; box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.06); position: relative; }
         .section-title::before { content: ''; position: absolute; top: -6px; left: 10px; width: 30px; height: 12px; background: rgba(255,255,255,0.4); border: 1px solid rgba(0,0,0,0.05); transform: rotate(-10deg); }
-        .section-title.main-course { background: var(--tape-green); transform: rotate(-1deg); border: 1px dashed #9fb0c2; }
-        .section-title.dessert { background: var(--tape-pink); transform: rotate(1deg); border: 1px dashed #a9b6c6; }
+        .section-title.main-course { background: var(--tape-green); transform: rotate(-1deg); border: 1px dashed #85a38e; }
+        .section-title.dessert { background: var(--tape-pink); transform: rotate(1deg); border: 1px dashed #cc9292; }
         .grid-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.8rem; }
         .book-card { background: var(--card-bg); border: 1px dashed var(--wrapper-border); border-radius: 6px; padding: 2.2rem 1.4rem 1.6rem; position: relative; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s; box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.05); background-image: linear-gradient(transparent 95%, var(--card-line) 100%); background-size: 100% 1.7rem; background-position: 0 1.4rem; display: flex; flex-direction: column; }
         .book-card:hover { transform: translateY(-6px) rotate(-1deg); box-shadow: 5px 8px 15px rgba(0, 0, 0, 0.08); z-index: 2; }
@@ -205,7 +205,7 @@
         body.dark-mode .price-new { background: rgba(209, 91, 91, 0.2); color: #f09b9b; border-color: rgba(244, 194, 194, 0.2); }
         body.dark-mode .price-free { background: rgba(0, 137, 123, 0.2); color: #74d4c7; border-color: rgba(178, 223, 219, 0.2); }
         .bookmark-ribbon { position: absolute; top: -1px; right: 15px; width: 20px; height: 30px; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%); opacity: 0.8; box-shadow: 1px 2px 3px rgba(0,0,0,0.1); z-index: 6; }
-        .ribbon-pink { background: #d3bcc8; } .ribbon-blue { background: #b0c3d2; } .ribbon-green { background: #b4c9c0; } .ribbon-yellow { background: #d3cdb4; }
+        .ribbon-pink { background: #d49a9a; } .ribbon-blue { background: #a2b9c4; } .ribbon-green { background: #9abca2; } .ribbon-yellow { background: #dcc197; }
         .order-btn { margin-top: 1rem; padding: 0.4rem 0; font-family: var(--font-body); font-size: 0.95rem; font-weight: bold; border: 1px dashed var(--ink-sub); border-radius: 20px; background: transparent; color: var(--ink-main); cursor: pointer; transition: all 0.2s; width: 100%; }
         .order-btn:hover { background: var(--wrapper-border); } .order-btn.added { background: var(--primary); color: #fff; border-style: solid; border-color: var(--primary); cursor: not-allowed; opacity: 0.8; }
         .float-group { position: fixed; bottom: 90px; right: 30px; display: flex; flex-direction: column; gap: 15px; z-index: 100; }
@@ -479,7 +479,7 @@
             text-align: center; background: var(--card-bg); border: 1px dashed var(--ink-sub); border-radius: 10px;
             padding: 2rem 1.5rem 1.8rem; margin: 3.5rem 0 0; position: relative; box-shadow: 2px 3px 0 rgba(0,0,0,0.05);
         }
-        .tip-section::before { content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(2deg); width: 64px; height: 18px; background: var(--tape-yellow, rgba(202,212,224,0.75)); background: rgba(202, 212, 224, 0.75); border-radius: 2px; }
+        .tip-section::before { content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(2deg); width: 64px; height: 18px; background: var(--tape-yellow, rgba(220,193,151,0.75)); background: rgba(220, 193, 151, 0.75); border-radius: 2px; }
         .tip-section h3 { font-family: var(--font-chinese-title); font-size: 1.45rem; margin-bottom: 0.5rem; }
         .tip-section p { color: var(--ink-sub); font-size: 0.92rem; }
         /* 店主头像 + 消息气泡：像店主在门口招呼客人 */
@@ -553,7 +553,7 @@
         .tip-stamp .ts-tape {
             position: absolute; top: -9px; left: 50%; transform: translateX(-50%) rotate(-2deg);
             width: 56px; height: 15px; border-radius: 2px;
-            background: var(--tape-yellow, rgba(202,212,224,0.75)); opacity: 0.85;
+            background: var(--tape-yellow, rgba(220,193,151,0.75)); opacity: 0.85;
         }
         @media (max-width: 560px) {
             .tip-reply { gap: 0.6rem; }
@@ -618,16 +618,7 @@
             background: var(--card-bg); box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.05); max-width: 78vw;
         }
         .soda-boot-card .boot-fish { position: relative; display: inline-block; margin: 0 auto; animation: sodaFloat 1.6s ease-in-out infinite; }
-        .soda-boot-card .boot-fish .bf-svg { display: block; width: 88px; height: 80px; }
-        .soda-boot-card .boot-fish .bf-tail { transform-origin: 70px 36px; animation: sodaTail 1.6s ease-in-out infinite; }
-        .soda-boot-card .boot-fish .bf-wok { animation: sodaToss 1.05s ease-in-out infinite; }
-        .soda-boot-card .bf-bubble { position: absolute; border-radius: 50%; border: 1.5px solid rgba(122,90,51,.45); background: rgba(255,255,255,.55); animation: sodaBubble 2.2s ease-in infinite; }
-        .soda-boot-card .bf-bubble.b1 { width: 7px; height: 7px; left: -13px; top: 8px; }
-        .soda-boot-card .bf-bubble.b2 { width: 5px; height: 5px; left: -21px; top: 24px; animation-delay: .55s; }
-        .soda-boot-card .bf-bubble.b3 { width: 4px; height: 4px; left: -6px; top: 1px; animation-delay: 1.1s; }
-        body.dark-mode .soda-boot-card .bf-bubble { border-color: rgba(232,176,106,.55); background: rgba(255,255,255,.12); }
-        @keyframes sodaBubble { 0% { transform: translateY(5px) scale(.5); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(-16px) scale(1); opacity: 0; } }
-        @keyframes sodaTail { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(7deg); } }
+        .soda-boot-card .boot-emoji { font-size: 2.2rem; line-height: 1; display: block; }
         .soda-boot-card .txt { font-family: var(--font-chinese-title); font-size: 1.05rem; color: var(--ink-main); letter-spacing: 1px; display: block; margin-top: 0.45rem; }
         .soda-boot-card .sub { font-family: 'Space Mono', monospace; font-size: 0.64rem; letter-spacing: 2px; color: var(--ink-sub); display: block; margin-top: 0.25rem; }
         .soda-boot-card .retry {
@@ -635,7 +626,6 @@
             border: 1px dashed var(--ink-sub); border-radius: 20px; background: var(--tape-green); color: var(--ink-main);
         }
         @keyframes sodaFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
-        @keyframes sodaToss { 0%, 100% { transform: translateY(0) rotate(0deg); } 45% { transform: translateY(-9px) rotate(-7deg); } 60% { transform: translateY(-4px) rotate(-2deg); } }
 
         /* ===== 银白蕾丝餐具风背景装饰（参考银器风格图；想退回删除 #silverDeco 与 .sd-lace 两块即可） ===== */
         #silverDeco { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
@@ -758,38 +748,7 @@
     <div id="sodaBoot">
         <div class="soda-boot-card">
             <div class="boot-fish" aria-hidden="true">
-                <span class="bf-bubble b1"></span><span class="bf-bubble b2"></span><span class="bf-bubble b3"></span>
-                <svg class="bf-svg" viewBox="0 0 92 84">
-                    <!-- 蓝色小鱼本体 -->
-                    <path class="bf-tail" d="M68 36 L88 21 Q83 36 88 51 Z" fill="#5fa8d3" stroke="#2b5d7d" stroke-width="2.5" stroke-linejoin="round"/>
-                    <ellipse cx="42" cy="38" rx="30" ry="21" fill="#8ecae6" stroke="#2b5d7d" stroke-width="2.5"/>
-                    <path d="M20 47 Q42 61 62 47" fill="none" stroke="#f0f9ff" stroke-width="5" stroke-linecap="round" opacity=".85"/>
-                    <circle cx="28" cy="32" r="6.5" fill="#3a2e22"/>
-                    <circle cx="30.3" cy="29.8" r="2.2" fill="#fff"/>
-                    <ellipse cx="21" cy="41.5" rx="4.5" ry="3" fill="#f2907e" opacity=".75"/>
-                    <path d="M13.5 39.5 Q16.5 43 19.5 39.5" fill="none" stroke="#2b5d7d" stroke-width="2.2" stroke-linecap="round"/>
-                    <path d="M45 40 Q53 44 49.5 52 Q43.5 48 43.5 42.5 Z" fill="#5fa8d3" stroke="#2b5d7d" stroke-width="2.2" stroke-linejoin="round"/>
-                    <!-- 厨师帽 -->
-                    <g>
-                        <circle cx="31" cy="10" r="5.5" fill="#fffdf7" stroke="#8a8375" stroke-width="2"/>
-                        <circle cx="39" cy="7.5" r="6" fill="#fffdf7" stroke="#8a8375" stroke-width="2"/>
-                        <circle cx="46" cy="11" r="5" fill="#fffdf7" stroke="#8a8375" stroke-width="2"/>
-                        <rect x="26" y="13" width="24" height="7" rx="3" fill="#fffdf7" stroke="#8a8375" stroke-width="2"/>
-                    </g>
-                    <!-- 颠锅炒饭 -->
-                    <g class="bf-wok">
-                        <ellipse cx="24" cy="63" rx="2.2" ry="1.5" fill="#fff6e3" stroke="#cbb98f" stroke-width=".9"/>
-                        <ellipse cx="31" cy="59.5" rx="2.4" ry="1.6" fill="#fff6e3" stroke="#cbb98f" stroke-width=".9"/>
-                        <ellipse cx="38" cy="62" rx="2.2" ry="1.5" fill="#fff6e3" stroke="#cbb98f" stroke-width=".9"/>
-                        <ellipse cx="28" cy="65.5" rx="2" ry="1.4" fill="#fff6e3" stroke="#cbb98f" stroke-width=".9"/>
-                        <ellipse cx="35" cy="65" rx="2.1" ry="1.4" fill="#fff6e3" stroke="#cbb98f" stroke-width=".9"/>
-                        <g transform="rotate(-9 30 74)">
-                            <ellipse cx="30" cy="74" rx="20" ry="6" fill="#4a4038" stroke="#2e2822" stroke-width="2.5"/>
-                            <path d="M13 73 Q30 81.5 47 72" fill="none" stroke="#6a5f52" stroke-width="1.6" opacity=".8"/>
-                        </g>
-                        <path d="M11 71 L2 66" stroke="#2e2822" stroke-width="3.5" stroke-linecap="round"/>
-                    </g>
-                </svg>
+                <span class="boot-emoji">🐟</span>
             </div>
             <span class="txt" id="sodaBootTxt">正在摆桌…</span>
             <span class="sub" id="sodaBootSub">WELCOME TO SODAFISH</span>
@@ -1104,6 +1063,22 @@
         if (key) htmlCache[key] = html;
         el.innerHTML = html;
       }
+
+      /* 头像秒显：启动时先用本地缓存的上次头像填招牌，避免进主页时头像「闪一下」 */
+      (function () {
+        try {
+          var cav = localStorage.getItem("sodaSignAv");
+          if (cav) {
+            var si = document.getElementById("signAvatar");
+            if (si && !si.getAttribute("src")) {
+              si.onerror = function () { si.hidden = true; var fb = document.getElementById("signFb"); if (fb) fb.hidden = false; };
+              si.src = cav; si.hidden = false;
+            }
+            var fb = document.getElementById("signFb");
+            if (fb && si && !si.hidden) fb.hidden = true;
+          }
+        } catch (e) {}
+      })();
 
       var state = {
         books: [],
@@ -1602,14 +1577,30 @@
           var av = map.admin_avatar || "";
           if (av) {
             var si = $("signAvatar");
-            si.src = av; si.hidden = false; $("signFb").hidden = true;
-            si.onerror = function () { si.hidden = true; $("signFb").hidden = false; };
-            /* 赞赏区气泡旁的店主头像（左右两个对话行共用） */
+            /* 预加载：等头像真正解码完再换上去，避免默认小鱼→空白→头像的闪烁 */
+            var showSignAv = function () {
+              if (si.getAttribute("src") === av && !si.hidden) return;
+              si.src = av; si.hidden = false; $("signFb").hidden = true;
+            };
+            var pre = new Image();
+            pre.referrerPolicy = "no-referrer";
+            pre.onload = showSignAv;
+            pre.onerror = function () { /* 加载失败保持默认小鱼 */ };
+            pre.src = av;
+            try {
+              if (localStorage.getItem("sodaSignAv") !== av) localStorage.setItem("sodaSignAv", av);
+            } catch (e) {}
+            /* 赞赏区气泡旁的店主头像（左右两个对话行共用，同样先解码再显示） */
             ["tipAvatar", "tipAvatar2"].forEach(function (id) {
               var ta = $(id);
-              ta.src = av; ta.hidden = false;
-              $(id === "tipAvatar" ? "tipFb" : "tipFb2").hidden = true;
-              ta.onerror = function () { ta.hidden = true; $(id === "tipAvatar" ? "tipFb" : "tipFb2").hidden = false; };
+              var tp = new Image();
+              tp.referrerPolicy = "no-referrer";
+              tp.onload = function () {
+                ta.src = av; ta.hidden = false;
+                $(id === "tipAvatar" ? "tipFb" : "tipFb2").hidden = true;
+              };
+              tp.onerror = function () { /* 保持占位 */ };
+              tp.src = av;
             });
           }
           /* 店内公告板：后台「店内公告板」写的 shop_notice，留空不显示 */
