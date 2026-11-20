@@ -3,9 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 <title>SodaFish 小食堂 · 复古车票风</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%90%9F%3C/text%3E%3C/svg%3E">
 <script>
@@ -24,8 +21,7 @@
   }
   #sodaWrapLoad.gone { opacity:0; visibility:hidden; pointer-events:none; }
   .sw-card {
-    text-align:center; padding:1.5rem 2.1rem; border:1px dashed var(--sub); border-radius:10px;
-    background:var(--card); box-shadow:3px 4px 0 rgba(0,0,0,.05); max-width:78vw;
+    text-align:center; padding:1.5rem 2.1rem; max-width:78vw;
     font-family:"KaiTi","STKaiti",serif; color:var(--fg);
   }
   .sw-card .e { font-size:2rem; display:block; animation:swFloat 1.6s ease-in-out infinite; }
@@ -71,7 +67,11 @@
     if (S) S.textContent = "TAP TO RETRY";
     if (R) R.hidden = false;
   }
-  f.addEventListener("load", hide);
+  f.addEventListener("load", function () {
+    /* iframe load 不代表内层画好了：等内层 soda ready 消息才揭幕，绝不提前露白。
+       保底：load 后 8 秒没收到 ready 也揭幕，防止死锁卡加载页。 */
+    setTimeout(function () { hide(); }, 8000);
+  });
   if (R) R.addEventListener("click", function () { location.reload(); });
   window.addEventListener("message", function (ev) {
     var d = ev && ev.data;
@@ -80,7 +80,6 @@
     if (d.soda === "ready" && d.dark) document.documentElement.className = "soda-dark";
   });
   setTimeout(fail, 15000);
-  if (document.readyState === "complete") setTimeout(hide, 3500);
 })();
 </script>
 </body>
