@@ -32,11 +32,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Ma+Shan+Zheng&family=Klee+One:wght@400;600&family=Space+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #f7f4ec; --card-bg: #fffdf9; --ink-main: #3d342c; --ink-sub: #85796b;
-            --line-color: rgba(200, 195, 185, 0.15); --card-line: #f0ece1;
-            --tape-green: rgba(171, 202, 178, 0.7); --tape-pink: rgba(233, 175, 175, 0.7);
-            --wrapper-bg: rgba(255, 255, 255, 0.4); --wrapper-border: rgba(217, 208, 194, 0.5);
-            --primary: #d49a9a; --bar-bg: #e8e2d5;
+            --bg-color: #f4f6f9; --card-bg: #ffffff; --ink-main: #4f5a66; --ink-sub: #8e99a6;
+            --line-color: rgba(168, 177, 190, 0.16); --card-line: #e9edf1;
+            --tape-green: rgba(189, 200, 213, 0.75); --tape-pink: rgba(211, 219, 228, 0.85);
+            --wrapper-bg: rgba(255, 255, 255, 0.55); --wrapper-border: rgba(178, 187, 199, 0.55);
+            --primary: #a7b5c5; --bar-bg: #e5e9ee;
             --font-english: 'Great Vibes', cursive; --font-chinese-title: 'Ma Shan Zheng', cursive;
             --font-body: 'Klee One', 'KaiTi', serif;
         }
@@ -59,8 +59,20 @@
         .btn-sticker:hover { transform: translateY(-2px) rotate(-1deg); box-shadow: 3px 4px 5px rgba(0,0,0,0.08); }
         .btn-sticker.active { background: var(--ink-main); color: var(--bg-color); border-style: solid; transform: rotate(1deg); }
         .btn-theme { border-radius: 50%; width: 40px; height: 40px; padding: 0; justify-content: center; font-size: 1.2rem; border-style: solid; }
-        .wrapper { max-width: 1000px; margin: 0 auto; background: var(--wrapper-bg); padding: 3rem 2rem; border-radius: 12px; box-shadow: inset 0 0 20px rgba(255,255,255,0.05), 0 4px 20px rgba(0,0,0,0.03); border: 1px solid var(--wrapper-border); overflow: hidden; }
-        header { text-align: center; margin-bottom: 3rem; position: relative; }
+        .wrapper { max-width: 1000px; margin: 0 auto; background: var(--wrapper-bg); padding: 3rem 2rem; border-radius: 12px; box-shadow: inset 0 0 20px rgba(255,255,255,0.05), 0 4px 20px rgba(0,0,0,0.03); border: 1px solid var(--wrapper-border); overflow: hidden; position: relative; }
+        /* 银白法式装修：顶部蕾丝花边 + 一串珍珠 */
+        .wrapper::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 34px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='34' viewBox='0 0 64 34'%3E%3Crect width='64' height='13' fill='%23f1f4f8'/%3E%3Ccircle cx='8' cy='13' r='8' fill='%23f1f4f8'/%3E%3Ccircle cx='24' cy='13' r='8' fill='%23f1f4f8'/%3E%3Ccircle cx='40' cy='13' r='8' fill='%23f1f4f8'/%3E%3Ccircle cx='56' cy='13' r='8' fill='%23f1f4f8'/%3E%3Cpath d='M0 1.2 H64' stroke='%23cdd5e0' stroke-width='1'/%3E%3Ccircle cx='16' cy='6.5' r='2' fill='none' stroke='%23cdd5e0' stroke-width='1'/%3E%3Ccircle cx='48' cy='6.5' r='2' fill='none' stroke='%23cdd5e0' stroke-width='1'/%3E%3Ccircle cx='32' cy='6.5' r='2' fill='none' stroke='%23cdd5e0' stroke-width='1'/%3E%3Ccircle cx='8' cy='13' r='5.6' fill='none' stroke='%23d8dfe8' stroke-width='1'/%3E%3Ccircle cx='24' cy='13' r='5.6' fill='none' stroke='%23d8dfe8' stroke-width='1'/%3E%3Ccircle cx='40' cy='13' r='5.6' fill='none' stroke='%23d8dfe8' stroke-width='1'/%3E%3Ccircle cx='56' cy='13' r='5.6' fill='none' stroke='%23d8dfe8' stroke-width='1'/%3E%3C/svg%3E");
+            background-repeat: repeat-x; opacity: 0.9; pointer-events: none;
+        }
+        .wrapper::after {
+            content: ''; position: absolute; top: 35px; left: 0; right: 0; height: 12px;
+            background-image: radial-gradient(circle 4.5px at 7px 6px, #f4f7fa 0 1.7px, #c7d0dc 1.9px 3.5px, transparent 3.7px);
+            background-size: 14px 12px; background-repeat: repeat-x; opacity: 0.85; pointer-events: none;
+        }
+        @media (max-width: 560px) { .wrapper::before { height: 27px; background-size: 51px 27px; } .wrapper::after { top: 28px; } }
+        header { text-align: center; margin-bottom: 3rem; position: relative; z-index: 1; }
 
         /* ===== 店铺招牌：店主头像挂饰（点进店主后台） =====
            沿用车票风：胶带、虚线、邮票齿孔圆框、轻轻摇摆，不引入新风格。 */
@@ -101,7 +113,7 @@
         @keyframes signSway { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-1.8deg); } }
         .shop-sign .sign-tape {
             width: 64px; height: 16px; border-radius: 2px; transform: rotate(-3deg); opacity: 0.85;
-            background: rgba(220, 193, 151, 0.75); box-shadow: 1px 1px 0 rgba(0,0,0,0.05);
+            background: rgba(202, 212, 224, 0.75); box-shadow: 1px 1px 0 rgba(0,0,0,0.05);
         }
         .shop-sign .sign-frame {
             width: 88px; height: 88px; border-radius: 50%; border: 2px dashed var(--ink-sub);
@@ -112,7 +124,7 @@
         /* 内圈邮票齿孔细线 */
         .shop-sign .sign-frame::after {
             content: ''; position: absolute; inset: 3px; border-radius: 50%;
-            border: 1px dashed rgba(120, 96, 68, 0.35); pointer-events: none;
+            border: 1px dashed rgba(139, 148, 161, 0.4); pointer-events: none;
         }
         .shop-sign .sign-frame img { width: 100%; height: 100%; object-fit: cover; object-position: center; border-radius: 50%; display: block; }
         .shop-sign .sign-fb { font-size: 2.4rem; line-height: 1; }
@@ -165,8 +177,8 @@
         .list-section { margin-bottom: 3.5rem; position: relative; } .list-section.hidden { display: none; }
         .section-title { display: inline-block; font-family: var(--font-chinese-title); font-size: 1.5rem; padding: 0.4rem 2rem; border-radius: 4px; margin-bottom: 2rem; box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.06); position: relative; }
         .section-title::before { content: ''; position: absolute; top: -6px; left: 10px; width: 30px; height: 12px; background: rgba(255,255,255,0.4); border: 1px solid rgba(0,0,0,0.05); transform: rotate(-10deg); }
-        .section-title.main-course { background: var(--tape-green); transform: rotate(-1deg); border: 1px dashed #85a38e; }
-        .section-title.dessert { background: var(--tape-pink); transform: rotate(1deg); border: 1px dashed #cc9292; }
+        .section-title.main-course { background: var(--tape-green); transform: rotate(-1deg); border: 1px dashed #9fb0c2; }
+        .section-title.dessert { background: var(--tape-pink); transform: rotate(1deg); border: 1px dashed #a9b6c6; }
         .grid-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.8rem; }
         .book-card { background: var(--card-bg); border: 1px dashed var(--wrapper-border); border-radius: 6px; padding: 2.2rem 1.4rem 1.6rem; position: relative; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s; box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.05); background-image: linear-gradient(transparent 95%, var(--card-line) 100%); background-size: 100% 1.7rem; background-position: 0 1.4rem; display: flex; flex-direction: column; }
         .book-card:hover { transform: translateY(-6px) rotate(-1deg); box-shadow: 5px 8px 15px rgba(0, 0, 0, 0.08); z-index: 2; }
@@ -193,7 +205,7 @@
         body.dark-mode .price-new { background: rgba(209, 91, 91, 0.2); color: #f09b9b; border-color: rgba(244, 194, 194, 0.2); }
         body.dark-mode .price-free { background: rgba(0, 137, 123, 0.2); color: #74d4c7; border-color: rgba(178, 223, 219, 0.2); }
         .bookmark-ribbon { position: absolute; top: -1px; right: 15px; width: 20px; height: 30px; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%); opacity: 0.8; box-shadow: 1px 2px 3px rgba(0,0,0,0.1); z-index: 6; }
-        .ribbon-pink { background: #d49a9a; } .ribbon-blue { background: #a2b9c4; } .ribbon-green { background: #9abca2; } .ribbon-yellow { background: #dcc197; }
+        .ribbon-pink { background: #d3bcc8; } .ribbon-blue { background: #b0c3d2; } .ribbon-green { background: #b4c9c0; } .ribbon-yellow { background: #d3cdb4; }
         .order-btn { margin-top: 1rem; padding: 0.4rem 0; font-family: var(--font-body); font-size: 0.95rem; font-weight: bold; border: 1px dashed var(--ink-sub); border-radius: 20px; background: transparent; color: var(--ink-main); cursor: pointer; transition: all 0.2s; width: 100%; }
         .order-btn:hover { background: var(--wrapper-border); } .order-btn.added { background: var(--primary); color: #fff; border-style: solid; border-color: var(--primary); cursor: not-allowed; opacity: 0.8; }
         .float-group { position: fixed; bottom: 90px; right: 30px; display: flex; flex-direction: column; gap: 15px; z-index: 100; }
@@ -310,7 +322,7 @@
         .success-box .stamp { right: 56px; }
         .ok-btn-row { display: flex; gap: 0.6rem; justify-content: center; align-items: center; flex-wrap: wrap; margin-top: 0.8rem; }
         .ok-btn-row button { margin: 0; white-space: nowrap; }
-        .ok-tip-btn { background: rgba(220,193,151,0.55); }
+        .ok-tip-btn { background: rgba(202, 212, 224, 0.55); }
         body.dark-mode .ok-tip-btn { background: rgba(220,193,151,0.22); }
 
         /* ===== 多端自适应：按钮不压缩变形 ===== */
@@ -418,7 +430,7 @@
         .cover-box {
             position: relative; margin: -0.6rem -0.4rem 1rem; border: 1px dashed var(--wrapper-border); border-radius: 5px;
             overflow: hidden; aspect-ratio: 3 / 4; max-height: 320px;
-            background: linear-gradient(160deg, #f7f1e2, #efe6d2 55%, #e9dcc3);
+            background: linear-gradient(160deg, #f4f6fa, #e9edf3 55%, #dde4ec);
             display: flex; align-items: center; justify-content: center;
         }
         body.dark-mode .cover-box { background: linear-gradient(160deg, #46403a, #3b352f 55%, #332e28); }
@@ -436,7 +448,7 @@
         }
         .cover-fb { text-align: center; color: #a08d6f; }
         body.dark-mode .cover-fb { color: #8d7f6a; }
-        .cover-fb .fb-char { font-family: var(--font-chinese-title); font-size: 2.6rem; line-height: 1.1; color: #8f7b5c; display: block; }
+        .cover-fb .fb-char { font-family: var(--font-chinese-title); font-size: 2.6rem; line-height: 1.1; color: #8e99a6; display: block; }
         body.dark-mode .cover-fb .fb-char { color: #a99a80; }
         .cover-fb .fb-line { font-family: 'Space Mono', monospace; font-size: 0.62rem; letter-spacing: 3px; margin-top: 0.3rem; display: block; }
         .cover-box::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 8px, rgba(120,96,68,0.04) 8px, rgba(120,96,68,0.04) 9px); pointer-events: none; }
@@ -457,7 +469,7 @@
         .pickup-btn:hover { transform: translateY(-2px); box-shadow: 2px 4px 8px rgba(0,0,0,0.08); }
         .pickup-hint { font-size: 0.82rem; color: var(--ink-sub); margin-top: 0.7rem; }
         .pickup-result { margin-top: 1rem; }
-        .pickup-tip-btn { margin-top: 0.2rem; font-family: var(--font-body); font-size: 0.85rem; padding: 0.35rem 1rem; border-radius: 20px; border: 1px dashed var(--ink-sub); background: rgba(220,193,151,0.55); color: var(--ink-main); cursor: pointer; transition: all 0.2s; white-space: nowrap; max-width: 100%; }
+        .pickup-tip-btn { margin-top: 0.2rem; font-family: var(--font-body); font-size: 0.85rem; padding: 0.35rem 1rem; border-radius: 20px; border: 1px dashed var(--ink-sub); background: rgba(202, 212, 224, 0.55); color: var(--ink-main); cursor: pointer; transition: all 0.2s; white-space: nowrap; max-width: 100%; }
         .pickup-tip-btn:hover { transform: translateY(-2px); box-shadow: 2px 4px 8px rgba(0,0,0,0.08); }
         body.dark-mode .pickup-tip-btn { background: rgba(220,193,151,0.22); }
         .pickup-title { font-family: var(--font-chinese-title); font-size: 1.2rem; margin-bottom: 0.3rem; }
@@ -467,7 +479,7 @@
             text-align: center; background: var(--card-bg); border: 1px dashed var(--ink-sub); border-radius: 10px;
             padding: 2rem 1.5rem 1.8rem; margin: 3.5rem 0 0; position: relative; box-shadow: 2px 3px 0 rgba(0,0,0,0.05);
         }
-        .tip-section::before { content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(2deg); width: 64px; height: 18px; background: var(--tape-yellow, rgba(220,193,151,0.75)); background: rgba(220,193,151,0.75); border-radius: 2px; }
+        .tip-section::before { content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(2deg); width: 64px; height: 18px; background: var(--tape-yellow, rgba(202,212,224,0.75)); background: rgba(202, 212, 224, 0.75); border-radius: 2px; }
         .tip-section h3 { font-family: var(--font-chinese-title); font-size: 1.45rem; margin-bottom: 0.5rem; }
         .tip-section p { color: var(--ink-sub); font-size: 0.92rem; }
         /* 店主头像 + 消息气泡：像店主在门口招呼客人 */
@@ -489,13 +501,13 @@
         }
         body.dark-mode .tip-avatar::before { opacity: 0.5; }
         .tip-bubble {
-            position: relative; background: rgba(220,193,151,0.28); border: 1px dashed var(--ink-sub);
+            position: relative; background: rgba(202,212,224,0.28); border: 1px dashed var(--ink-sub);
             border-radius: 14px; padding: 0.55rem 1rem; font-family: var(--font-chinese-title);
             font-size: 1.02rem; letter-spacing: 1px; color: var(--ink-main); transform: rotate(0.8deg); max-width: 15rem;
         }
         .tip-bubble::before {
             content: ''; position: absolute; left: -6px; top: 50%; transform: translateY(-50%) rotate(45deg);
-            width: 10px; height: 10px; background: rgba(220,193,151,0.28);
+            width: 10px; height: 10px; background: rgba(202,212,224,0.28);
             border-left: 1px dashed var(--ink-sub); border-bottom: 1px dashed var(--ink-sub);
         }
         body.dark-mode .tip-bubble { background: rgba(220,193,151,0.12); }
@@ -541,7 +553,7 @@
         .tip-stamp .ts-tape {
             position: absolute; top: -9px; left: 50%; transform: translateX(-50%) rotate(-2deg);
             width: 56px; height: 15px; border-radius: 2px;
-            background: var(--tape-yellow, rgba(220,193,151,0.75)); opacity: 0.85;
+            background: var(--tape-yellow, rgba(202,212,224,0.75)); opacity: 0.85;
         }
         @media (max-width: 560px) {
             .tip-reply { gap: 0.6rem; }
@@ -606,8 +618,9 @@
             background: var(--card-bg); box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.05); max-width: 78vw;
         }
         .soda-boot-card .boot-fish { position: relative; display: inline-block; margin: 0 auto; animation: sodaFloat 1.6s ease-in-out infinite; }
-        .soda-boot-card .boot-fish .bf-svg { display: block; width: 78px; height: 58px; }
+        .soda-boot-card .boot-fish .bf-svg { display: block; width: 88px; height: 80px; }
         .soda-boot-card .boot-fish .bf-tail { transform-origin: 70px 36px; animation: sodaTail 1.6s ease-in-out infinite; }
+        .soda-boot-card .boot-fish .bf-wok { animation: sodaToss 1.05s ease-in-out infinite; }
         .soda-boot-card .bf-bubble { position: absolute; border-radius: 50%; border: 1.5px solid rgba(122,90,51,.45); background: rgba(255,255,255,.55); animation: sodaBubble 2.2s ease-in infinite; }
         .soda-boot-card .bf-bubble.b1 { width: 7px; height: 7px; left: -13px; top: 8px; }
         .soda-boot-card .bf-bubble.b2 { width: 5px; height: 5px; left: -21px; top: 24px; animation-delay: .55s; }
@@ -622,11 +635,44 @@
             border: 1px dashed var(--ink-sub); border-radius: 20px; background: var(--tape-green); color: var(--ink-main);
         }
         @keyframes sodaFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+        @keyframes sodaToss { 0%, 100% { transform: translateY(0) rotate(0deg); } 45% { transform: translateY(-9px) rotate(-7deg); } 60% { transform: translateY(-4px) rotate(-2deg); } }
+
+        /* ===== 银白蕾丝餐具风背景装饰（参考银器风格图；想退回删除 #silverDeco 与 .sd-lace 两块即可） ===== */
+        #silverDeco { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+        #silverDeco svg { position: absolute; overflow: visible; }
+        .sd-lace { top: -1px; left: 0; width: 100%; height: 58px; opacity: .5; }
+        .sd-lace-in { position: absolute; top: -1px; left: 0; width: 100%; height: 62px; opacity: .55; pointer-events: none; }
+        .sd-plate { top: 84px; left: 50%; width: 330px; height: 330px; margin-left: -165px; opacity: .38; }
+        .sd-pearls.p1 { top: 64px; left: 0.8%; width: 300px; opacity: .55; }
+        .sd-pearls.p2 { top: 44px; right: 0.5%; width: 330px; opacity: .55; }
+        .sd-fork { left: 1.2%; top: 320px; width: 33px; opacity: .55; transform: rotate(7deg); }
+        .sd-spoon { right: 1.4%; top: 300px; width: 33px; opacity: .55; transform: rotate(-8deg); }
+        .sd-knife { left: 2.2%; top: 660px; width: 31px; opacity: .5; transform: rotate(-6deg); }
+        .sd-key { right: 2.6%; top: 600px; width: 54px; opacity: .55; transform: rotate(15deg); }
+        .sd-bow { left: 1.6%; bottom: 140px; width: 96px; opacity: .55; }
+        .sd-spark { width: 18px; height: 18px; opacity: .6; }
+        .sd-spark.s1 { top: 250px; right: 8%; }
+        .sd-spark.s2 { top: 520px; left: 6%; }
+        .sd-spark.s3 { top: 180px; left: 12%; }
+        .sd-dots { bottom: 0; left: 0; width: 100%; height: 100px; opacity: .45; }
+        body.dark-mode #silverDeco { opacity: .14; }
+        @media (max-width: 1060px) {
+            .sd-fork { left: 0.4%; } .sd-spoon { right: 0.4%; } .sd-knife { left: 0.8%; } .sd-key { right: 1%; } .sd-bow { left: 0.8%; }
+        }
+        @media (max-width: 760px) {
+            .sd-plate, .sd-knife, .sd-bow, .sd-key, .sd-pearls.p2, .sd-spark.s3 { display: none; }
+            .sd-lace { height: 44px; }
+            .sd-lace-in { height: 48px; }
+            .sd-pearls.p1 { width: 200px; top: 50px; opacity: .4; }
+            .sd-fork { left: 0.2%; width: 26px; top: 260px; }
+            .sd-spoon { right: 0.2%; width: 26px; top: 250px; }
+            .sd-spark.s1 { right: 4%; }
+        }
 
         /* ===== 定时上架自动弹窗：新菜上新公告（沿用 success-box 车票风） ===== */
-        .launch-item { display: flex; gap: 0.85rem; align-items: center; text-align: left; background: rgba(220,193,151,0.18); border: 1px dashed var(--ink-sub); border-radius: 8px; padding: 0.7rem 0.85rem; margin-bottom: 0.6rem; }
+        .launch-item { display: flex; gap: 0.85rem; align-items: center; text-align: left; background: rgba(202,212,224,0.18); border: 1px dashed var(--ink-sub); border-radius: 8px; padding: 0.7rem 0.85rem; margin-bottom: 0.6rem; }
         body.dark-mode .launch-item { background: rgba(220,193,151,0.08); }
-        .launch-item .lc-cover { width: 46px; height: 62px; flex: none; border: 1px dashed var(--wrapper-border); border-radius: 4px; overflow: hidden; background: linear-gradient(160deg, #f7f1e2, #efe6d2); display: flex; align-items: center; justify-content: center; font-family: var(--font-chinese-title); font-size: 1.4rem; color: #8f7b5c; }
+        .launch-item .lc-cover { width: 46px; height: 62px; flex: none; border: 1px dashed var(--wrapper-border); border-radius: 4px; overflow: hidden; background: linear-gradient(160deg, #f4f6fa, #e9edf2); display: flex; align-items: center; justify-content: center; font-family: var(--font-chinese-title); font-size: 1.4rem; color: #8e99a6; }
         body.dark-mode .launch-item .lc-cover { background: linear-gradient(160deg, #46403a, #3b352f); color: #a99a80; }
         .launch-item .lc-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .launch-item .lc-t { font-family: var(--font-chinese-title); font-size: 1.05rem; line-height: 1.3; }
@@ -634,20 +680,115 @@
     </style>
 </head>
 <body>
+    <div id="silverDeco" aria-hidden="true">
+        <!-- 顶部蕾丝（在 wrapper 内另有一层，见下方 .sd-lace-in） -->
+        <svg class="sd-pearls p1" viewBox="0 0 300 140">
+            <path d="M8 128 Q110 6 292 52" fill="none" stroke="#b7bdc9" stroke-width="9" stroke-linecap="round" stroke-dasharray="0.1 18" opacity=".8"/>
+            <path d="M8 128 Q110 6 292 52" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-dasharray="0.1 18" stroke-dashoffset="-2" opacity=".9"/>
+        </svg>
+        <svg class="sd-pearls p2" viewBox="0 0 330 140">
+            <path d="M322 128 Q210 6 10 52" fill="none" stroke="#b7bdc9" stroke-width="9" stroke-linecap="round" stroke-dasharray="0.1 18" opacity=".8"/>
+            <path d="M322 128 Q210 6 10 52" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-dasharray="0.1 18" stroke-dashoffset="-2" opacity=".9"/>
+        </svg>
+        <svg class="sd-plate" viewBox="0 0 200 200">
+            <defs><radialGradient id="sdgPlate" cx=".5" cy=".45" r=".65">
+                <stop offset="0" stop-color="#f4f5f8"/><stop offset=".8" stop-color="#dcdfe6"/><stop offset="1" stop-color="#c2c8d2"/>
+            </radialGradient></defs>
+            <circle cx="100" cy="100" r="96" fill="url(#sdgPlate)" opacity=".8"/>
+            <circle cx="100" cy="100" r="96" fill="none" stroke="#b0b7c2" stroke-width="1.5"/>
+            <circle cx="100" cy="100" r="87" fill="none" stroke="#b0b7c2" stroke-width="1" stroke-dasharray="2 6"/>
+            <circle cx="100" cy="100" r="76" fill="none" stroke="#b7bdc8" stroke-width="5" stroke-linecap="round" stroke-dasharray="0.1 26"/>
+            <circle cx="100" cy="100" r="64" fill="none" stroke="#b0b7c2" stroke-width="1.5"/>
+            <circle cx="100" cy="100" r="45" fill="none" stroke="#b0b7c2" stroke-width="1" opacity=".8"/>
+            <circle cx="100" cy="100" r="37" fill="#eef0f4" stroke="#b0b7c2" stroke-width="1.2"/>
+            <path d="M100 4 l-10 6 3.5 6 6.5 -3.5 6.5 3.5 3.5 -6 Z" fill="#d5dae2" stroke="#a8b0bc" stroke-width="1"/>
+        </svg>
+        <svg class="sd-item sd-fork" viewBox="0 0 36 170">
+            <g fill="url(#sdgSil)" stroke="#9aa2b0" stroke-width="1">
+                <rect x="7" y="4" width="4" height="40" rx="2"/>
+                <rect x="15" y="2" width="4" height="42" rx="2"/>
+                <rect x="23" y="4" width="4" height="40" rx="2"/>
+                <path d="M7 36 Q7 52 13 57 L13 64 H21 L21 57 Q27 52 27 36 Z"/>
+                <rect x="13" y="62" width="8" height="102" rx="4"/>
+            </g>
+        </svg>
+        <svg class="sd-item sd-spoon" viewBox="0 0 36 170">
+            <g fill="url(#sdgSil)" stroke="#9aa2b0" stroke-width="1">
+                <ellipse cx="17" cy="26" rx="12" ry="21"/>
+                <rect x="12" y="46" width="10" height="10" rx="3"/>
+                <rect x="13" y="54" width="8" height="110" rx="4"/>
+            </g>
+            <ellipse cx="17" cy="24" rx="6.5" ry="13" fill="#cfd4dc" opacity=".7"/>
+        </svg>
+        <svg class="sd-item sd-knife" viewBox="0 0 36 170">
+            <g fill="url(#sdgSil)" stroke="#9aa2b0" stroke-width="1">
+                <path d="M15 4 Q27 9 25 36 Q24 52 22 64 L14 64 Q13 30 15 4 Z"/>
+                <rect x="13" y="64" width="9" height="100" rx="4"/>
+            </g>
+        </svg>
+        <svg class="sd-item sd-key" viewBox="0 0 60 140">
+            <circle cx="30" cy="26" r="18" fill="none" stroke="#b0b7c2" stroke-width="7"/>
+            <circle cx="30" cy="26" r="8" fill="none" stroke="#b0b7c2" stroke-width="3"/>
+            <rect x="26.5" y="44" width="7" height="76" rx="3" fill="#c6cbd4" stroke="#9aa2b0" stroke-width="1"/>
+            <rect x="33" y="98" width="14" height="7" rx="2" fill="#c6cbd4" stroke="#9aa2b0" stroke-width="1"/>
+            <rect x="33" y="112" width="10" height="6" rx="2" fill="#c6cbd4" stroke="#9aa2b0" stroke-width="1"/>
+        </svg>
+        <svg class="sd-item sd-bow" viewBox="0 0 120 90">
+            <g fill="#dde1e8" stroke="#a4acb9" stroke-width="1.5" stroke-linejoin="round">
+                <path d="M58 40 Q30 8 12 26 Q4 36 20 48 Q36 58 58 44 Z"/>
+                <path d="M62 40 Q90 8 108 26 Q116 36 100 48 Q84 58 62 44 Z"/>
+                <path d="M56 46 Q40 66 26 84 L38 86 Q50 66 60 50 Z"/>
+                <path d="M64 46 Q80 66 94 84 L82 86 Q70 66 60 50 Z"/>
+                <circle cx="60" cy="44" r="9"/>
+            </g>
+        </svg>
+        <svg class="sd-spark s1" viewBox="-10 -10 20 20"><path d="M0 -9 L2.2 -2.2 L9 0 L2.2 2.2 L0 9 L-2.2 2.2 L-9 0 L-2.2 -2.2 Z" fill="#c9ced8"/></svg>
+        <svg class="sd-spark s2" viewBox="-10 -10 20 20"><path d="M0 -9 L2.2 -2.2 L9 0 L2.2 2.2 L0 9 L-2.2 2.2 L-9 0 L-2.2 -2.2 Z" fill="#c9ced8"/></svg>
+        <svg class="sd-spark s3" viewBox="-10 -10 20 20"><path d="M0 -9 L2.2 -2.2 L9 0 L2.2 2.2 L0 9 L-2.2 2.2 L-9 0 L-2.2 -2.2 Z" fill="#c9ced8"/></svg>
+        <svg class="sd-dots" viewBox="0 0 1200 100" preserveAspectRatio="none">
+            <path d="M0 80 Q300 60 600 78 T1200 70" stroke="#c3c9d3" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="0.1 22" opacity=".6"/>
+            <path d="M0 92 Q300 78 600 90 T1200 84" stroke="#c3c9d3" stroke-width="3" fill="none" stroke-linecap="round" stroke-dasharray="0.1 30" opacity=".5"/>
+        </svg>
+        <defs>
+            <linearGradient id="sdgSil" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#e2e5ea"/><stop offset=".5" stop-color="#b6bdc9"/><stop offset="1" stop-color="#dfe2e8"/>
+            </linearGradient>
+        </defs>
+    </div>
     <div id="sodaBoot">
         <div class="soda-boot-card">
             <div class="boot-fish" aria-hidden="true">
                 <span class="bf-bubble b1"></span><span class="bf-bubble b2"></span><span class="bf-bubble b3"></span>
-                <svg class="bf-svg" viewBox="0 0 96 72">
-                    <path class="bf-tail" d="M68 36 L88 21 Q83 36 88 51 Z" fill="#e8b06a" stroke="#7a5a33" stroke-width="2.5" stroke-linejoin="round"/>
-                    <path d="M33 18 Q44 5 57 15 Q49 20 44 21 Z" fill="#e8b06a" stroke="#7a5a33" stroke-width="2.5" stroke-linejoin="round"/>
-                    <ellipse cx="42" cy="38" rx="30" ry="21" fill="#f6b98a" stroke="#7a5a33" stroke-width="2.5"/>
-                    <path d="M20 47 Q42 61 62 47" fill="none" stroke="#fff3e2" stroke-width="5" stroke-linecap="round" opacity=".85"/>
+                <svg class="bf-svg" viewBox="0 0 92 84">
+                    <!-- 蓝色小鱼本体 -->
+                    <path class="bf-tail" d="M68 36 L88 21 Q83 36 88 51 Z" fill="#5fa8d3" stroke="#2b5d7d" stroke-width="2.5" stroke-linejoin="round"/>
+                    <ellipse cx="42" cy="38" rx="30" ry="21" fill="#8ecae6" stroke="#2b5d7d" stroke-width="2.5"/>
+                    <path d="M20 47 Q42 61 62 47" fill="none" stroke="#f0f9ff" stroke-width="5" stroke-linecap="round" opacity=".85"/>
                     <circle cx="28" cy="32" r="6.5" fill="#3a2e22"/>
                     <circle cx="30.3" cy="29.8" r="2.2" fill="#fff"/>
                     <ellipse cx="21" cy="41.5" rx="4.5" ry="3" fill="#f2907e" opacity=".75"/>
-                    <path d="M13.5 39.5 Q16.5 43 19.5 39.5" fill="none" stroke="#7a5a33" stroke-width="2.2" stroke-linecap="round"/>
-                    <path d="M45 40 Q53 44 49.5 52 Q43.5 48 43.5 42.5 Z" fill="#e8b06a" stroke="#7a5a33" stroke-width="2.2" stroke-linejoin="round"/>
+                    <path d="M13.5 39.5 Q16.5 43 19.5 39.5" fill="none" stroke="#2b5d7d" stroke-width="2.2" stroke-linecap="round"/>
+                    <path d="M45 40 Q53 44 49.5 52 Q43.5 48 43.5 42.5 Z" fill="#5fa8d3" stroke="#2b5d7d" stroke-width="2.2" stroke-linejoin="round"/>
+                    <!-- 厨师帽 -->
+                    <g>
+                        <circle cx="31" cy="10" r="5.5" fill="#fffdf7" stroke="#8a8375" stroke-width="2"/>
+                        <circle cx="39" cy="7.5" r="6" fill="#fffdf7" stroke="#8a8375" stroke-width="2"/>
+                        <circle cx="46" cy="11" r="5" fill="#fffdf7" stroke="#8a8375" stroke-width="2"/>
+                        <rect x="26" y="13" width="24" height="7" rx="3" fill="#fffdf7" stroke="#8a8375" stroke-width="2"/>
+                    </g>
+                    <!-- 颠锅炒饭 -->
+                    <g class="bf-wok">
+                        <ellipse cx="24" cy="63" rx="2.2" ry="1.5" fill="#fff6e3" stroke="#cbb98f" stroke-width=".9"/>
+                        <ellipse cx="31" cy="59.5" rx="2.4" ry="1.6" fill="#fff6e3" stroke="#cbb98f" stroke-width=".9"/>
+                        <ellipse cx="38" cy="62" rx="2.2" ry="1.5" fill="#fff6e3" stroke="#cbb98f" stroke-width=".9"/>
+                        <ellipse cx="28" cy="65.5" rx="2" ry="1.4" fill="#fff6e3" stroke="#cbb98f" stroke-width=".9"/>
+                        <ellipse cx="35" cy="65" rx="2.1" ry="1.4" fill="#fff6e3" stroke="#cbb98f" stroke-width=".9"/>
+                        <g transform="rotate(-9 30 74)">
+                            <ellipse cx="30" cy="74" rx="20" ry="6" fill="#4a4038" stroke="#2e2822" stroke-width="2.5"/>
+                            <path d="M13 73 Q30 81.5 47 72" fill="none" stroke="#6a5f52" stroke-width="1.6" opacity=".8"/>
+                        </g>
+                        <path d="M11 71 L2 66" stroke="#2e2822" stroke-width="3.5" stroke-linecap="round"/>
+                    </g>
                 </svg>
             </div>
             <span class="txt" id="sodaBootTxt">正在摆桌…</span>
@@ -673,6 +814,12 @@
         </div>
     </div>
     <div class="wrapper">
+        <svg class="sd-lace-in" viewBox="0 0 1200 62" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0 0 H1200 V26 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 Z" fill="#e6e8ee" opacity=".55"/>
+            <path d="M0 0 H1200 V26 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0 a24 16 0 0 0 -48 0" fill="none" stroke="#b0b7c2" stroke-width="1.2"/>
+            <path d="M24 14 H1176" stroke="#b7bdc9" stroke-width="6" stroke-linecap="round" stroke-dasharray="0.1 48" opacity=".7"/>
+            <path d="M24 50 H1176" stroke="#b7bdc9" stroke-width="4" stroke-linecap="round" stroke-dasharray="0.1 48" opacity=".55"/>
+        </svg>
         <header>
             <div class="shop-head">
                 <a class="shop-sign" href="admin.html" id="shopSign" title="店主后台 · 进店打理">
