@@ -208,6 +208,7 @@
         .ribbon-pink { background: #d49a9a; } .ribbon-blue { background: #a2b9c4; } .ribbon-green { background: #9abca2; } .ribbon-yellow { background: #dcc197; }
         .order-btn { margin-top: 1rem; padding: 0.4rem 0; font-family: var(--font-body); font-size: 0.95rem; font-weight: bold; border: 1px dashed var(--ink-sub); border-radius: 20px; background: transparent; color: var(--ink-main); cursor: pointer; transition: all 0.2s; width: 100%; }
         .order-btn:hover { background: var(--wrapper-border); } .order-btn.added { background: var(--primary); color: #fff; border-style: solid; border-color: var(--primary); cursor: not-allowed; opacity: 0.8; }
+        .order-btn.locked { opacity: 0.55; cursor: not-allowed; border-style: solid; color: var(--ink-sub); background: transparent; }
         .float-group { position: fixed; bottom: 90px; right: 30px; display: flex; flex-direction: column; gap: 15px; z-index: 100; }
         .cart-float, .rank-float { width: 55px; height: 55px; border-radius: 50%; background: var(--card-bg); color: var(--ink-main); border: 1px dashed var(--ink-sub); box-shadow: 2px 4px 12px rgba(0,0,0,0.1); font-size: 1.6rem; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.2s; position: relative; }
         .cart-float:hover, .rank-float:hover { transform: scale(1.1) rotate(5deg); }
@@ -1113,7 +1114,7 @@
         }
       }
 
-      function isOrderable(b) { return b.status === "已完成"; }
+      function isOrderable(b) { return isLive(b); }
       /* 出餐进度：后台设置优先（done/cooking），未设置则按上架状态推断 */
       function stageOf(b) {
         if (b && (b.stage === "done" || b.stage === "cooking")) return b.stage;
@@ -1122,8 +1123,7 @@
       function stageLabel(st) { return st === "done" ? "🍳 已出餐" : "🔥 烹饪中"; }
       function pickLabel(b) {
         if (isOrderable(b)) return "+ 加入餐盘";
-        if (b.category === "main") return b.status === "未完成" ? "+ 催更投票" : "+ 投票求上新";
-        return "+ 投票求上新";
+        return "⏸ 暂不开放领餐";
       }
 
       function ribbonOf(b) {
@@ -1152,8 +1152,9 @@
         var stCls = b.status === "已完成" ? "status-done" : (b.status === "未上架" ? "status-ready" : "status-wip");
         var added = state.cart.indexOf(b.code) > -1;
         var stage = stageOf(b);
+        var orderable = isOrderable(b);
         var key = (b.title + " " + b.code + " " + (b.intro || b.note || "") + " " + (b.status || "")).toLowerCase();
-        return '<div class="book-card" data-code="' + esc(b.code) + '" data-stage="' + stage + '" data-search="' + esc(key) + '">' +
+        return '<div class="book-card' + (orderable ? "" : " is-locked") + '" data-code="' + esc(b.code) + '" data-stage="' + stage + '" data-search="' + esc(key) + '">' +
           '<div class="bookmark-ribbon ' + ribbonOf(b) + '"></div>' +
           '<div class="menu-tag ' + TAG[i % 3] + '">' + esc(b.code) + '</div>' +
           coverHTML(b) +
@@ -1165,7 +1166,7 @@
             '<span class="vote-chip" data-vote="' + esc(b.code) + '">0 票</span>' +
           '</div>' +
           '<div class="book-note">' + esc(b.intro || b.note || "") + '</div>' +
-          '<button class="order-btn' + (added ? " added" : "") + '" type="button"' + (added ? " disabled" : "") + '>' + (added ? "✓ 已加入餐盘" : pickLabel(b)) + '</button>' +
+          '<button class="order-btn' + (added ? " added" : "") + (!orderable ? " locked" : "") + '" type="button"' + ((added || !orderable) ? " disabled" : "") + '>' + (added ? "✓ 已加入餐盘" : pickLabel(b)) + '</button>' +
         '</div>';
       }
 
@@ -1314,26 +1315,35 @@
         return res ? res.data : null;
       }
 
-      /* ---------- 定时上架 ----------
-         后台给菜设好 publish_at：到点前主页不显示，到点后自动出现在菜单，
-         并自动弹出「新菜上架」弹窗（每本书每台设备只弹一次，48 小时内有效）。 */
+      /* ---------- 定时上架 / 下架 ----------
+         后台给菜设好 publish_at（上架时间）与 unpublish_at（下架时间）：
+         - 到上架时间前主页不显示「加入餐盘」，只显示「暂不开放领餐」；
+         - 到上架时间自动上架并弹出「新菜上架」弹窗（每本书每台设备只弹一次，48 小时内有效）；
+         - 到下架时间自动下架，主页保留卡片但按钮变为「暂不开放领餐」，不能加入餐盘、不能下单。 */
       function isLive(b) {
         if (!b) return false;
-        if (b.active) return true;
+        var now = Date.now();
+        if (b.unpublish_at) {
+          var ue = new Date(b.unpublish_at).getTime();
+          if (!isNaN(ue) && ue <= now) return false;   /* 已到下架时间：自动下架 */
+        }
         if (b.publish_at) {
           var t = new Date(b.publish_at).getTime();
-          if (!isNaN(t) && t <= Date.now()) return true;
+          if (isNaN(t)) return !!b.active;
+          if (t > now) return false;                   /* 定时上架还没到点 */
+          return true;                                 /* 已到上架时间：自动上架 */
         }
-        return false;
+        return !!b.active;
       }
       function applyBooks() {
-        state.books = (state.allBooks || []).filter(isLive);
+        /* 主页展示所有书：未上架 / 已下架的书也显示，但按钮为「暂不开放领餐」不可下单 */
+        state.books = (state.allBooks || []).slice();
         byCode = {};
         state.books.forEach(function (b) { byCode[b.code] = b; });
       }
       function bookSignature(data) {
         return (data || []).map(function (b) {
-          return [b.code, b.active ? 1 : 0, b.publish_at || "", b.status || "", b.stage || "", b.note || "", b.intro || "", b.cover_url ? 1 : 0].join("~");
+          return [b.code, b.active ? 1 : 0, b.publish_at || "", b.unpublish_at || "", b.status || "", b.stage || "", b.note || "", b.intro || "", b.cover_url ? 1 : 0].join("~");
         }).join("|");
       }
       function launchSeenMap() {
@@ -1401,7 +1411,7 @@
         if (bookPolling || !cloud) return;
         bookPolling = true;
         try {
-          var data = unwrap(await cloud.database.from("soda_books").select("code,title,category,status,stage,badge,ribbon,note,intro,cover_url,platform_url,sort,active,publish_at").order("sort", { ascending: true })) || [];
+          var data = unwrap(await cloud.database.from("soda_books").select("code,title,category,status,stage,badge,ribbon,note,intro,cover_url,platform_url,sort,active,publish_at,unpublish_at").order("sort", { ascending: true })) || [];
           state.allBooks = data || [];
           var sig = bookSignature(state.allBooks);
           var changed = sig !== bookSig;
@@ -1453,7 +1463,18 @@
 
         state.sending = true;
         paintCart();
+        /* 智能规则兜底：只提交当前上架窗口内的书，已下架/未上架的自动剔除 */
         var picks = state.cart.slice();
+        var livePicks = picks.filter(function (c) { return isLive(byCode[c]); });
+        var dropped = picks.length - livePicks.length;
+        if (!livePicks.length) {
+          toast("餐盘里的菜都已暂不开放领餐，先移除后再挑别的吧～");
+          state.sending = false;
+          paintCart();
+          return;
+        }
+        if (dropped) toast("有 " + dropped + " 道已暂不开放领餐，已自动从订单剔除。");
+        picks = livePicks;
         try {
           var r = unwrap(await cloud.database.rpc("soda_place_order", {
             p_book_codes: picks,
@@ -1835,7 +1856,7 @@
         var code = card.getAttribute("data-code");
         var b = byCode[code];
         if (b && isOrderable(b)) addToCart(code);
-        else voteOnce(code);
+        else toast("《" + ((b && b.title) || "这道菜") + "》还没上架，暂不开放领餐哦～");
       }
 
       async function voteOnce(code) {
