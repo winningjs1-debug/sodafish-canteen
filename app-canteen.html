@@ -1286,6 +1286,12 @@
 
       function addToCart(code) {
         if (state.cart.indexOf(code) > -1) return;
+        /* 强规则：只有上架中的菜才能进餐盘 */
+        var b = byCode[code];
+        if (!isOrderable(b)) {
+          toast("《" + ((b && b.title) || "这道菜") + "》暂不开放领餐，只有上架中的菜可以加入餐盘哦～");
+          return;
+        }
         if (state.cart.length >= 20) { toast("一次最多点 20 道，先提交这一轮吧。"); return; }
         state.cart.push(code);
         syncCard(code, true);
@@ -1320,26 +1326,40 @@
          - 到上架时间前主页不显示「加入餐盘」，只显示「暂不开放领餐」；
          - 到上架时间自动上架并弹出「新菜上架」弹窗（每本书每台设备只弹一次，48 小时内有效）；
          - 到下架时间自动下架，主页保留卡片但按钮变为「暂不开放领餐」，不能加入餐盘、不能下单。 */
+      /* ---------- 智能领餐强规则 ----------
+         可领餐（上架中）必须同时满足：
+         1) 后台开关为「在架」(active)
+         2) 状态标签为「已完成」（未上架 / 未完成一律不可领餐）
+         3) 时间窗内：定时上架已到点，且未过下架时间
+         主页展示所有书，但只有满足以上全部条件的书能加入餐盘提交订单。 */
       function isLive(b) {
         if (!b) return false;
         var now = Date.now();
+        if (b.active === false) return false;            /* 后台手动下架 */
         if (b.unpublish_at) {
           var ue = new Date(b.unpublish_at).getTime();
-          if (!isNaN(ue) && ue <= now) return false;   /* 已到下架时间：自动下架 */
+          if (!isNaN(ue) && ue <= now) return false;     /* 已到下架时间：自动下架 */
         }
         if (b.publish_at) {
           var t = new Date(b.publish_at).getTime();
-          if (isNaN(t)) return !!b.active;
-          if (t > now) return false;                   /* 定时上架还没到点 */
-          return true;                                 /* 已到上架时间：自动上架 */
+          if (isNaN(t)) return b.status === "已完成";
+          if (t > now) return false;                     /* 定时上架还没到点 */
+          return true;                                   /* 已到上架时间：自动上架 */
         }
-        return !!b.active;
+        return b.status === "已完成";                    /* 无定时：已完成=上架中 */
       }
       function applyBooks() {
         /* 主页展示所有书：未上架 / 已下架的书也显示，但按钮为「暂不开放领餐」不可下单 */
         state.books = (state.allBooks || []).slice();
         byCode = {};
         state.books.forEach(function (b) { byCode[b.code] = b; });
+        /* 强规则兜底：餐盘里只保留当前上架中的菜，已下架/未上架的立即移出 */
+        var keep = state.cart.filter(function (c) { return isOrderable(byCode[c]); });
+        if (keep.length !== state.cart.length) {
+          toast("已把 " + (state.cart.length - keep.length) + " 道暂不开放领餐的菜移出餐盘");
+          state.cart = keep;
+          paintCart();
+        }
       }
       function bookSignature(data) {
         return (data || []).map(function (b) {
@@ -1465,7 +1485,8 @@
         paintCart();
         /* 智能规则兜底：只提交当前上架窗口内的书，已下架/未上架的自动剔除 */
         var picks = state.cart.slice();
-        var livePicks = picks.filter(function (c) { return isLive(byCode[c]); });
+        /* 强规则兜底：只提交当前上架窗口内的书，已下架/未上架的自动剔除 */
+        var livePicks = picks.filter(function (c) { return isOrderable(byCode[c]); });
         var dropped = picks.length - livePicks.length;
         if (!livePicks.length) {
           toast("餐盘里的菜都已暂不开放领餐，先移除后再挑别的吧～");
@@ -1856,7 +1877,7 @@
         var code = card.getAttribute("data-code");
         var b = byCode[code];
         if (b && isOrderable(b)) addToCart(code);
-        else toast("《" + ((b && b.title) || "这道菜") + "》还没上架，暂不开放领餐哦～");
+        else toast("《" + ((b && b.title) || "这道菜") + "》暂不开放领餐（未上架 / 未到上架时间或已过下架时间），只有上架中的菜可以加入餐盘～");
       }
 
       async function voteOnce(code) {
