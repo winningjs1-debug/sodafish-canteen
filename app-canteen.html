@@ -605,7 +605,16 @@
             text-align: center; padding: 1.5rem 2.1rem; border: 1px dashed var(--ink-sub); border-radius: 10px;
             background: var(--card-bg); box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.05); max-width: 78vw;
         }
-        .soda-boot-card .boot-emoji { font-size: 2rem; line-height: 1; display: block; animation: sodaFloat 1.6s ease-in-out infinite; }
+        .soda-boot-card .boot-fish { position: relative; display: inline-block; margin: 0 auto; animation: sodaFloat 1.6s ease-in-out infinite; }
+        .soda-boot-card .boot-fish .bf-svg { display: block; width: 78px; height: 58px; }
+        .soda-boot-card .boot-fish .bf-tail { transform-origin: 70px 36px; animation: sodaTail 1.6s ease-in-out infinite; }
+        .soda-boot-card .bf-bubble { position: absolute; border-radius: 50%; border: 1.5px solid rgba(122,90,51,.45); background: rgba(255,255,255,.55); animation: sodaBubble 2.2s ease-in infinite; }
+        .soda-boot-card .bf-bubble.b1 { width: 7px; height: 7px; left: -13px; top: 8px; }
+        .soda-boot-card .bf-bubble.b2 { width: 5px; height: 5px; left: -21px; top: 24px; animation-delay: .55s; }
+        .soda-boot-card .bf-bubble.b3 { width: 4px; height: 4px; left: -6px; top: 1px; animation-delay: 1.1s; }
+        body.dark-mode .soda-boot-card .bf-bubble { border-color: rgba(232,176,106,.55); background: rgba(255,255,255,.12); }
+        @keyframes sodaBubble { 0% { transform: translateY(5px) scale(.5); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(-16px) scale(1); opacity: 0; } }
+        @keyframes sodaTail { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(7deg); } }
         .soda-boot-card .txt { font-family: var(--font-chinese-title); font-size: 1.05rem; color: var(--ink-main); letter-spacing: 1px; display: block; margin-top: 0.45rem; }
         .soda-boot-card .sub { font-family: 'Space Mono', monospace; font-size: 0.64rem; letter-spacing: 2px; color: var(--ink-sub); display: block; margin-top: 0.25rem; }
         .soda-boot-card .retry {
@@ -613,12 +622,34 @@
             border: 1px dashed var(--ink-sub); border-radius: 20px; background: var(--tape-green); color: var(--ink-main);
         }
         @keyframes sodaFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+        /* ===== 定时上架自动弹窗：新菜上新公告（沿用 success-box 车票风） ===== */
+        .launch-item { display: flex; gap: 0.85rem; align-items: center; text-align: left; background: rgba(220,193,151,0.18); border: 1px dashed var(--ink-sub); border-radius: 8px; padding: 0.7rem 0.85rem; margin-bottom: 0.6rem; }
+        body.dark-mode .launch-item { background: rgba(220,193,151,0.08); }
+        .launch-item .lc-cover { width: 46px; height: 62px; flex: none; border: 1px dashed var(--wrapper-border); border-radius: 4px; overflow: hidden; background: linear-gradient(160deg, #f7f1e2, #efe6d2); display: flex; align-items: center; justify-content: center; font-family: var(--font-chinese-title); font-size: 1.4rem; color: #8f7b5c; }
+        body.dark-mode .launch-item .lc-cover { background: linear-gradient(160deg, #46403a, #3b352f); color: #a99a80; }
+        .launch-item .lc-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .launch-item .lc-t { font-family: var(--font-chinese-title); font-size: 1.05rem; line-height: 1.3; }
+        .launch-item .lc-n { font-size: 0.82rem; color: var(--ink-sub); margin-top: 0.15rem; }
     </style>
 </head>
 <body>
     <div id="sodaBoot">
         <div class="soda-boot-card">
-            <span class="boot-emoji">🐟</span>
+            <div class="boot-fish" aria-hidden="true">
+                <span class="bf-bubble b1"></span><span class="bf-bubble b2"></span><span class="bf-bubble b3"></span>
+                <svg class="bf-svg" viewBox="0 0 96 72">
+                    <path class="bf-tail" d="M68 36 L88 21 Q83 36 88 51 Z" fill="#e8b06a" stroke="#7a5a33" stroke-width="2.5" stroke-linejoin="round"/>
+                    <path d="M33 18 Q44 5 57 15 Q49 20 44 21 Z" fill="#e8b06a" stroke="#7a5a33" stroke-width="2.5" stroke-linejoin="round"/>
+                    <ellipse cx="42" cy="38" rx="30" ry="21" fill="#f6b98a" stroke="#7a5a33" stroke-width="2.5"/>
+                    <path d="M20 47 Q42 61 62 47" fill="none" stroke="#fff3e2" stroke-width="5" stroke-linecap="round" opacity=".85"/>
+                    <circle cx="28" cy="32" r="6.5" fill="#3a2e22"/>
+                    <circle cx="30.3" cy="29.8" r="2.2" fill="#fff"/>
+                    <ellipse cx="21" cy="41.5" rx="4.5" ry="3" fill="#f2907e" opacity=".75"/>
+                    <path d="M13.5 39.5 Q16.5 43 19.5 39.5" fill="none" stroke="#7a5a33" stroke-width="2.2" stroke-linecap="round"/>
+                    <path d="M45 40 Q53 44 49.5 52 Q43.5 48 43.5 42.5 Z" fill="#e8b06a" stroke="#7a5a33" stroke-width="2.2" stroke-linejoin="round"/>
+                </svg>
+            </div>
             <span class="txt" id="sodaBootTxt">正在摆桌…</span>
             <span class="sub" id="sodaBootSub">WELCOME TO SODAFISH</span>
             <button class="retry" type="button" id="sodaBootRetry" hidden>重新连接</button>
@@ -826,6 +857,19 @@
             <button type="button" id="tipModalClose">不用啦，谢谢 ♡</button>
         </div>
     </div>
+    <div class="success-modal" id="launchModal">
+        <div class="success-box">
+            <button class="modal-x" type="button" data-closemodal="launchModal" title="关闭">✕</button>
+            <div class="stamp">NEW</div>
+            <h3>🎉 新菜上架啦！</h3>
+            <p style="margin-bottom:0.8rem;">主厨掐着点把新菜端上桌了：</p>
+            <div id="launchBody"></div>
+            <div class="ok-btn-row">
+                <button type="button" id="launchGo" class="ok-tip-btn">去尝鲜 →</button>
+                <button type="button" id="launchClose">知道啦 ♡</button>
+            </div>
+        </div>
+    </div>
     <button id="backToTop" type="button">⬆️</button>
     <div id="toast"></div>
 
@@ -916,6 +960,7 @@
 
       var state = {
         books: [],
+        allBooks: [],
         tally: {},
         overview: { ballots: 0, votes: 0, today_ballots: 0, today_votes: 0 },
         recent: [],
@@ -1144,11 +1189,77 @@
         return res ? res.data : null;
       }
 
-      async function loadBooks() {
-        var data = unwrap(await cloud.database.from("soda_books").select("*").eq("active", true).order("sort", { ascending: true }));
-        state.books = data || [];
+      /* ---------- 定时上架 ----------
+         后台给菜设好 publish_at：到点前主页不显示，到点后自动出现在菜单，
+         并自动弹出「新菜上架」弹窗（每本书每台设备只弹一次，48 小时内有效）。 */
+      function isLive(b) {
+        if (!b) return false;
+        if (b.active) return true;
+        if (b.publish_at) {
+          var t = new Date(b.publish_at).getTime();
+          if (!isNaN(t) && t <= Date.now()) return true;
+        }
+        return false;
+      }
+      function applyBooks() {
+        state.books = (state.allBooks || []).filter(isLive);
         byCode = {};
         state.books.forEach(function (b) { byCode[b.code] = b; });
+      }
+      function bookSignature(data) {
+        return (data || []).map(function (b) {
+          return [b.code, b.active ? 1 : 0, b.publish_at || "", b.status || "", b.stage || "", b.note || "", b.intro || "", b.cover_url ? 1 : 0].join("~");
+        }).join("|");
+      }
+      function launchSeenMap() {
+        try {
+          var o = JSON.parse(localStorage.getItem("sodaLaunchSeen") || "{}");
+          return (o && typeof o === "object" && !Array.isArray(o)) ? o : {};
+        } catch (e) { return {}; }
+      }
+      function markLaunchSeen(codes) {
+        var m = launchSeenMap();
+        codes.forEach(function (c) { m[c] = Date.now(); });
+        var keys = Object.keys(m);
+        if (keys.length > 60) {
+          keys.sort(function (a, b) { return m[a] - m[b]; });
+          keys.slice(0, keys.length - 60).forEach(function (k) { delete m[k]; });
+        }
+        try { localStorage.setItem("sodaLaunchSeen", JSON.stringify(m)); } catch (e) {}
+      }
+      function checkLaunches() {
+        var now = Date.now(), WINDOW = 48 * 3600 * 1000;
+        var seen = launchSeenMap(), due = [], stale = [];
+        (state.allBooks || []).forEach(function (b) {
+          if (!b.publish_at) return;
+          var t = new Date(b.publish_at).getTime();
+          if (isNaN(t) || t > now) return;
+          if (now - t > WINDOW) { stale.push(b.code); return; }
+          if (!seen[b.code]) due.push(b);
+        });
+        if (stale.length) markLaunchSeen(stale);
+        if (!due.length) return;
+        due.sort(function (p1, p2) { return new Date(p2.publish_at).getTime() - new Date(p1.publish_at).getTime(); });
+        var shown = due.slice(0, 3);
+        $("launchBody").innerHTML = shown.map(function (b) {
+          var url = (b.cover_url && String(b.cover_url).trim()) || state.covers[normTitle(b.title)] || "";
+          var cov = url
+            ? '<img src="' + esc(url) + '" alt="" referrerpolicy="no-referrer" onerror="this.style.display=\'none\'">'
+            : esc((b.title || "菜").slice(0, 1));
+          return '<div class="launch-item"><span class="lc-cover">' + cov + '</span><span>' +
+            '<div class="lc-t">《' + esc(b.title) + '》</div>' +
+            '<div class="lc-n">' + esc(b.code) + (b.note ? " · " + esc(b.note) : "") + '</div></span></div>';
+        }).join("");
+        markLaunchSeen(due.map(function (b) { return b.code; }));
+        $("launchModal").classList.add("show");
+      }
+
+      async function loadBooks() {
+        /* 全量拉取（含未上架的定时菜），上架与否在本地按 active / publish_at 判断 */
+        var data = unwrap(await cloud.database.from("soda_books").select("*").order("sort", { ascending: true })) || [];
+        state.allBooks = data || [];
+        bookSig = bookSignature(state.allBooks);
+        applyBooks();
         try {
           var notes = unwrap(await cloud.database.from("soda_notes").select("book,cover_url").limit(500)) || [];
           var map = {};
@@ -1156,6 +1267,26 @@
           state.covers = map;
         } catch (e) { state.covers = {}; }
         renderMenu();
+        checkLaunches();
+      }
+
+      /* 轮询书目：到点的定时菜自动上架 + 变化才重渲染，避免频繁重绘 */
+      var bookSig = "", bookPolling = false, bookTimer = null;
+      async function pollBooks() {
+        if (bookPolling || !cloud) return;
+        bookPolling = true;
+        try {
+          var data = unwrap(await cloud.database.from("soda_books").select("code,title,category,status,stage,badge,ribbon,note,intro,cover_url,platform_url,sort,active,publish_at").order("sort", { ascending: true })) || [];
+          state.allBooks = data || [];
+          var sig = bookSignature(state.allBooks);
+          var changed = sig !== bookSig;
+          bookSig = sig;
+          applyBooks();
+          if (changed) renderMenu();
+          checkLaunches();
+        } catch (e) {} finally {
+          bookPolling = false;
+        }
       }
 
       var refreshing = false;
@@ -1595,6 +1726,13 @@
           "打赏完全自愿，喜欢的话扫上面的码支持一下主厨就好，不赏也没关系 ♡");
       });
       $("tipModalClose").addEventListener("click", function () { $("tipModal").classList.remove("show"); });
+      /* 定时上架弹窗：去尝鲜 / 知道啦 / 点遮罩均可关闭 */
+      $("launchClose").addEventListener("click", function () { $("launchModal").classList.remove("show"); });
+      $("launchGo").addEventListener("click", function () {
+        $("launchModal").classList.remove("show");
+        scrollToId("section-main");
+      });
+      $("launchModal").addEventListener("click", function (e) { if (e.target === $("launchModal")) $("launchModal").classList.remove("show"); });
       /* 弹窗右上角 × 关闭（赞赏码窗口 / 下单成功弹窗通用） */
       document.querySelectorAll(".modal-x").forEach(function (btn) {
         btn.addEventListener("click", function () {
@@ -1604,7 +1742,7 @@
       });
       $("tipModal").addEventListener("click", function (e) { if (e.target === $("tipModal")) $("tipModal").classList.remove("show"); });
       $("successModal").addEventListener("click", function (e) { if (e.target === $("successModal")) closeModal(); });
-      document.addEventListener("keydown", function (e) { if (e.key === "Escape") { $("successModal").classList.remove("show"); $("tipModal").classList.remove("show"); } });
+      document.addEventListener("keydown", function (e) { if (e.key === "Escape") { $("successModal").classList.remove("show"); $("tipModal").classList.remove("show"); $("launchModal").classList.remove("show"); } });
 
       var backTop = $("backToTop");
       backTop.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
@@ -1612,7 +1750,7 @@
         if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) backTop.classList.add("show");
         else backTop.classList.remove("show");
       });
-      document.addEventListener("visibilitychange", function () { if (!document.hidden) refreshLive(); });
+      document.addEventListener("visibilitychange", function () { if (!document.hidden) { refreshLive(); pollBooks(); } });
 
       /* ---------- 首屏遮罩 ---------- */
       var bootDone = false, appStarted = false, liveTimer = null;
@@ -1657,6 +1795,7 @@
           loadSettings();
           paintMyOrders();
           if (!liveTimer) liveTimer = setInterval(refreshLive, 6000);
+          if (!bookTimer) bookTimer = setInterval(pollBooks, 10000);
           hideBoot();
           postTheme();
         } catch (err) {
