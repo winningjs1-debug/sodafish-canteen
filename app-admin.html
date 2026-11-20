@@ -173,6 +173,8 @@ input.search:focus{outline:none;border-color:rgba(142,27,32,.7);background:rgba(
 
 /* ---------- 表格 ---------- */
 .panel{display:grid;grid-template-columns:minmax(0,1fr) 296px;gap:16px;align-items:start}
+.panel-single{grid-template-columns:minmax(0,1fr)}
+.panel-single > *{grid-column:1}
 @media (max-width:900px){.panel{grid-template-columns:minmax(0,1fr)}}
 .notice-editor{
   grid-column:1/-1;
@@ -256,6 +258,15 @@ textarea.search{resize:vertical;line-height:1.6}
 .stage-group-be .sg{flex:1;cursor:pointer;font-family:var(--mono);font-size:11px;letter-spacing:.03em;padding:6px 4px;border-radius:5px;border:1px dashed var(--line);background:rgba(255,255,255,.03);color:var(--muted-2);transition:all .18s;white-space:nowrap;text-align:center}
 .stage-group-be .sg:hover{color:var(--cream);border-color:rgba(216,184,120,.5)}
 .stage-group-be .sg.on{color:#14100e;background:var(--brass);border-color:var(--brass);font-weight:600;border-style:solid}
+/* 定时上架：黄铜虚线框，一眼能找到 */
+.pub-box{margin-top:10px;border:1px dashed rgba(216,184,120,.55);border-radius:7px;padding:9px 10px;background:rgba(216,184,120,.06)}
+.pub-box .pub-title{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--brass);font-weight:600}
+.pub-box .note{margin:4px 0 6px}
+.pub-hero{margin-bottom:14px;border:1px dashed rgba(216,184,120,.55);border-radius:8px;padding:14px 16px;background:rgba(216,184,120,.06)}
+.pub-hero .pub-title{font-family:var(--mono);font-size:13px;letter-spacing:.14em;color:var(--brass);font-weight:700}
+.pub-hero p{font-size:11.5px;color:var(--muted-2);line-height:1.7;margin:6px 0 0}
+.pub-hero b{color:var(--brass)}
+.pub-row .pub-time{width:190px;font-size:11.5px}
 .dlcell{font-family:var(--mono);font-size:11px;color:var(--brass);overflow-wrap:anywhere}
 .err{background:rgba(142,27,32,.18);border:1px solid var(--maroon);border-radius:7px;padding:12px 14px;font-size:12.5px}
 </style>
@@ -286,6 +297,7 @@ textarea.search{resize:vertical;line-height:1.6}
     <button class="tab" type="button" data-tab="menu">菜单管理 <b id="tabNMenu">0</b></button>
     <button class="tab" type="button" data-tab="notes">点菜便签 <b id="tabNNotes">0</b></button>
     <button class="tab" type="button" data-tab="comments">讨论区 <b id="tabNComments">0</b></button>
+    <button class="tab" type="button" data-tab="publish" style="color:var(--brass);font-weight:600">⏰ 定时上架 <b id="tabNPub">0</b></button>
   </nav>
 
   <section class="cards" id="cardsOrders">
@@ -429,6 +441,12 @@ textarea.search{resize:vertical;line-height:1.6}
         <button class="sg" type="button" data-stage="cooking">🔥 烹饪中</button>
         <button class="sg" type="button" data-stage="done">🍳 已出餐</button>
       </div>
+      <div class="pub-box">
+        <div class="pub-title">⏰ 定时上架</div>
+        <p class="note">选好时间点「保存到云端」即可。时间一到，这道菜会在主页菜单自动上架，并自动弹出「新菜上架」弹窗——不用再手动点上架。清除定时则恢复普通上架开关。</p>
+        <input class="search" id="bePublishAt" type="datetime-local" style="width:100%">
+        <button class="btn sm" id="bePublishClear" type="button" style="margin-top:5px">清除定时</button>
+      </div>
       <label class="fl">角标（可留空）</label>
       <input class="search" id="beBadge" placeholder="首发 / 待返场 / 免费" style="width:100%">
       <label class="fl">丝带颜色</label>
@@ -499,6 +517,24 @@ textarea.search{resize:vertical;line-height:1.6}
       <ul id="hotList"><li class="note">读取中…</li></ul>
       <p class="note" id="cmtFoot"></p>
     </aside>
+  </div>
+
+  <!-- 定时上架 -->
+  <div class="panel panel-single" id="panelPublish" hidden>
+    <div class="pub-hero">
+      <div class="pub-title">⏰ 定时上架 · 提前设置，时间一到自动开饭</div>
+      <p>在下面给任意一道菜设好「上架时间」，点 <b>保存定时</b>。时间一到，这道菜会在<b>食堂主页自动上架</b>，并向读者<b>自动弹出「🎉 新菜上架」弹窗</b>——你不用守在屏幕前，也不用再手动点上架。想取消就点 <b>清除定时</b>。菜单管理里也能对单道菜单独设置。</p>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>菜品</th><th>定时状态</th><th>设置上架时间</th><th>操作</th></tr>
+        </thead>
+        <tbody id="pubRows">
+          <tr><td colspan="4" class="empty">读取中…</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <p class="note">
@@ -620,7 +656,7 @@ textarea.search{resize:vertical;line-height:1.6}
     try {
       var res = await Promise.all([
         cloud.database.from("soda_ballots").select("id,nickname,message,picks,item_count,created_at").order("created_at", { ascending: false }).limit(500),
-        cloud.database.from("soda_books").select("code,title,category,status,stage,badge,ribbon,note,intro,cover_url,platform_url,sort,active").order("sort", { ascending: true }),
+        cloud.database.from("soda_books").select("code,title,category,status,stage,badge,ribbon,note,intro,cover_url,platform_url,sort,active,publish_at").order("sort", { ascending: true }),
         cloud.database.rpc("soda_overview"),
         cloud.database.rpc("soda_tally"),
         cloud.database.from("soda_notes").select("*").order("created_at", { ascending: false }).limit(500),
@@ -672,6 +708,7 @@ textarea.search{resize:vertical;line-height:1.6}
     renderMenuAdmin();
     renderNotes();
     renderComments();
+    renderPublish();
     $("tabNOrders").textContent = state.ballots.length;
     $("tabNShop").textContent = state.shop.filter(function (o) { return o.status === "待核对"; }).length;
     $("tabNNotes").textContent = state.notes.length;
@@ -697,6 +734,31 @@ textarea.search{resize:vertical;line-height:1.6}
   function stChip(s) {
     var cls = s === "已发放" ? "done" : (s === "已核对" ? "ok" : (s === "已驳回" ? "no" : "wait"));
     return '<span class="st ' + cls + '">' + esc(s || "待核对") + '</span>';
+  }
+
+  /* ---------- 定时上架 ---------- */
+  /* ISO → datetime-local 输入框用的本地时间字符串 */
+  function localInput(iso) {
+    if (!iso) return "";
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return "";
+    function p(n) { return String(n).padStart(2, "0"); }
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + "T" + p(d.getHours()) + ":" + p(d.getMinutes());
+  }
+  /* ISO → 表格里短标签用：MM-DD HH:MM */
+  function shortTime(iso) {
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return "";
+    function p(n) { return String(n).padStart(2, "0"); }
+    return (d.getMonth() + 1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes());
+  }
+  function pubChip(b) {
+    if (!b.publish_at) return "";
+    var t = new Date(b.publish_at).getTime();
+    if (isNaN(t)) return "";
+    var passed = t <= Date.now();
+    return '<div style="margin-top:3px"><span class="st ' + (passed ? "done" : "wait") + '" title="定时上架：到点后主页自动上架并弹窗">' +
+      (passed ? "⏰ 已到点自动上架" : "⏰ " + esc(shortTime(b.publish_at)) + " 自动上架") + '</span></div>';
   }
 
   function renderShop() {
@@ -915,6 +977,68 @@ textarea.search{resize:vertical;line-height:1.6}
     $("cmtFoot").textContent = "共 " + cs.length + " 条讨论，来自 " + Object.keys(joiners).length + " 位食客。";
   }
 
+  /* ---------- 定时上架面板 ---------- */
+  function renderPublish() {
+    var rows = (state.bookRows || []).slice();
+    var q = state.q.toLowerCase();
+    if (q) rows = rows.filter(function (b) {
+      return ((b.code || "") + " " + (b.title || "") + " " + (b.note || "")).toLowerCase().indexOf(q) > -1;
+    });
+    /* 已定时的排前面按时间先后，未定时的按 sort */
+    var scheduled = rows.filter(function (b) { return b.publish_at; }).sort(function (a, b) { return new Date(a.publish_at) - new Date(b.publish_at); });
+    var rest = rows.filter(function (b) { return !b.publish_at; }).sort(function (a, b) { return (a.sort == null ? 100 : a.sort) - (b.sort == null ? 100 : b.sort); });
+    var all = scheduled.concat(rest);
+    $("tabNPub").textContent = (state.bookRows || []).filter(function (b) { return b.publish_at; }).length;
+
+    if (!all.length) {
+      $("pubRows").innerHTML = '<tr><td colspan="4" class="empty">还没有菜品。先到「菜单管理」新增一道，再来这里设定时。</td></tr>';
+      return;
+    }
+    $("pubRows").innerHTML = all.map(function (b) {
+      var chip, countdown = "";
+      if (b.publish_at) {
+        var t = new Date(b.publish_at).getTime();
+        if (t <= Date.now()) {
+          chip = '<span class="st done" title="已到点：主页已自动上架并弹窗">✅ 已到点 · 主页已自动上架</span>';
+        } else {
+          var ms = t - Date.now(), h = Math.floor(ms / 3600e3), m = Math.floor((ms % 3600e3) / 60e3);
+          countdown = h >= 24 ? Math.floor(h / 24) + " 天 " + (h % 24) + " 小时后" : (h ? h + " 小时 " + m + " 分后" : m + " 分钟后");
+          chip = '<span class="st wait" title="到点后主页自动上架并弹窗">⏰ ' + esc(shortTime(b.publish_at)) + ' 自动上架 · ' + countdown + '</span>';
+        }
+      } else {
+        chip = '<span class="st" style="color:var(--muted-2)">未设置</span>';
+      }
+      return '<tr class="pub-row" data-code="' + esc(b.code) + '">' +
+        '<td class="bookcell"><div class="t">《' + esc(b.title) + '》</div><div class="a no">' + esc(b.code) + ' · ' + (b.category === "dessert" ? "🍰 甜点" : "🐟 主菜") + (b.active ? " · 在架" : " · 下架") + '</div></td>' +
+        '<td>' + chip + '</td>' +
+        '<td><input class="search pub-time" type="datetime-local" data-pubtime="' + esc(b.code) + '" value="' + localInput(b.publish_at) + '"></td>' +
+        '<td class="act">' +
+          '<button class="btn sm primary" type="button" data-pubsave="' + esc(b.code) + '">保存定时</button>' +
+          (b.publish_at ? '<button class="btn sm" type="button" data-pubclear="' + esc(b.code) + '">清除定时</button>' : '') +
+        '</td>' +
+        '</tr>';
+    }).join("");
+  }
+
+  $("pubRows").addEventListener("click", async function (e) {
+    var btn = e.target.closest("button");
+    if (!btn) return;
+    var code = btn.getAttribute("data-pubsave") || btn.getAttribute("data-pubclear");
+    var row = (state.bookRows || []).filter(function (b) { return b.code === code; })[0];
+    if (!row) return;
+    var clearing = btn.hasAttribute("data-pubclear");
+    var val = clearing ? "" : ((document.querySelector('[data-pubtime="' + code + '"]') || {}).value || "");
+    if (!clearing && !val) { alert("先选好上架时间再点「保存定时」哦。"); return; }
+    btn.disabled = true;
+    try {
+      var payload = rowPayload(row, { p_publish_at: clearing ? "" : new Date(val).toISOString() });
+      var r = unwrap(await cloud.database.rpc("soda_admin_book_save", payload));
+      if (r && r.error) { alert(r.error); return; }
+      await load();
+    } catch (err) { alert("保存失败：" + ((err && err.message) || "网络异常")); }
+    finally { btn.disabled = false; }
+  });
+
   /* ---------- 菜单管理 ---------- */
   function renderMenuAdmin() {
     var rows = state.bookRows || [];
@@ -948,7 +1072,7 @@ textarea.search{resize:vertical;line-height:1.6}
         '<td>' + stChip(b.status) + '</td>' +
         '<td>' + stageChip(b) + '</td>' +
         '<td class="no">' + (b.sort == null ? 100 : b.sort) + '</td>' +
-        '<td>' + (b.active ? '<span class="st done">在架</span>' : '<span class="st no">下架</span>') + '</td>' +
+        '<td>' + (b.active ? '<span class="st done">在架</span>' : '<span class="st no">下架</span>') + pubChip(b) + '</td>' +
         '<td class="act">' +
           '<button class="btn sm" type="button" data-edit="' + esc(b.code) + '">编辑</button>' +
           '<button class="btn sm" type="button" data-toggle="' + esc(b.code) + '">' + (b.active ? "下架" : "上架") + '</button>' +
@@ -999,6 +1123,7 @@ textarea.search{resize:vertical;line-height:1.6}
     $("bePlatform").value = b ? (b.platform_url || "") : "";
     $("beSort").value = b ? (b.sort == null ? 100 : b.sort) : nextSort();
     $("beActive").checked = b ? !!b.active : true;
+    $("bePublishAt").value = localInput(b ? b.publish_at : "");
     if (!b) $("beCode").value = nextCode();
     setCover(b ? b.cover_url : "");
     $("beMsg").textContent = "";
@@ -1019,7 +1144,8 @@ textarea.search{resize:vertical;line-height:1.6}
       p_cover: b.cover_url || "",
       p_platform: b.platform_url || "",
       p_sort: b.sort == null ? 100 : Number(b.sort),
-      p_active: !!b.active
+      p_active: !!b.active,
+      p_publish_at: b.publish_at || ""
     };
     if (overrides) Object.keys(overrides).forEach(function (k) { p[k] = overrides[k]; });
     return p;
@@ -1040,7 +1166,8 @@ textarea.search{resize:vertical;line-height:1.6}
       p_cover: ($("beCoverUrl").value || "").trim(),
       p_platform: ($("bePlatform").value || "").trim(),
       p_sort: parseInt($("beSort").value, 10) || 100,
-      p_active: $("beActive").checked
+      p_active: $("beActive").checked,
+      p_publish_at: $("bePublishAt").value ? new Date($("bePublishAt").value).toISOString() : ""
     };
   }
 
@@ -1097,6 +1224,11 @@ textarea.search{resize:vertical;line-height:1.6}
 
   $("beReset").addEventListener("click", function () { fillEditor(null); });
 
+  $("bePublishClear").addEventListener("click", function () {
+    $("bePublishAt").value = "";
+    $("beMsg").textContent = "已清除定时上架时间，点「保存到云端」生效。";
+  });
+
   $("beSave").addEventListener("click", async function () {
     var p = formPayload();
     if (!p.p_code) { $("beMsg").textContent = "编号不能为空。"; return; }
@@ -1106,7 +1238,7 @@ textarea.search{resize:vertical;line-height:1.6}
     try {
       var r = unwrap(await cloud.database.rpc("soda_admin_book_save", p));
       if (r && r.error) { $("beMsg").textContent = r.error; return; }
-      $("beMsg").textContent = "已保存 " + (r && r.code ? r.code : p.p_code) + "，菜单页 6 秒内自动刷新。";
+      $("beMsg").textContent = "已保存 " + (r && r.code ? r.code : p.p_code) + (p.p_publish_at ? " · ⏰ 定时上架已设好，到点主页自动上架弹窗" : "") + "，菜单页 6 秒内自动刷新。";
       await load();
     } catch (err) {
       $("beMsg").textContent = "保存失败：" + ((err && err.message) || "网络异常");
@@ -1158,8 +1290,8 @@ textarea.search{resize:vertical;line-height:1.6}
   });
 
   /* ---------- 标签页 ---------- */
-  var PANELS = { orders: ["panelOrders", "cardsOrders"], shop: ["panelShop", "cardsShop"], menu: ["panelMenu", "cardsMenu"], notes: ["panelNotes", "cardsNotes"], comments: ["panelComments", "cardsComments"] };
-  var PH = { orders: "搜书名 / 署名 / 留言", shop: "搜单号 / 署名 / 留言 / 书名", menu: "搜编号 / 书名 / 备注", notes: "搜书名 / 作者 / 平台 / 简介", comments: "搜昵称 / 内容 / 书名" };
+  var PANELS = { orders: ["panelOrders", "cardsOrders"], shop: ["panelShop", "cardsShop"], menu: ["panelMenu", "cardsMenu"], notes: ["panelNotes", "cardsNotes"], comments: ["panelComments", "cardsComments"], publish: ["panelPublish", "panelPublish"] };
+  var PH = { orders: "搜书名 / 署名 / 留言", shop: "搜单号 / 署名 / 留言 / 书名", menu: "搜编号 / 书名 / 备注", notes: "搜书名 / 作者 / 平台 / 简介", comments: "搜昵称 / 内容 / 书名", publish: "搜编号 / 书名 / 备注" };
   function switchTab(tab) {
     state.tab = tab;
     document.querySelectorAll(".tab").forEach(function (b) { b.classList.toggle("on", b.getAttribute("data-tab") === tab); });
