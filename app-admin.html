@@ -402,6 +402,10 @@ textarea.search{resize:vertical;line-height:1.6}
 
   <!-- 菜单管理 -->
   <div class="panel" id="panelMenu" hidden>
+    <div class="pub-hero">
+      <div class="pub-title">⬆ 怎么上菜：两种方式，都不用一本本录单</div>
+      <p><b>① 立即上架</b>：在下面表格里找到这本书，点右边的「上架」按钮即可——会自动把状态改成「已完成」，主页立刻开放领餐。<br><b>② 定时上架</b>：点「编辑」或去「⏰ 定时上架」页，设好上架/下架时间，到点自动开放、到点自动收摊。<br>本书目早就存在库里，上菜 = 改状态/开窗口，<b>不需要重新输入书名</b>。</p>
+    </div>
     <div class="notice-editor">
       <h3 style="margin:0 0 4px">📋 店内公告板</h3>
       <p class="note" style="margin-bottom:8px">写的话会实时展示在主页大标题下方的公告板上（清空再保存即可下架公告板）：</p>
@@ -1111,7 +1115,7 @@ textarea.search{resize:vertical;line-height:1.6}
         '<td>' + (b.active ? '<span class="st done">在架</span>' : '<span class="st no">下架</span>') + pubChip(b) + '</td>' +
         '<td class="act">' +
           '<button class="btn sm" type="button" data-edit="' + esc(b.code) + '">编辑</button>' +
-          '<button class="btn sm" type="button" data-toggle="' + esc(b.code) + '">' + (b.active ? "下架" : "上架") + '</button>' +
+          '<button class="btn sm" type="button" data-toggle="' + esc(b.code) + '" title="' + (b.active ? "立刻收摊：主页显示暂不开放领餐" : "一键上菜：状态改为已完成并立即开放领餐") + '">' + (b.active ? "下架" : "⬆ 上架") + '</button>' +
           '<button class="btn sm" type="button" data-del="' + esc(b.code) + '">删除</button>' +
         '</td>' +
         '</tr>';
@@ -1313,7 +1317,18 @@ textarea.search{resize:vertical;line-height:1.6}
     if (btn.hasAttribute("data-toggle")) {
       btn.disabled = true;
       try {
-        var r = unwrap(await cloud.database.rpc("soda_admin_book_save", rowPayload(row, { p_active: !row.active })));
+        var turningOn = !row.active;
+        var patch = { p_active: turningOn };
+        if (turningOn) {
+          /* 一键上菜：状态同时改为「已完成」，否则主页仍会显示暂不开放领餐 */
+          patch.p_status = "已完成";
+          if (row.publish_at || row.unpublish_at) {
+            if (!confirm("《" + row.title + "》原来设了定时上架/下架时间。\n立即上架会清除这些定时，改为马上开放领餐。继续吗？")) return;
+            patch.p_publish_at = "";
+            patch.p_unpublish_at = "";
+          }
+        }
+        var r = unwrap(await cloud.database.rpc("soda_admin_book_save", rowPayload(row, patch)));
         if (r && r.error) { alert(r.error); return; }
         await load();
       } catch (err) { alert("操作失败：" + ((err && err.message) || "网络异常")); }
