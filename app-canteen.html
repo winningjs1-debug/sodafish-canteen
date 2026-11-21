@@ -1570,8 +1570,19 @@
         var html = '<div class="dl-box">' +
           '<div style="margin-bottom:0.4rem;"><b>' + esc(r.order_no) + '</b> · ' + (r.item_count || 1) + ' 道 · ' + statusChip(r.status) + '</div>';
         if (r.status === "已发放" && r.delivery) {
-          html += '<div>网盘链接：<a href="' + esc(r.delivery.url || "") + '" target="_blank" rel="noopener noreferrer">' + esc(r.delivery.url || "") + '</a> <button class="copy-link" type="button" data-copy="' + esc(r.delivery.url || "") + '">复制</button></div>' +
-            '<div>提取码：<b>' + esc(r.delivery.code || "") + '</b> <button class="copy-link" type="button" data-copy="' + esc(r.delivery.code || "") + '">复制</button></div>';
+          var its = (Array.isArray(r.delivery.items) ? r.delivery.items : []).filter(function (x) { return x && String(x.url || "").trim(); });
+          if (its.length > 1) {
+            html += '<div style="margin-bottom:0.2rem;">这张单子有 ' + its.length + ' 本，逐本领取：</div>' + its.map(function (it) {
+              return '<div style="margin-top:0.35rem;padding-top:0.35rem;border-top:1px dashed var(--wrapper-border);">' +
+                '<div>《' + esc(it.title || it.bcode || "") + '》</div>' +
+                '<div>网盘链接：<a href="' + esc(it.url || "") + '" target="_blank" rel="noopener noreferrer">' + esc(it.url || "") + '</a> <button class="copy-link" type="button" data-copy="' + esc(it.url || "") + '">复制</button></div>' +
+                '<div>提取码：<b>' + esc(it.pwd || "") + '</b> <button class="copy-link" type="button" data-copy="' + esc(it.pwd || "") + '">复制</button></div>' +
+                '</div>';
+            }).join("");
+          } else {
+            html += '<div>网盘链接：<a href="' + esc(r.delivery.url || "") + '" target="_blank" rel="noopener noreferrer">' + esc(r.delivery.url || "") + '</a> <button class="copy-link" type="button" data-copy="' + esc(r.delivery.url || "") + '">复制</button></div>' +
+              '<div>提取码：<b>' + esc(r.delivery.code || "") + '</b> <button class="copy-link" type="button" data-copy="' + esc(r.delivery.code || "") + '">复制</button></div>';
+          }
         } else if (r.status === "待核对") {
           html += '<div style="color:var(--ink-sub);">店主还没核对到账，稍后再来查查～（记得转账备注单号）</div>';
         } else if (r.status === "已核对") {
