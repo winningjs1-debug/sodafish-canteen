@@ -183,7 +183,74 @@
         .section-title.main-course { background: var(--tape-green); transform: rotate(-1deg); border: 1px dashed #85a38e; }
         .section-title.dessert { background: var(--tape-pink); transform: rotate(1deg); border: 1px dashed #cc9292; }
         .grid-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.8rem; }
-        .book-card { background: var(--card-bg); border: 1px dashed var(--wrapper-border); border-radius: 6px; padding: 2.2rem 1.4rem 1.6rem; position: relative; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s; box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.05); background-image: linear-gradient(transparent 95%, var(--card-line) 100%); background-size: 100% 1.7rem; background-position: 0 1.4rem; display: flex; flex-direction: column; }
+        /* 书卡 = 3D 翻转容器：纸面/虚线/内衬都移到正反两面上，卡本身只负责透视与悬挂 */
+        .book-card { position: relative; perspective: 1200px; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s; }
+        .flip-inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 0.65s cubic-bezier(0.4, 0.2, 0.2, 1); }
+        .book-card.flipped .flip-inner { transform: rotateY(180deg); }
+        .face {
+            backface-visibility: hidden; -webkit-backface-visibility: hidden;
+            background: var(--card-bg); border: 1px dashed var(--wrapper-border); border-radius: 6px;
+            box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.05);
+            background-image: linear-gradient(transparent 95%, var(--card-line) 100%); background-size: 100% 1.7rem; background-position: 0 1.4rem;
+        }
+        .face-front { padding: 2.2rem 1.4rem 1.6rem; display: flex; flex-direction: column; }
+        .face-front .order-btn { margin-top: auto; }
+        /* 背面简介卡：绝对定位盖满整卡，镜像朝后 */
+        .face-back {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            transform: rotateY(180deg);
+            padding: 1.9rem 1.2rem 0.9rem;
+            display: flex; flex-direction: column;
+            overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+        }
+        .face-back::-webkit-scrollbar { display: none; }
+        /* 法式蕾丝顶边 + 角落餐具小装饰 */
+        .bk-lace {
+            height: 24px; margin: -1.4rem -1.2rem 0.55rem; border-bottom: 1px dashed var(--wrapper-border);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='34' viewBox='0 0 64 34'%3E%3Crect width='64' height='13' fill='%23f1f4f8'/%3E%3Ccircle cx='8' cy='13' r='8' fill='%23f1f4f8'/%3E%3Ccircle cx='24' cy='13' r='8' fill='%23f1f4f8'/%3E%3Ccircle cx='40' cy='13' r='8' fill='%23f1f4f8'/%3E%3Ccircle cx='56' cy='13' r='8' fill='%23f1f4f8'/%3E%3Cpath d='M0 1.2 H64' stroke='%23cdd5e0' stroke-width='1'/%3E%3Ccircle cx='16' cy='6.5' r='2' fill='none' stroke='%23cdd5e0' stroke-width='1'/%3E%3Ccircle cx='48' cy='6.5' r='2' fill='none' stroke='%23cdd5e0' stroke-width='1'/%3E%3Ccircle cx='32' cy='6.5' r='2' fill='none' stroke='%23cdd5e0' stroke-width='1'/%3E%3C/svg%3E");
+            background-repeat: repeat-x; background-size: 46px 24px; background-position: center top; opacity: 0.9;
+        }
+        body.dark-mode .bk-lace { opacity: 0.45; }
+        /* 法式餐具角饰：银灰小刀叉 SVG，和店门口招牌同款造型 */
+        .face-back::before { content: ''; position: absolute; top: 30px; right: 9px; width: 9px; height: 30px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 72'%3E%3Cpath d='M8.9 27.6V12.6C8.9 6.8 10.3 2.9 13 1.5C15.7 4.3 16.9 9.2 16.6 14.7C16.3 20 15.2 24.6 14.1 27.6Z' fill='%23a9b2bf'/%3E%3Crect x='7.9' y='27.6' width='8.2' height='3' rx='1' fill='%23a9b2bf'/%3E%3Cpath d='M9.6 30.6C8.9 35 8.8 41 9.3 47C9.7 53 9.7 59 9.8 63.8C9.9 67.4 10.8 69.6 12 69.6C13.2 69.6 14.1 67.4 14.2 63.8C14.3 59 14.3 53 14.7 47C15.2 41 15.1 35 14.4 30.6Z' fill='%23a9b2bf'/%3E%3C/svg%3E") center/contain no-repeat; opacity: 0.55; transform: rotate(9deg); }
+        .face-back::after { content: ''; position: absolute; top: 30px; left: 9px; width: 9px; height: 30px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 72'%3E%3Crect x='5.6' y='2.2' width='2' height='13.8' rx='1' fill='%23a9b2bf'/%3E%3Crect x='9.2' y='2.2' width='2' height='15.2' rx='1' fill='%23a9b2bf'/%3E%3Crect x='12.8' y='2.2' width='2' height='15.2' rx='1' fill='%23a9b2bf'/%3E%3Crect x='16.4' y='2.2' width='2' height='13.8' rx='1' fill='%23a9b2bf'/%3E%3Cpath d='M5.6 13.5H18.4C18.4 19.8 15.6 23.6 12 24.2C8.4 23.6 5.6 19.8 5.6 13.5Z' fill='%23a9b2bf'/%3E%3Crect x='10.9' y='24.2' width='2.2' height='40' rx='1.1' fill='%23a9b2bf'/%3E%3C/svg%3E") center/contain no-repeat; opacity: 0.55; transform: rotate(-9deg); }
+        .bk-head { display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-family: var(--font-chinese-title); font-size: 1.08rem; letter-spacing: 2px; color: var(--ink-main); margin-bottom: 0.55rem; }
+        .bk-head .bk-ico { font-size: 0.95rem; }
+        .bk-note { flex: 1 0 auto; overflow: visible; font-size: 0.85rem; color: var(--ink-main); line-height: 1.75; text-align: justify; min-height: 0; }
+        .bk-note:empty::after { content: '这道菜还没写简介～'; color: var(--ink-sub); }
+        /* 背面标签区：只放简介专属标签（剧情/主角/人设），不再出现正面待返场那套 */
+        .bk-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; row-gap: 0.28rem; align-items: center; justify-content: center; margin: 0.35rem 0 0; }
+        .bk-flourish { text-align: center; font-size: 0.68rem; color: var(--ink-sub); opacity: 0.85; letter-spacing: 4px; margin-top: 0.45rem; }
+        /* 剧情标签（HE/小甜饼/甜宠…）：马卡龙五色轮换，和谐但不相撞；长标签可折行不出框 */
+        .intro-tag { font-family: var(--font-chinese-title); font-weight: 400; font-size: 0.78rem; line-height: 1.5; padding: 0.05rem 0.45rem; border-radius: 20px; border: 1px solid transparent; white-space: normal; text-align: center; max-width: 100%; }
+        .intro-tag.c0 { background: #fbf1e3; color: #9a6b3f; border-color: #ecd9b5; }
+        .intro-tag.c1 { background: #fde9e6; color: #b5564f; border-color: #f3cdc8; }
+        .intro-tag.c2 { background: #e6f1e7; color: #4a7452; border-color: #c8dcc9; }
+        .intro-tag.c3 { background: #ece6f6; color: #7b6394; border-color: #d9ccf0; }
+        .intro-tag.c4 { background: #e3eef6; color: #3b6b8c; border-color: #c6d9e8; }
+        /* 主角名字：淡藕紫小方章，斜一点点，和正面斜章呼应但不撞色 */
+        .cast-name { font-family: var(--font-chinese-title); font-weight: 400; font-size: 0.8rem; line-height: 1.5; padding: 0.05rem 0.45rem; border-radius: 6px; background: #eee9f6; color: #6d5a8e; border: 1px solid #d9cdf0; white-space: nowrap; }
+        /* 人设：透明底虚线胶囊，轻一圈 */
+        .cast-role { font-family: var(--font-chinese-title); font-weight: 400; font-size: 0.72rem; line-height: 1.5; padding: 0.03rem 0.4rem; border-radius: 20px; background: transparent; color: #7c8794; border: 1px dashed var(--wrapper-border); white-space: nowrap; }
+        .cast-row { display: flex; flex-wrap: wrap; gap: 0.3rem; row-gap: 0.28rem; align-items: center; justify-content: center; margin: 0.4rem 0 0; }
+        .cast-x { font-family: 'Space Mono', monospace; font-size: 0.66rem; color: var(--ink-sub); }
+        /* 人设行（…攻 X …受）：攻珊瑚陶土 / 受雾蓝，与剧情标签色系错开 */
+        .persona-row { margin-top: 0.3rem; }
+        .persona-tag { font-family: var(--font-chinese-title); font-weight: 400; font-size: 0.74rem; line-height: 1.5; padding: 0.04rem 0.42rem; border-radius: 20px; border: 1px solid transparent; white-space: normal; text-align: center; max-width: 100%; }
+        .persona-tag.pa { background: #fae3dc; color: #b05a48; border-color: #eec9bf; }
+        .persona-tag.pb { background: #e4edf3; color: #48688a; border-color: #c9d9e6; }
+        .persona-tag.pn { background: #f0f1f3; color: #7c8794; border-color: #d8dde3; }
+        body.dark-mode .intro-tag.c0 { background: rgba(217, 180, 120, 0.16); color: #d8b98c; border-color: rgba(236, 217, 181, 0.28); }
+        body.dark-mode .intro-tag.c1 { background: rgba(209, 91, 91, 0.18); color: #f0a19c; border-color: rgba(244, 194, 194, 0.28); }
+        body.dark-mode .intro-tag.c2 { background: rgba(74, 116, 82, 0.2); color: #9dc7a6; border-color: rgba(193, 212, 197, 0.28); }
+        body.dark-mode .intro-tag.c3 { background: rgba(150, 130, 200, 0.18); color: #c0b1e2; border-color: rgba(217, 205, 240, 0.28); }
+        body.dark-mode .intro-tag.c4 { background: rgba(59, 107, 140, 0.2); color: #9cc2dd; border-color: rgba(188, 211, 225, 0.28); }
+        body.dark-mode .cast-name { background: rgba(150, 130, 200, 0.18); color: #b8a8dc; border-color: rgba(217, 205, 240, 0.28); }
+        body.dark-mode .cast-role { color: #98a1ad; border-color: rgba(255, 255, 255, 0.14); }
+        /* 背面底部蕾丝：顶边蕾丝的镜像，卡底收边 */
+        .lace-btm { height: 20px; margin: 0.4rem -1.2rem -0.65rem; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='34' viewBox='0 0 64 34'%3E%3Crect width='64' height='13' fill='%23f1f4f8'/%3E%3Ccircle cx='8' cy='13' r='8' fill='%23f1f4f8'/%3E%3Ccircle cx='24' cy='13' r='8' fill='%23f1f4f8'/%3E%3Ccircle cx='40' cy='13' r='8' fill='%23f1f4f8'/%3E%3Ccircle cx='56' cy='13' r='8' fill='%23f1f4f8'/%3E%3Cpath d='M0 1.2 H64' stroke='%23cdd5e0' stroke-width='1'/%3E%3Ccircle cx='16' cy='6.5' r='2' fill='none' stroke='%23cdd5e0' stroke-width='1'/%3E%3Ccircle cx='48' cy='6.5' r='2' fill='none' stroke='%23cdd5e0' stroke-width='1'/%3E%3Ccircle cx='32' cy='6.5' r='2' fill='none' stroke='%23cdd5e0' stroke-width='1'/%3E%3C/svg%3E"); background-repeat: repeat-x; background-size: 46px 20px; background-position: center bottom; opacity: 0.85; transform: scaleY(-1); }
+        body.dark-mode .lace-btm { opacity: 0.4; }
+        .bk-hint { text-align: center; font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 1.5px; color: var(--ink-sub); border-top: 1px dashed var(--wrapper-border); padding-top: 0.5rem; }
         .book-card:hover { transform: translateY(-6px) rotate(-1deg); box-shadow: 5px 8px 15px rgba(0, 0, 0, 0.08); z-index: 2; }
         .book-card::before { content: '📍'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-size: 1.2rem; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2)); opacity: 0.8; z-index: 10; }
         .book-card:nth-child(2n) { transform: rotate(0.5deg); } .book-card:nth-child(3n) { transform: rotate(-0.8deg); }
@@ -273,7 +340,7 @@
 
         @media (max-width: 1024px) { .grid-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.2rem; } .wrapper { padding: 2rem 1.5rem; } .title-english { font-size: 4rem; } .title-chinese { font-size: 2.6rem; } }
         @media (max-width: 768px) { body { padding: 1.5rem 1rem; } .toolbar { justify-content: center; flex-direction: column; padding: 0; } .filter-group { justify-content: center; width: 100%; } .filter-group .btn-sticker { flex: none; justify-content: center; } .title-english { font-size: 3rem; } .title-chinese { font-size: 2rem; } header::before, header::after { display: none; } .panel { max-width: 100%; right: -100%; } }
-        @media (max-width: 480px) { body { padding: 1rem 0.5rem; } .wrapper { padding: 1.5rem 1rem; } .title-english { font-size: 2.5rem; } .title-chinese { font-size: 1.6rem; } .grid-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; } .book-card { padding: 1.6rem 0.8rem 1.1rem; } .book-name { font-size: 1.12rem; } .book-note { font-size: 0.85rem; } .menu-tag { padding: 0.12rem 0.45rem; font-size: 0.66rem; top: -9px; left: 6px; } .book-card::before { font-size: 0.82rem; top: -8px; } .bookmark-ribbon { right: 7px; width: 12px; height: 20px; } .float-group { bottom: 80px; right: 15px; gap: 10px; } .cart-float, .rank-float { width: 45px; height: 45px; font-size: 1.3rem; } #backToTop { bottom: 15px; right: 18px; width: 40px; height: 40px; } }
+        @media (max-width: 480px) { body { padding: 1rem 0.5rem; } .wrapper { padding: 1.5rem 1rem; } .title-english { font-size: 2.5rem; } .title-chinese { font-size: 1.6rem; } .grid-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; } .face-front { padding: 1.6rem 0.8rem 1.1rem; } .book-name { font-size: 1.12rem; } .bk-note { font-size: 0.8rem; } .menu-tag { padding: 0.12rem 0.45rem; font-size: 0.66rem; top: -9px; left: 6px; } .book-card::before { font-size: 0.82rem; top: -8px; } .bookmark-ribbon { right: 7px; width: 12px; height: 20px; } .float-group { bottom: 80px; right: 15px; gap: 10px; } .cart-float, .rank-float { width: 45px; height: 45px; font-size: 1.3rem; } #backToTop { bottom: 15px; right: 18px; width: 40px; height: 40px; } }
     </style>
     <style>
         /* ===== 实时数据接入所需的最小补充：沿用原纸张/车票语言，不改既有观感 ===== */
@@ -446,8 +513,7 @@
         /* 窄屏下让封面随卡片自适应，避免被 max-height 挤压 */
         @media (max-width: 560px) {
             .cover-box { aspect-ratio: 4 / 5; max-height: 185px; }
-            .book-card { padding-bottom: 1rem; }
-            .book-note { margin-top: 0.5rem; padding-top: 0.5rem; }
+            .face-front { padding-bottom: 1rem; }
             /* 两列窄卡防重叠：编号标签缩小左移、图钉缩小、丝带收窄，三者互不接触 */
             .menu-tag { top: -10px; left: 8px; padding: 0.15rem 0.55rem; font-size: 0.7rem; letter-spacing: 0.5px; }
             .book-card::before { font-size: 0.9rem; top: -9px; filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.18)); }
@@ -614,7 +680,17 @@
         @media (max-width: 560px) {
             /* 两列保持不变，只收间距：列宽更大，卡片更接近方形 */
             .grid-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7rem; }
-            .book-card { padding: 1.5rem 0.7rem 0.85rem; }
+            .face-front { padding: 1.5rem 0.7rem 0.85rem; }
+            .face-back { padding: 1.6rem 0.7rem 0.7rem; }
+            .bk-lace { margin: -1.1rem -0.7rem 0.45rem; }
+            .lace-btm { margin: 0.35rem -0.7rem -0.5rem; }
+            /* 背面简介专属标签（剧情/主角/人设）手机端收紧 */
+            .intro-tag { font-size: 0.72rem; padding: 0.04rem 0.38rem; }
+            .persona-tag { font-size: 0.7rem; padding: 0.03rem 0.36rem; }
+            .cast-name { font-size: 0.74rem; padding: 0.04rem 0.38rem; }
+            .cast-role { font-size: 0.66rem; padding: 0.02rem 0.34rem; }
+            .cast-x { font-size: 0.6rem; }
+            .bk-flourish { font-size: 0.62rem; margin-top: 0.35rem; }
             /* 封面从竖长 4:5 改成正方形：卡片高度收住，整体比例更"方"，不再是窄长条 */
             .cover-box { aspect-ratio: 1 / 1; max-height: none; margin: -0.2rem -0.2rem 0.55rem; }
             .book-name { font-size: 1.02rem; line-height: 1.3; margin-bottom: 0.45rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -623,8 +699,9 @@
             .price-badge, .status-badge { font-size: 0.76rem; padding: 0.05rem 0.38rem; }
             .stage-chip { font-size: 0.7rem; padding: 0.02rem 0.32rem; letter-spacing: 0.2px; }
             .vote-chip { font-size: 0.66rem; padding: 0.06rem 0.36rem; }
-            /* 简介只留一行，压住卡片高度 */
-            .book-note { font-size: 0.78rem; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+            /* 简介已移到背面简介卡，正面卡片更矮更方 */
+            .bk-head { font-size: 0.95rem; letter-spacing: 1px; margin-bottom: 0.4rem; }
+            .bk-note { font-size: 0.78rem; }
             .order-btn { margin-top: 0.55rem; }
         }
 
@@ -1167,6 +1244,101 @@
         return open + '<div class="cover-box"><div class="cover-fb"><span class="fb-char">' + esc(b.title.slice(0, 1)) + '</span><span class="fb-line">' + esc(b.code) + ' · SODAFISH</span></div></div>' + close;
       }
 
+      /* ===== 简介解析：把「标签：」「主角：」两行约定抽出来做成标签，其余当正文 =====
+         常见剧情词（HE/小甜饼/甜宠…）即使没写标签行也会自动识别成标签 */
+      var PLOT_WORDS = ["HE", "BE", "小甜饼", "甜宠", "甜文", "治愈", "破镜重圆", "先婚后爱", "强强", "年下", "年上", "校园", "都市", "古代", "现代", "架空", "悬疑", "推理", "万人迷", "穿书", "重生", "追妻火葬场", "双洁", "1v1", "强制爱", "疯批", "甜虐", "虐文", "爽文", "群像", "无限流", "轻喜剧", "单元剧", "日常向"];
+      function isPlotWord(w) {
+        if (/^he$/i.test(w) || /^be$/i.test(w)) return true;
+        for (var i = 0; i < PLOT_WORDS.length; i++) {
+          var p = PLOT_WORDS[i];
+          if (w === p) return true;
+          if (p.length >= 2 && w.indexOf(p) > -1) return true;
+          if (w.length >= 2 && p.indexOf(w) > -1) return true;
+        }
+        return false;
+      }
+      function parseIntro(raw) {
+        var proseLines = [], tags = [], cast = [], persona = [];
+        var lines = String(raw || "").split(/\r?\n/);
+        for (var i = 0; i < lines.length; i++) {
+          var ln = lines[i].trim(), m;
+          if (!ln || /^[-—－_·*#=]{1,6}$/.test(ln)) continue;
+          if ((m = ln.match(/^(标签|tags?)[:：]\s*(.+)$/i))) {
+            var ws = m[2].split(/[、,，/／|·\s]+/);
+            for (var a = 0; a < ws.length; a++) if (ws[a]) tags.push(ws[a]);
+          } else if ((m = ln.match(/^(主角|人物|角色|cast)[:：]\s*(.+)$/i))) {
+            var ps = m[2].split(/\s*[×xX✕＊]\s*|、|，|,|\s+vs\s+/);
+            for (var b = 0; b < ps.length; b++) {
+              var w = ps[b].trim(); if (!w) continue;
+              var cm = w.match(/^(.+?)[（(]([^）)]+)[）)]$/);
+              cast.push(cm ? { name: cm[1].trim(), role: cm[2].trim() } : { name: w, role: "" });
+            }
+          } else if (ln.length <= 44 && /[×xX✕＊]/.test(ln) && /(攻|受|互攻|不分)/.test(ln) && ln.indexOf("：") < 0 && ln.indexOf(":") < 0) {
+            /* 人设行：如「身材很好的年下混血小狗攻 X 冷静天然直球美人受」 */
+            var pp = ln.split(/\s*[×xX✕＊]\s*/);
+            for (var c = 0; c < pp.length; c++) {
+              var pw = pp[c].trim(); if (!pw) continue;
+              var kind = "n";
+              if (/攻/.test(pw) && !/受/.test(pw)) kind = "a";
+              else if (/受/.test(pw) && !/攻/.test(pw)) kind = "b";
+              persona.push({ text: pw, kind: kind });
+            }
+          } else if (ln.length <= 20 && /^[^\s×xX✕＊：:，,]{1,6}\s*[×xX✕＊]\s*[^\s×xX✕＊：:，,]{1,6}$/.test(ln)) {
+            /* 名字行：如「秦灿X谢以津」 */
+            var np = ln.split(/\s*[×xX✕＊]\s*/);
+            for (var d = 0; d < np.length; d++) if (np[d].trim()) cast.push({ name: np[d].trim(), role: "" });
+          } else {
+            /* 标签行：一行里大部分词是剧情词（如「HE 小甜饼 甜宠 搞笑 年下攻 …」）就整行当标签 */
+            var words = ln.split(/\s+/), hit = 0;
+            if (words.length >= 2) {
+              for (var e = 0; e < words.length; e++) if (isPlotWord(words[e])) hit++;
+              if (hit >= 2 || (hit >= 1 && hit * 2 >= words.length && words.length <= 8)) {
+                for (var f = 0; f < words.length; f++) if (words[f] && tags.indexOf(words[f]) < 0) tags.push(words[f]);
+                continue;
+              }
+            }
+            proseLines.push(ln);
+          }
+        }
+        var text = proseLines.join("\n");
+        if (!tags.length) {
+          for (var j = 0; j < PLOT_WORDS.length; j++) {
+            var word = PLOT_WORDS[j];
+            var re = new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+            if (re.test(text)) {
+              var canon = /^(he|be)$/i.test(word) ? word.toUpperCase() : word;
+              if (tags.indexOf(canon) < 0) tags.push(canon);
+            }
+          }
+        }
+        return { prose: text, tags: tags.slice(0, 10), cast: cast.slice(0, 4), persona: persona.slice(0, 4) };
+      }
+
+      function backHTML(b) {
+        var p = parseIntro(b.intro || b.note || "");
+        var tagHtml = p.tags.map(function (t, idx) {
+          return '<span class="intro-tag c' + (idx % 5) + '">' + esc(t) + '</span>';
+        }).join("");
+        var castHtml = p.cast.map(function (c, idx) {
+          return (idx > 0 ? '<span class="cast-x">×</span>' : "") +
+            '<span class="cast-name">' + esc(c.name) + '</span>' +
+            (c.role ? '<span class="cast-role">' + esc(c.role) + '</span>' : "");
+        }).join("");
+        var personaHtml = p.persona.map(function (pp, idx) {
+          var kind = pp.kind === "n" ? (idx % 2 ? "pb" : "pa") : pp.kind;
+          return '<span class="persona-tag p' + kind + '">' + esc(pp.text) + '</span>';
+        }).join('<span class="cast-x">×</span>');
+        var rows = "";
+        if (castHtml) rows += '<div class="cast-row">' + castHtml + '</div>';
+        if (personaHtml) rows += '<div class="cast-row persona-row">' + personaHtml + '</div>';
+        return '<div class="bk-lace"></div>' +
+          '<div class="bk-head"><span class="bk-ico">🍽️</span><span>内容简介</span><span class="bk-ico">🍽️</span></div>' +
+          rows +
+          '<div class="bk-note">' + esc(p.prose).replace(/\n/g, "<br>") + '</div>' +
+          (tagHtml ? '<div class="bk-flourish">— ⚜ —</div><div class="bk-tags">' + tagHtml + '</div>' : '') +
+          '<div class="lace-btm"></div>';
+      }
+
       function cardHTML(b, i) {
         var priceHtml = "";
         if (!isOrderable(b) && b.badge) {
@@ -1180,16 +1352,20 @@
         return '<div class="book-card' + (orderable ? "" : " is-locked") + '" data-code="' + esc(b.code) + '" data-stage="' + stage + '" data-search="' + esc(key) + '">' +
           '<div class="bookmark-ribbon ' + ribbonOf(b) + '"></div>' +
           '<div class="menu-tag ' + TAG[i % 3] + '">' + esc(b.code) + '</div>' +
-          coverHTML(b) +
-          '<div class="book-name">《' + esc(b.title) + '》</div>' +
-          '<div class="book-meta">' +
-            priceHtml +
-            '<span class="status-badge ' + stCls + '">' + esc(b.status || "") + '</span>' +
-            '<span class="stage-chip stage-' + stage + '">' + stageLabel(stage) + '</span>' +
-            '<span class="vote-chip" data-vote="' + esc(b.code) + '">0 票</span>' +
+          '<div class="flip-inner">' +
+            '<div class="face face-front">' +
+              coverHTML(b) +
+              '<div class="book-name">《' + esc(b.title) + '》</div>' +
+              '<div class="book-meta">' +
+                priceHtml +
+                '<span class="status-badge ' + stCls + '">' + esc(b.status || "") + '</span>' +
+                '<span class="stage-chip stage-' + stage + '">' + stageLabel(stage) + '</span>' +
+                '<span class="vote-chip" data-vote="' + esc(b.code) + '">0 票</span>' +
+              '</div>' +
+              '<button class="order-btn' + (added ? " added" : "") + (!orderable ? " locked" : "") + '" type="button"' + ((added || !orderable) ? " disabled" : "") + '>' + (added ? "✓ 已加入餐盘" : pickLabel(b)) + '</button>' +
+            '</div>' +
+            '<div class="face face-back">' + backHTML(b) + '</div>' +
           '</div>' +
-          '<div class="book-note">' + esc(b.intro || b.note || "") + '</div>' +
-          '<button class="order-btn' + (added ? " added" : "") + (!orderable ? " locked" : "") + '" type="button"' + ((added || !orderable) ? " disabled" : "") + '>' + (added ? "✓ 已加入餐盘" : pickLabel(b)) + '</button>' +
         '</div>';
       }
 
@@ -1903,6 +2079,8 @@
 
       $("grid-main").addEventListener("click", onCardClick);
       $("grid-dessert").addEventListener("click", onCardClick);
+      $("grid-main").addEventListener("click", onCardFlip);
+      $("grid-dessert").addEventListener("click", onCardFlip);
       function onCardClick(e) {
         var btn = e.target.closest(".order-btn");
         if (!btn || btn.disabled) return;
@@ -1912,6 +2090,12 @@
         var b = byCode[code];
         if (b && isOrderable(b)) addToCart(code);
         else toast("《" + ((b && b.title) || "这道菜") + "》暂不开放领餐（未上架 / 未到上架时间或已过下架时间），只有上架中的菜可以加入餐盘～");
+      }
+      /* 点击卡片翻面看简介；按钮/链接/票数不触发翻转 */
+      function onCardFlip(e) {
+        if (e.target.closest(".order-btn, .vote-chip, a, button")) return;
+        var card = e.target.closest(".book-card");
+        if (card) card.classList.toggle("flipped");
       }
 
       async function voteOnce(code) {
