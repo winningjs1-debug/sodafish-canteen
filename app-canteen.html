@@ -610,6 +610,23 @@
             .pickup-row { flex-direction: column; }
             .pickup-input { width: 100%; }
         }
+        /* ===== 手机端书卡重排（≤560px）：保持两列布局，卡片收成方正比例 + 标签两排放下，平板与桌面端不受影响 ===== */
+        @media (max-width: 560px) {
+            /* 两列保持不变，只收间距：列宽更大，卡片更接近方形 */
+            .grid-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7rem; }
+            .book-card { padding: 1.5rem 0.7rem 0.85rem; }
+            /* 封面从竖长 4:5 改成正方形：卡片高度收住，整体比例更"方"，不再是窄长条 */
+            .cover-box { aspect-ratio: 1 / 1; max-height: none; margin: -0.2rem -0.2rem 0.55rem; }
+            .book-name { font-size: 1.02rem; line-height: 1.3; margin-bottom: 0.45rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+            /* 标签收紧：待返场/未上架 一排，已出餐/票数 一排，不再挤成三排 */
+            .book-meta { gap: 0.3rem; row-gap: 0.28rem; margin-bottom: 0.45rem; }
+            .price-badge, .status-badge { font-size: 0.76rem; padding: 0.05rem 0.38rem; }
+            .stage-chip { font-size: 0.7rem; padding: 0.02rem 0.32rem; letter-spacing: 0.2px; }
+            .vote-chip { font-size: 0.66rem; padding: 0.06rem 0.36rem; }
+            /* 简介只留一行，压住卡片高度 */
+            .book-note { font-size: 0.78rem; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+            .order-btn { margin-top: 0.55rem; }
+        }
 
         /* 首屏遮罩：盖住半渲染状态，避免黑屏/白屏闪烁 */
         #sodaBoot {
