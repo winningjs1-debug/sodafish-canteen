@@ -367,6 +367,13 @@ textarea.search{resize:vertical;line-height:1.6}
 
   <!-- 订单核对 -->
   <div class="panel" id="panelShop" hidden>
+    <div class="pub-hero" id="batchBox">
+      <div class="pub-title">📚 按书自动发放 · 链接只填一次，同款订单全自动</div>
+      <p>下面按书汇总了还有待发订单的书目。<b>每本书只填一次网盘链接和提取码</b>（会自动记住），点「保存并自动发放」，点了这本书的<b>所有待发订单会立刻一起发放</b>；<b>以后每来一个新订单（只点这本书的），下单瞬间就自动发好链接</b>，你完全不用再操作。多本书的订单，等它每本书的链接都齐了会自动一起发。</p>
+      <div id="batchList" style="margin-top:4px"></div>
+      <button class="btn primary" id="batchAll" type="button" style="margin-top:8px">🚀 补发所有已配好链接的订单</button>
+      <p class="note" id="batchMsg"></p>
+    </div>
     <div class="tablewrap">
       <table>
         <thead>
@@ -396,7 +403,7 @@ textarea.search{resize:vertical;line-height:1.6}
       <button class="btn primary" id="avatarSave" type="button">保存头像</button>
       <p class="note" id="avatarMsg"></p>
       <h3 style="margin-top:6px">说明</h3>
-      <p class="note">读者下单拿单号+凭证 → 扫码赞赏并备注单号 → 你在这里核对 → 填网盘链接与提取码点「确认发放」→ 读者在菜单页「🧾 我的订单」凭凭证领取。</p>
+      <p class="note">读者下单拿单号+凭证 → 扫码赞赏并备注单号 → 你只需给这本书<b>配一次网盘链接</b>（在上方「按书自动发放」或菜单编辑里填）→ 该书所有订单<b>自动发放</b>，之后新订单下单即发 → 读者在菜单页「🧾 我的订单」凭凭证领取。</p>
     </aside>
   </div>
 
@@ -467,6 +474,13 @@ textarea.search{resize:vertical;line-height:1.6}
       <textarea class="search" id="beIntro" rows="2" placeholder="一句话介绍这本书" style="width:100%"></textarea>
       <label class="fl">首发平台链接（可不填）</label>
       <input class="search" id="bePlatform" placeholder="https://..." style="width:100%">
+      <div class="pub-box">
+        <div class="pub-title">🔗 这本书的网盘链接 · 填一次，订单自动发放</div>
+        <p class="note">填好这本书的网盘链接和提取码保存后：<b>这本书的所有待发订单立刻一起发放</b>，以后每来一个新订单（只点这本书的）都会<b>在下单瞬间自动发好链接</b>，你完全不用再操作。多本书的订单等每本书的链接都齐了自动发。</p>
+        <input class="search" id="beLinkUrl" type="text" placeholder="网盘链接 https://pan.baidu.com/s/..." style="width:100%">
+        <input class="search" id="beLinkPwd" type="text" placeholder="提取码（没有可留空）" style="width:100%;margin-top:6px">
+        <p class="note" id="beLinkMsg"></p>
+      </div>
       <label class="fl">封面图</label>
       <div style="display:flex;gap:10px;align-items:flex-start">
         <div class="be-cover"><img id="beCoverPrev" alt="" hidden referrerpolicy="no-referrer"><span id="beCoverFb">🖼</span></div>
@@ -636,7 +650,7 @@ textarea.search{resize:vertical;line-height:1.6}
   };
   var unwrap = function (r) { if (r && r.error) throw r.error; return r ? r.data : null; };
 
-  var state = { ballots: [], books: {}, bookRows: [], tally: {}, overview: {}, notes: [], comments: [], shop: [], qr: "", avatar: "", notice: "", tab: "orders", filter: "all", q: "", ready: false, editing: null, stageSel: "cooking" };
+  var state = { ballots: [], books: {}, bookRows: [], tally: {}, overview: {}, notes: [], comments: [], shop: [], bookLinks: {}, qr: "", avatar: "", notice: "", tab: "orders", filter: "all", q: "", ready: false, editing: null, stageSel: "cooking" };
 
   /* ---------- 口令 ---------- */
   function unlock() {
@@ -669,7 +683,8 @@ textarea.search{resize:vertical;line-height:1.6}
         cloud.database.from("soda_notes").select("*").order("created_at", { ascending: false }).limit(500),
         cloud.database.from("soda_comments").select("*").order("created_at", { ascending: false }).limit(500),
         cloud.database.rpc("soda_admin_orders", { p_pass: ADMIN_PASS }),
-        cloud.database.from("soda_settings").select("key,value")
+        cloud.database.from("soda_settings").select("key,value"),
+        cloud.database.from("soda_book_links").select("book_code,url,pwd")
       ]);
       state.ballots = unwrap(res[0]) || [];
       var books = unwrap(res[1]) || [];
@@ -688,6 +703,9 @@ textarea.search{resize:vertical;line-height:1.6}
       state.qr = settings.wechat_qr || "";
       state.avatar = settings.admin_avatar || "";
       state.notice = settings.shop_notice || "";
+      var bl = unwrap(res[8]) || [];
+      state.bookLinks = {};
+      bl.forEach(function (r) { state.bookLinks[r.book_code] = { url: r.url || "", pwd: r.pwd || "" }; });
       $("errBox").hidden = true;
       $("liveTxt").textContent = "实时 · " + new Date().toLocaleTimeString("zh-CN", { hour12: false });
       render();
@@ -781,7 +799,39 @@ textarea.search{resize:vertical;line-height:1.6}
     return html + '</div>';
   }
 
+  /* 按书统一发放：把待发订单按书目汇总，一本书填一次链接即可批量发 */
+  function renderBatch() {
+    var pend = (state.shop || []).filter(function (s) { return s.status === "待核对" || s.status === "已核对"; });
+    var map = {};
+    pend.forEach(function (s) {
+      (Array.isArray(s.book_ids) ? s.book_ids : []).forEach(function (c) {
+        if (!map[c]) map[c] = { code: c, n: 0 };
+        map[c].n++;
+      });
+    });
+    var rows = Object.keys(map).map(function (k) { return map[k]; }).sort(function (a, b) { return b.n - a.n; });
+    if (!rows.length) {
+      $("batchList").innerHTML = '<p class="note" style="margin:0">现在没有待发的订单。读者一下单，这里就会自动按书汇总。</p>';
+      $("batchAll").disabled = true;
+      return;
+    }
+    $("batchAll").disabled = false;
+    var links = state.bookLinks || {};
+    $("batchList").innerHTML = rows.map(function (r) {
+      var lk = links[r.code] || {};
+      var on = !!lk.url;
+      return '<div data-bl="' + esc(r.code) + '" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:7px 0;border-bottom:1px dashed var(--line)">' +
+        '<div style="flex:1 1 150px;min-width:130px"><b>《' + esc(titleOf(r.code)) + '》</b>' +
+        '<div class="no" style="font-size:12px;color:var(--muted-2)">' + esc(r.code) + ' · ' + r.n + ' 单待发' + (on ? ' · ✅ 已启用自动发放' : '') + '</div></div>' +
+        '<input class="mini-input" type="text" placeholder="网盘链接" data-bl-url value="' + esc(lk.url || "") + '" style="flex:2 1 200px;min-width:150px">' +
+        '<input class="mini-input" type="text" placeholder="提取码" data-bl-pwd value="' + esc(lk.pwd || "") + '" style="flex:0 1 90px;min-width:72px">' +
+        '<button class="btn sm primary" type="button" data-bl-release="' + esc(r.code) + '">💾 保存并自动发放 ' + r.n + ' 单</button>' +
+        '</div>';
+    }).join("");
+  }
+
   function renderShop() {
+    renderBatch();
     var o = state.overview || {};
     $("kShopWait").textContent = o.orders_pending || 0;
     $("kShopToday").textContent = o.orders_today || 0;
@@ -816,12 +866,15 @@ textarea.search{resize:vertical;line-height:1.6}
         act = '<button class="btn sm primary" type="button" data-act="approve" data-no="' + esc(s.order_no) + '">✓ 已核对到账</button>' +
               '<button class="btn sm" type="button" data-act="reject" data-no="' + esc(s.order_no) + '">✕ 驳回</button>';
       } else if (s.status === "已核对") {
-        act = '<input class="mini-input" type="text" placeholder="网盘链接" data-url="' + esc(s.order_no) + '">' +
-              '<input class="mini-input" type="text" placeholder="提取码" data-code="' + esc(s.order_no) + '">' +
+        var b0 = picks.length === 1 ? picks[0] : "";
+        var lk0 = (b0 && state.bookLinks && state.bookLinks[b0]) || {};
+        act = '<input class="mini-input" type="text" placeholder="网盘链接" data-url="' + esc(s.order_no) + '" value="' + esc(lk0.url || "") + '">' +
+              '<input class="mini-input" type="text" placeholder="提取码" data-code="' + esc(s.order_no) + '" value="' + esc(lk0.pwd || "") + '">' +
               '<button class="btn sm primary" type="button" data-act="deliver" data-no="' + esc(s.order_no) + '">📦 确认发放</button>' +
               '<button class="btn sm" type="button" data-act="reject" data-no="' + esc(s.order_no) + '">✕ 驳回</button>';
       } else if (s.status === "已发放" && s.delivery) {
-        act = '<div class="dlcell">' + esc(s.delivery.url || "") + '</div><div class="dlcell">提取码 ' + esc(s.delivery.code || "") + '</div>';
+        var icnt = (Array.isArray(s.delivery.items) && s.delivery.items.length) || 1;
+        act = '<div class="dlcell">' + esc(s.delivery.url || "") + (icnt > 1 ? "（等 " + icnt + " 本，读者端会逐本列出）" : "") + '</div><div class="dlcell">提取码 ' + esc(s.delivery.code || "") + '</div>';
       }
       var who = esc(s.nickname || "匿名") + (s.reader_note ? '<div class="msg">' + esc(s.reader_note) + '</div>' : "");
       return '<tr>' +
@@ -1167,6 +1220,11 @@ textarea.search{resize:vertical;line-height:1.6}
     $("bePublishEnd").value = localInput(b ? b.unpublish_at : "");
     if (!b) $("beCode").value = nextCode();
     setCover(b ? b.cover_url : "");
+    /* 网盘链接（这本书的订单自动发放用） */
+    var lk = (b && state.bookLinks && state.bookLinks[b.code]) || {};
+    $("beLinkUrl").value = lk.url || "";
+    $("beLinkPwd").value = lk.pwd || "";
+    $("beLinkMsg").textContent = lk.url ? "已配置：这本书的新订单会自动发链接。" : "";
     $("beMsg").textContent = "";
   }
 
@@ -1282,7 +1340,18 @@ textarea.search{resize:vertical;line-height:1.6}
     try {
       var r = unwrap(await cloud.database.rpc("soda_admin_book_save", p));
       if (r && r.error) { $("beMsg").textContent = r.error; return; }
-      $("beMsg").textContent = "已保存 " + (r && r.code ? r.code : p.p_code) + (p.p_publish_at ? " · ⏰ 定时上架已设好，到点主页自动上架弹窗" : "") + (p.p_unpublish_at ? " · 到下架时间自动下架" : "") + "，菜单页 6 秒内自动刷新。";
+      var msg = "已保存 " + (r && r.code ? r.code : p.p_code) + (p.p_publish_at ? " · ⏰ 定时上架已设好，到点主页自动上架弹窗" : "") + (p.p_unpublish_at ? " · 到下架时间自动下架" : "");
+      /* 顺手保存这本书的网盘链接：保存即自动发放该书全部待发订单，此后新单自动发 */
+      var lkUrl = ($("beLinkUrl").value || "").trim();
+      if (lkUrl) {
+        var lr = unwrap(await cloud.database.rpc("soda_admin_book_link_save", {
+          p_pass: ADMIN_PASS, p_book_code: (r && r.code ? r.code : p.p_code),
+          p_url: lkUrl, p_pwd: ($("beLinkPwd").value || "").trim()
+        })) || {};
+        if (lr && lr.error) msg += " · ⚠️ 网盘链接没存上：" + lr.error;
+        else msg += " · 🔗 链接已配置" + (lr.released ? "，已自动发放 " + lr.released + " 单" : "") + (lr.waiting ? "，还有 " + lr.waiting + " 单缺其它书的链接" : "") + "，以后新订单自动发";
+      }
+      $("beMsg").textContent = msg + "。菜单页 6 秒内自动刷新。";
       await load();
     } catch (err) {
       $("beMsg").textContent = "保存失败：" + ((err && err.message) || "网络异常");
@@ -1432,6 +1501,40 @@ textarea.search{resize:vertical;line-height:1.6}
     } else {
       shopAct(act, no);
     }
+  });
+
+  /* ---------- 按书自动发放：保存链接即自动发放 ---------- */
+  $("batchList").addEventListener("click", async function (e) {
+    var btn = e.target.closest("button");
+    if (!btn) return;
+    var code = btn.getAttribute("data-bl-release") || btn.getAttribute("data-bl-save");
+    var row = btn.closest("[data-bl]");
+    if (!code || !row) return;
+    var url = (row.querySelector("[data-bl-url]").value || "").trim();
+    var pwd = (row.querySelector("[data-bl-pwd]").value || "").trim();
+    if (!url) { $("batchMsg").textContent = "先把这本书的网盘链接填上哦。"; return; }
+    btn.disabled = true;
+    try {
+      var s = unwrap(await cloud.database.rpc("soda_admin_book_link_save", { p_pass: ADMIN_PASS, p_book_code: code, p_url: url, p_pwd: pwd })) || {};
+      if (s && s.error) { $("batchMsg").textContent = s.error; return; }
+      $("batchMsg").textContent = "《" + titleOf(code) + "》链接已记住，已自动发放 " + (s.released || 0) + " 单" +
+        (s.waiting ? "；还有 " + s.waiting + " 单含多本书，等其余书的链接补齐后会自动一起发。" : "。以后这本书的新订单下单即自动发放。");
+      await load();
+    } catch (err) {
+      $("batchMsg").textContent = "操作失败：" + ((err && err.message) || "网络异常");
+    } finally { btn.disabled = false; }
+  });
+
+  $("batchAll").addEventListener("click", async function () {
+    var btn = this;
+    btn.disabled = true;
+    try {
+      var r = unwrap(await cloud.database.rpc("soda_admin_release_batch", { p_pass: ADMIN_PASS, p_book_code: null })) || {};
+      $("batchMsg").textContent = "已补发 " + (r.released || 0) + " 单" + (r.waiting ? "，还有 " + r.waiting + " 单缺链接暂时发不了。" : "。");
+      await load();
+    } catch (err) {
+      $("batchMsg").textContent = "发放失败：" + ((err && err.message) || "网络异常");
+    } finally { btn.disabled = false; }
   });
 
   /* ---------- 赞赏码设置 ---------- */
