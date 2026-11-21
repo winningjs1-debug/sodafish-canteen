@@ -37,7 +37,7 @@
             --tape-green: rgba(171, 202, 178, 0.7); --tape-pink: rgba(233, 175, 175, 0.7);
             --wrapper-bg: rgba(255, 255, 255, 0.55); --wrapper-border: rgba(178, 187, 199, 0.55);
             --primary: #d49a9a; --bar-bg: #e8e2d5;
-            --font-english: 'Great Vibes', cursive; --font-chinese-title: 'Ma Shan Zheng', cursive;
+            --font-english: 'Great Vibes', cursive; --font-chinese-title: 'Ma Shan Zheng', 'Kaiti SC', 'STKaiti', 'KaiTi', cursive;
             --font-body: 'Klee One', 'KaiTi', serif;
         }
         body.dark-mode {
@@ -59,6 +59,9 @@
         .btn-sticker:hover { transform: translateY(-2px) rotate(-1deg); box-shadow: 3px 4px 5px rgba(0,0,0,0.08); }
         .btn-sticker.active { background: var(--primary); color: #fff; border-style: solid; border-color: var(--primary); transform: rotate(1deg); }
         .btn-theme { border-radius: 50%; width: 40px; height: 40px; padding: 0; justify-content: center; font-size: 1.2rem; border-style: solid; }
+        /* 首页 hero 区四颗大按钮（去点单/查我的取餐码/食客心愿榜/赞赏主厨）：统一毛笔楷，
+           与店内标题同款字体，简体字全覆盖，不再出现日文字体缺字回退导致的粗细混搭 */
+        .hero-actions .btn-sticker { font-family: var(--font-chinese-title); font-weight: 400; font-size: 1.05rem; letter-spacing: 0.5px; }
         .wrapper { max-width: 1000px; margin: 0 auto; background: var(--wrapper-bg); padding: 3rem 2rem; border-radius: 12px; box-shadow: inset 0 0 20px rgba(255,255,255,0.05), 0 4px 20px rgba(0,0,0,0.03); border: 1px solid var(--wrapper-border); overflow: hidden; position: relative; }
         /* 银白法式装修：顶部蕾丝花边 + 一串珍珠 */
         .wrapper::before {
@@ -188,10 +191,11 @@
         .book-name { font-family: var(--font-chinese-title); font-size: 1.4rem; margin-bottom: 0.8rem; line-height: 1.2; }
         .book-meta { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; margin-bottom: 0.8rem; }
         .book-note { font-size: 0.95rem; color: var(--ink-sub); border-top: 1px dashed var(--wrapper-border); padding-top: 0.8rem; margin-top: 0.8rem; flex-grow: 1; }
-        .price-badge, .status-badge { font-size: 0.85rem; padding: 0.15rem 0.6rem; border-radius: 20px; font-weight: bold; border: 1px solid transparent; }
+        /* 书卡标签（待返场/未上架/已完成）与出餐标签统一毛笔楷：简体全覆盖，任何设备都不缺字 */
+        .price-badge, .status-badge { font-family: var(--font-chinese-title); font-weight: 400; font-size: 0.95rem; line-height: 1.5; padding: 0.1rem 0.6rem; border-radius: 20px; border: 1px solid transparent; }
         .status-badge { border-radius: 4px; transform: rotate(-2deg); }
         /* 出餐进度标签（菜单卡的二级分类）：已出餐 / 烹饪中，与上架状态分开显示 */
-        .stage-chip { font-size: 0.74rem; padding: 0.1rem 0.5rem; border-radius: 20px; border: 1px dashed var(--wrapper-border); color: var(--ink-sub); white-space: nowrap; letter-spacing: 0.3px; }
+        .stage-chip { font-family: var(--font-chinese-title); font-weight: 400; font-size: 0.84rem; padding: 0.05rem 0.5rem; border-radius: 20px; border: 1px dashed var(--wrapper-border); color: var(--ink-sub); white-space: nowrap; letter-spacing: 0.3px; }
         .stage-chip.stage-done { color: #4a7452; border-color: #c1d4c5; background: rgba(74, 116, 82, 0.07); }
         .stage-chip.stage-cooking { color: #b5564f; border-color: #e3b8b4; background: rgba(209, 91, 91, 0.06); }
         body.dark-mode .stage-chip.stage-done { color: #83c496; border-color: rgba(193, 212, 197, 0.3); background: rgba(74, 116, 82, 0.16); }
@@ -343,9 +347,9 @@
             .pickup-title { font-size: 1.05rem; line-height: 1.5; }
             .pickup-title .order-status { margin-top: 0.3rem; }
             #okPickup { font-size: 1.45rem; letter-spacing: 6px; }
-            /* 图标按钮固定自然尺寸，居中换行，不再拉伸撑满 */
+            /* 图标按钮固定自然尺寸，居中换行，不再拉伸撑满（毛笔楷字面偏小，字号略放大保证清晰） */
             .hero-actions { gap: 0.55rem; }
-            .hero-actions .btn-sticker { flex: none; padding: 0.42rem 0.9rem; font-size: 0.88rem; }
+            .hero-actions .btn-sticker { flex: none; padding: 0.38rem 0.85rem; font-size: 0.98rem; }
             .section-title { font-size: 1.2rem; padding: 0.35rem 1.2rem; }
         }
         @media (max-width: 560px) {
