@@ -1688,7 +1688,7 @@ textarea.search{resize:vertical;line-height:1.6}
       if (!/^https?:\/\//i.test(url)) { reject(new Error("要 http/https 开头的直链")); return; }
       var a = new Audio();
       var done = false;
-      var timer = setTimeout(function () { if (!done) { done = true; a.src = ""; reject(new Error("8 秒内读不出音频，直链可能无效")); } }, 8000);
+      var timer = setTimeout(function () { if (!done) { done = true; a.src = ""; reject(new Error("15 秒内读不出音频，直链可能无效")); } }, 15000);
       a.preload = "metadata";
       a.addEventListener("loadedmetadata", function () {
         if (done) return;
@@ -1707,13 +1707,15 @@ textarea.search{resize:vertical;line-height:1.6}
     s = Math.round(s);
     return Math.floor(s / 60) + ":" + ("0" + (s % 60)).slice(-2);
   }
-  /* 填直链后自动识别：识别成功 → 自动开启音乐并保存 */
-  async function bgmAutoDetect() {
+  /* 识别直链：成功 → 自动开启音乐并保存；失败也按原样保存，避免「填了却没存上」 */
+  async function bgmAutoDetect(fromCommit) {
     var url = $("bgmUrl").value.trim();
     if (!url) {
-      if (bgmState.url) { await bgmSaveQuiet(""); bgmMsg("已清空直链，音乐随之关闭"); bgmState.on = false; renderMusic(); }
+      if (fromCommit && bgmState.url) { await bgmSaveQuiet(""); bgmState.on = false; renderMusic(); bgmMsg("已清空直链，音乐随之关闭"); }
       return;
     }
+    if (bgmState._detecting) return;
+    bgmState._detecting = true;
     bgmMsg("🎧 正在识别音频…");
     try {
       var dur = await probeAudio(url);
@@ -1722,13 +1724,27 @@ textarea.search{resize:vertical;line-height:1.6}
       await bgmSaveQuiet(url);
       bgmMsg("✓ 识别成功（" + fmtDur(dur) + "）· 音乐已自动开启，读者进店即循环播放");
     } catch (err) {
-      bgmMsg("⚠ 识别失败：" + ((err && err.message) || "直链无效"), true);
+      await bgmSaveQuiet(url);
+      bgmMsg("⚠ 识别未通过（" + ((err && err.message) || "直链无效") + "），已按原样保存；若食堂仍无声请换一个直链", true);
     }
+    bgmState._detecting = false;
   }
-  $("bgmUrl").addEventListener("change", bgmAutoDetect);
-  /* 开关：点一下立即生效并保存，无需再点保存键 */
+  /* 粘贴/输入后防抖自动识别，无需点别处 */
+  var bgmUrlTimer = null;
+  $("bgmUrl").addEventListener("input", function () {
+    bgmState.dirty = true;
+    if (bgmUrlTimer) clearTimeout(bgmUrlTimer);
+    bgmUrlTimer = setTimeout(function () { bgmAutoDetect(false); }, 900);
+  });
+  $("bgmUrl").addEventListener("change", function () {
+    if (bgmUrlTimer) clearTimeout(bgmUrlTimer);
+    bgmAutoDetect(true);
+  });
+  /* 开关：点一下立即生效并保存；框里有没存过的新直链就先识别它 */
   $("bgmSw").addEventListener("click", async function () {
-    if (bgmState.on && !$("bgmUrl").value.trim() && !bgmState.url) { bgmMsg("⚠ 先填一个音频直链再开开关", true); return; }
+    var box = $("bgmUrl").value.trim();
+    if (box && box !== bgmState.url) { await bgmAutoDetect(true); return; }
+    if (bgmState.on && !box && !bgmState.url) { bgmMsg("⚠ 先填一个音频直链再开开关", true); return; }
     bgmState.on = !bgmState.on;
     renderMusic();
     await bgmSaveQuiet();
