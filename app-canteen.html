@@ -713,79 +713,77 @@
             background-size: 25px 25px;
             transition: opacity 0.3s ease, visibility 0.3s;
         }
-        #sodaBoot.gone { opacity: 0; visibility: hidden; pointer-events: none; }
-        /* —— 加载屏「floating 小世界」场景（sb 前缀，勿与正餐样式混用）—— */
-        .sb-scene {
-            position: relative; width: 340px; height: 430px; flex: 0 0 auto;
-            transform: translateY(-3vh) scale(var(--sb-scale, 1));
+        #sodaBoot.gone { opacity: 0; visibility: hidden; pointer-events: none; overflow: hidden; }
+        /* ===== 启动屏「floating 小世界」场景 ===== */
+        .bootB { position: absolute; inset: 0; }
+        .bootB .scene { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); width: 340px; height: 430px; }
+        .bootB .fish-svg, .bootB .bubble-svg, .bootB .star-svg, .bootB .spiral-svg, .bootB .seaweed, .bootB .orbitFish, .bootB .tubFish { position: absolute; pointer-events: none; overflow: visible; }
+        .bootB .fish-body { animation: tailWiggle 1.1s ease-in-out infinite; transform-origin: 60% 50%; }
+        @keyframes tailWiggle { 0%,100% { transform: rotate(0deg); } 50% { transform: rotate(5deg) translateY(1px); } }
+        @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+        @keyframes rise {
+            0% { transform: translateY(0) translateX(0); opacity: 0; }
+            12% { opacity: .95; }
+            70% { opacity: .8; }
+            100% { transform: translateY(-320px) translateX(14px); opacity: 0; }
         }
-        @media (max-width: 430px) { #sodaBoot { --sb-scale: .8; } }
-        @media (max-width: 350px) { #sodaBoot { --sb-scale: .7; } }
-        @media (max-height: 660px) { #sodaBoot { --sb-scale: min(var(--sb-scale, 1), .82); } }
-        @media (min-width: 1024px) and (min-height: 800px) { #sodaBoot { --sb-scale: 1.06; } }
-        @media (prefers-reduced-motion: reduce) {
-            #sodaBoot * { animation-duration: 0.01s !important; animation-iteration-count: 1 !important; }
-        }
-        .sb-scene svg { position: absolute; overflow: visible; pointer-events: none; }
-        .sb-scene .sb-body { animation: sbTail 1.1s ease-in-out infinite; transform-origin: 60% 50%; }
-        @keyframes sbTail { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(5deg) translateY(1px); } }
-        .sb-orbit { pointer-events: none; }
-        .sb-orbit.o1 { animation: sbOrbitA 11s ease-in-out infinite; }
-        .sb-orbit.o2 { animation: sbOrbitB 14s ease-in-out infinite; animation-delay: -5s; }
-        @keyframes sbOrbitA {
-            0% { transform: translate(30px, 90px) scaleX(1); }
-            48% { transform: translate(240px, 40px) scaleX(1); }
-            52% { transform: translate(248px, 36px) scaleX(-1); }
-            98% { transform: translate(40px, 130px) scaleX(-1); }
-            100% { transform: translate(30px, 90px) scaleX(1); }
-        }
-        @keyframes sbOrbitB {
-            0% { transform: translate(250px, 140px) scaleX(-1); }
-            48% { transform: translate(20px, 200px) scaleX(-1); }
-            52% { transform: translate(14px, 204px) scaleX(1); }
-            98% { transform: translate(236px, 96px) scaleX(1); }
-            100% { transform: translate(250px, 140px) scaleX(-1); }
-        }
-        .sb-sign {
+        .bootB .star-svg { animation: twinkle 2.6s ease-in-out infinite; }
+        @keyframes twinkle { 0%,100% { opacity: .45; transform: scale(.92); } 50% { opacity: 1; transform: scale(1.06); } }
+        .bootB .spiral-svg { animation: spiralDrift 14s ease-in-out infinite; }
+        @keyframes spiralDrift { 0%,100% { transform: rotate(-8deg) translateY(0); } 50% { transform: rotate(10deg) translateY(-8px); } }
+        .bootB .sign {
             position: absolute; left: 50px; top: 10px; width: 190px; height: 250px;
             background: #fff; border: 2px solid #bdbdbd; border-radius: 10px;
-            display: flex; flex-direction: column; align-items: center;
-            padding-top: 40px; z-index: 2; transform-origin: 50% 0;
-            animation: sbSignSway2 5s ease-in-out infinite;
+            transform: rotate(-2deg); display: flex; flex-direction: column; align-items: center;
+            padding-top: 40px; z-index: 2; animation: signSway 5s ease-in-out infinite; transform-origin: 50% 0;
+            box-shadow: 0 4px 14px rgba(0,0,0,.05);
         }
-        @keyframes sbSignSway2 { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(-.5deg); } }
-        .sb-sign .tape {
+        @keyframes signSway { 0%,100% { transform: rotate(-2deg); } 50% { transform: rotate(-.5deg); } }
+        .bootB .sign .tape {
             position: absolute; top: -14px; left: 30px;
             background: #8a8a8a; color: #f5f5f5; font-family: 'Space Mono', monospace;
             font-size: .68rem; padding: .25rem .7rem; border-radius: 4px; transform: rotate(-3deg);
         }
-        .sb-sign .words {
+        .bootB .sign .words {
             font-family: 'Segoe Script', 'Comic Sans MS', cursive;
             font-size: .95rem; color: #8a8a8a; line-height: 1.7; text-align: left; padding: 0 14px;
         }
-        .sb-sign .doodles { margin-top: auto; padding-bottom: 16px; opacity: .75; position: static; }
-        .sb-seaweed { bottom: 40px; transform-origin: 50% 100%; animation: sbSway 3.4s ease-in-out infinite; }
-        .sb-seaweed.s2 { animation-delay: -1.7s; }
-        @keyframes sbSway { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(5deg); } }
-        .sb-tub { position: absolute; bottom: 12px; left: 50%; margin-left: -125px; width: 250px; }
-        .sb-tubFish { left: 50%; top: 38px; animation: sbBob 2.2s ease-in-out infinite; }
-        @keyframes sbBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-        .sb-bubble { animation: sbRise 6s linear infinite; }
-        @keyframes sbRise {
-            0% { transform: translateY(0) translateX(0); opacity: 0; }
-            12% { opacity: .95; }
-            70% { opacity: .8; }
-            100% { transform: translateY(-300px) translateX(14px); opacity: 0; }
+        .bootB .sign .doodles { margin-top: auto; padding-bottom: 16px; opacity: .75; }
+        .bootB .seaweed { transform-origin: 50% 100%; animation: sway 3.4s ease-in-out infinite; }
+        .bootB .seaweed.s2 { animation-delay: -1.7s; }
+        @keyframes sway { 0%,100% { transform: rotate(-4deg); } 50% { transform: rotate(5deg); } }
+        .bootB .tub { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); width: 250px; }
+        .bootB .tubFish { left: 50%; top: 38px; margin-left: -16px; animation: bob 2.2s ease-in-out infinite; }
+        .bootB .orbit1 { animation: orbitA 11s ease-in-out infinite; }
+        .bootB .orbit2 { animation: orbitB 14s ease-in-out infinite; animation-delay: -5s; }
+        @keyframes orbitA {
+            0% { transform: translate(30px, 90px) scaleX(1); }
+            48% { transform: translate(238px, 40px) scaleX(1); }
+            52% { transform: translate(244px, 36px) scaleX(-1); }
+            98% { transform: translate(40px, 130px) scaleX(-1); }
+            100% { transform: translate(30px, 90px) scaleX(1); }
         }
-        .sb-star { animation: sbTwinkle 2.6s ease-in-out infinite; }
-        @keyframes sbTwinkle { 0%, 100% { opacity: .45; transform: scale(.92); } 50% { opacity: 1; transform: scale(1.06); } }
-        .sb-txt { position: absolute; left: 50%; bottom: -74px; transform: translateX(-50%); text-align: center; width: 300px; z-index: 5; }
-        .sb-txt .txt { font-family: var(--font-chinese-title); font-size: 1.02rem; letter-spacing: 2px; color: var(--ink-main); display: block; }
-        .sb-txt .sub { font-family: 'Space Mono', monospace; font-size: .62rem; letter-spacing: 3px; color: var(--ink-sub); display: block; margin-top: .4rem; }
-        .sb-txt .retry {
+        @keyframes orbitB {
+            0% { transform: translate(244px, 140px) scaleX(-1); }
+            48% { transform: translate(20px, 200px) scaleX(-1); }
+            52% { transform: translate(14px, 204px) scaleX(1); }
+            98% { transform: translate(230px, 96px) scaleX(1); }
+            100% { transform: translate(244px, 140px) scaleX(-1); }
+        }
+        .bootB .centerTxt {
+            position: absolute; left: 50%; bottom: 110px; transform: translateX(-50%);
+            text-align: center; z-index: 5; width: 100%;
+        }
+        .bootB .txt { font-family: var(--font-chinese-title); font-size: 1.05rem; color: var(--ink-main); letter-spacing: 2px; display: block; }
+        .bootB .sub { font-family: 'Space Mono', monospace; font-size: 0.64rem; letter-spacing: 2px; color: var(--ink-sub); display: block; margin-top: 0.4rem; }
+        .bootB .retry {
             margin-top: 0.9rem; font-family: var(--font-body); font-size: 0.9rem; padding: 0.35rem 1.1rem; cursor: pointer;
             border: 1px dashed var(--ink-sub); border-radius: 20px; background: var(--tape-green); color: var(--ink-main);
         }
+        /* 小屏与矮屏：场景整体缩放，保证手机/平板/电脑都完整呈现 */
+        @media (max-width: 400px) { .bootB .scene { transform: translate(-50%, -50%) scale(.84); } }
+        @media (max-height: 660px) { .bootB .scene { transform: translate(-50%, -50%) scale(.78); } }
+        @media (max-width: 400px) and (max-height: 660px) { .bootB .scene { transform: translate(-50%, -50%) scale(.72); } }
 
         /* ===== 银白蕾丝餐具风背景装饰（参考银器风格图；想退回删除 #silverDeco 与 .sd-lace 两块即可） ===== */
         #silverDeco { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
@@ -914,56 +912,57 @@
         </defs>
     </div>
     <div id="sodaBoot">
-        <div class="sb-scene" aria-hidden="false">
-            <!-- 巡游金鱼 ×2 -->
-            <svg class="sb-orbit o1" style="left:0; top:0; width:74px;" viewBox="0 0 120 70">
-                <g class="sb-body"><path d="M38 35 C36 16 20 8 8 14 C12 22 12 27 8 35 C12 43 12 48 8 56 C20 62 36 54 38 35 Z" fill="#f6c76f"/><path d="M36 35 C36 14 58 6 78 10 C94 14 100 25 100 35 C100 45 94 56 78 60 C58 64 36 56 36 35 Z" fill="#f6c76f"/><circle cx="84" cy="26" r="4" fill="#3a3a3a"/></g>
-            </svg>
-            <svg class="sb-orbit o2" style="left:0; top:0; width:58px; opacity:.92;" viewBox="0 0 120 70">
-                <g class="sb-body" style="animation-delay:-.5s"><path d="M82 35 C84 16 100 8 112 14 C108 22 108 27 112 35 C108 43 108 48 112 56 C100 62 84 54 82 35 Z" fill="#f6c76f"/><path d="M84 35 C84 14 62 6 42 10 C26 14 20 25 20 35 C20 45 26 56 42 60 C62 64 84 56 84 35 Z" fill="#f6c76f"/><circle cx="36" cy="26" r="3.4" fill="#3a3a3a"/></g>
-            </svg>
-            <!-- 小牌子 -->
-            <div class="sb-sign">
-                <span class="tape">( ´ ` )ノ</span>
-                <div class="words">Floating<br>in&nbsp;my<br>own<br>little<br>world.</div>
-                <svg class="doodles" width="120" height="38" viewBox="0 0 120 38" fill="none">
-                    <ellipse cx="16" cy="20" rx="11" ry="6" stroke="#a9a9a9" stroke-width="2"/>
-                    <path d="M27 20 L34 15 L34 25 Z" stroke="#a9a9a9" stroke-width="2" stroke-linejoin="round"/>
-                    <circle cx="11" cy="18" r="1.6" fill="#a9a9a9"/>
-                    <path d="M56 14 a5 5 0 1 0 -5 5 a9 9 0 1 0 -9 -9 a14 14 0 1 0 14 14" stroke="#a9a9a9" stroke-width="2" stroke-linecap="round"/>
-                    <path d="M96 22 c-3 -6 -12 -3 -8 3 c2 3 6 5 8 8 c2 -3 6 -5 8 -8 c4 -6 -5 -9 -8 -3 Z" stroke="#a9a9a9" stroke-width="2"/>
+        <div class="bootB">
+            <div class="scene" aria-hidden="true">
+                <!-- 巡游金鱼 -->
+                <svg class="orbitFish orbit1" style="width:74px;" viewBox="0 0 120 70">
+                    <g class="fish-body"><path d="M38 35 C36 16 20 8 8 14 C12 22 12 27 8 35 C12 43 12 48 8 56 C20 62 36 54 38 35 Z" fill="#f6c76f"/><path d="M36 35 C36 14 58 6 78 10 C94 14 100 25 100 35 C100 45 94 56 78 60 C58 64 36 56 36 35 Z" fill="#f6c76f"/><circle cx="84" cy="26" r="4" fill="#3a3a3a"/></g>
                 </svg>
+                <svg class="orbitFish orbit2" style="width:58px; opacity:.92;" viewBox="0 0 120 70">
+                    <g class="fish-body" style="animation-delay:-.5s"><path d="M82 35 C84 16 100 8 112 14 C108 22 108 27 112 35 C108 43 108 48 112 56 C100 62 84 54 82 35 Z" fill="#f6c76f"/><path d="M84 35 C84 14 62 6 42 10 C26 14 20 25 20 35 C20 45 26 56 42 60 C62 64 84 56 84 35 Z" fill="#f6c76f"/><circle cx="36" cy="26" r="3.4" fill="#3a3a3a"/></g>
+                </svg>
+                <!-- 小牌子 -->
+                <div class="sign">
+                    <span class="tape">( ´ ` )ノ</span>
+                    <div class="words">Floating<br>in&nbsp;my<br>own<br>little<br>world.</div>
+                    <svg class="doodles" width="120" height="38" viewBox="0 0 120 38" fill="none">
+                        <ellipse cx="16" cy="20" rx="11" ry="6" stroke="#a9a9a9" stroke-width="2"/>
+                        <path d="M27 20 L34 15 L34 25 Z" stroke="#a9a9a9" stroke-width="2" stroke-linejoin="round"/>
+                        <circle cx="11" cy="18" r="1.6" fill="#a9a9a9"/>
+                        <path d="M56 14 a5 5 0 1 0 -5 5 a9 9 0 1 0 -9 -9 a14 14 0 1 0 14 14" stroke="#a9a9a9" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M96 22 c-3 -6 -12 -3 -8 3 c2 3 6 5 8 8 c2 -3 6 -5 8 -8 c4 -6 -5 -9 -8 -3 Z" stroke="#a9a9a9" stroke-width="2"/>
+                    </svg>
+                </div>
+                <!-- 海草 -->
+                <svg class="seaweed" style="left:6px; bottom:30px; width:56px;" viewBox="0 0 60 90" fill="none">
+                    <path d="M14 88 C10 60 16 38 12 14 C20 30 22 58 22 88 Z" fill="#b5cda0"/>
+                    <path d="M34 88 C30 56 40 30 36 8 C44 26 46 58 44 88 Z" fill="#9fb98b"/>
+                </svg>
+                <svg class="seaweed s2" style="right:4px; bottom:26px; width:50px;" viewBox="0 0 60 90" fill="none">
+                    <path d="M20 88 C16 58 24 34 20 10 C28 28 30 58 30 88 Z" fill="#9fb98b"/>
+                    <path d="M40 88 C38 62 44 42 42 20 C50 38 50 64 48 88 Z" fill="#b5cda0"/>
+                </svg>
+                <!-- 浴盆与小鱼 -->
+                <div class="tub">
+                    <svg style="width:100%; display:block;" viewBox="0 0 250 150" fill="none">
+                        <path d="M26 62 C26 108 66 134 125 134 C184 134 224 108 224 62" stroke="#9ec3e6" stroke-width="3" stroke-linecap="round" fill="#fdfefd"/>
+                        <path d="M26 62 C30 44 44 36 60 40 C66 22 88 16 104 26 C116 10 144 12 154 30 C170 22 192 30 198 46 C212 44 222 50 224 62" stroke="#9ec3e6" stroke-width="3" stroke-linecap="round" fill="#fdfefd"/>
+                        <ellipse cx="125" cy="72" rx="82" ry="20" fill="#dcebf5"/>
+                        <ellipse cx="66" cy="70" rx="8" ry="5" fill="#fff" opacity=".9"/>
+                        <ellipse cx="182" cy="76" rx="7" ry="4.5" fill="#fff" opacity=".9"/>
+                    </svg>
+                    <svg class="tubFish" style="width:62px;" viewBox="0 0 120 70">
+                        <g class="fish-body" style="animation-delay:-.2s"><path d="M82 35 C84 16 100 8 112 14 C108 22 108 27 112 35 C108 43 108 48 112 56 C100 62 84 54 82 35 Z" fill="#f6c76f"/><path d="M84 35 C84 14 62 6 42 10 C26 14 20 25 20 35 C20 45 26 56 42 60 C62 64 84 56 84 35 Z" fill="#f6c76f"/><circle cx="36" cy="26" r="3.6" fill="#3a3a3a"/></g>
+                    </svg>
+                </div>
+                <!-- 泡泡 & 星星 -->
+                <svg class="bubble-svg" style="left:150px; bottom:120px; width:18px; animation: rise 5.5s linear infinite;" viewBox="0 0 30 40"><ellipse cx="15" cy="20" rx="13" ry="16" fill="#dcebf5" stroke="#aac8e0" stroke-width="2"/></svg>
+                <svg class="bubble-svg" style="left:230px; bottom:110px; width:13px; animation: rise 6.5s linear infinite; animation-delay:-2.2s;" viewBox="0 0 30 40"><ellipse cx="15" cy="20" rx="13" ry="16" fill="#dcebf5" stroke="#aac8e0" stroke-width="2"/></svg>
+                <svg class="bubble-svg" style="left:70px; bottom:100px; width:15px; animation: rise 7.2s linear infinite; animation-delay:-4s;" viewBox="0 0 30 40"><ellipse cx="15" cy="20" rx="13" ry="16" fill="#dcebf5" stroke="#aac8e0" stroke-width="2"/></svg>
+                <svg class="star-svg" style="top:-6px; right:26px; width:40px;" viewBox="0 0 100 100"><path d="M50 5 C55 35 65 45 95 50 C65 55 55 65 50 95 C45 65 35 55 5 50 C35 45 45 35 50 5 Z" fill="#f3e3ae"/></svg>
+                <svg class="star-svg" style="bottom:180px; left:-4px; width:30px; animation-delay:-1.3s;" viewBox="0 0 100 100"><path d="M50 5 C55 35 65 45 95 50 C65 55 55 65 50 95 C45 65 35 55 5 50 C35 45 45 35 50 5 Z" fill="#f3e3ae"/></svg>
             </div>
-            <!-- 海草 -->
-            <svg class="sb-seaweed" style="left:6px; bottom:30px; width:56px;" viewBox="0 0 60 90" fill="none">
-                <path d="M14 88 C10 60 16 38 12 14 C20 30 22 58 22 88 Z" fill="#b5cda0"/>
-                <path d="M34 88 C30 56 40 30 36 8 C44 26 46 58 44 88 Z" fill="#9fb98b"/>
-            </svg>
-            <svg class="sb-seaweed s2" style="right:4px; bottom:26px; width:50px;" viewBox="0 0 60 90" fill="none">
-                <path d="M20 88 C16 58 24 34 20 10 C28 28 30 58 30 88 Z" fill="#9fb98b"/>
-                <path d="M40 88 C38 62 44 42 42 20 C50 38 50 64 48 88 Z" fill="#b5cda0"/>
-            </svg>
-            <!-- 浴盆与小鱼 -->
-            <div class="sb-tub">
-                <svg style="position:static; width:100%;" viewBox="0 0 250 150" fill="none">
-                    <path d="M26 62 C26 108 66 134 125 134 C184 134 224 108 224 62" stroke="#9ec3e6" stroke-width="3" stroke-linecap="round" fill="#fdfefd"/>
-                    <path d="M26 62 C30 44 44 36 60 40 C66 22 88 16 104 26 C116 10 144 12 154 30 C170 22 192 30 198 46 C212 44 222 50 224 62" stroke="#9ec3e6" stroke-width="3" stroke-linecap="round" fill="#fdfefd"/>
-                    <ellipse cx="125" cy="72" rx="82" ry="20" fill="#dcebf5"/>
-                    <ellipse cx="66" cy="70" rx="8" ry="5" fill="#fff" opacity=".9"/>
-                    <ellipse cx="182" cy="76" rx="7" ry="4.5" fill="#fff" opacity=".9"/>
-                </svg>
-                <svg class="sb-tubFish" style="width:62px; margin-left:-16px;" viewBox="0 0 120 70">
-                    <g class="sb-body" style="animation-delay:-.2s"><path d="M82 35 C84 16 100 8 112 14 C108 22 108 27 112 35 C108 43 108 48 112 56 C100 62 84 54 82 35 Z" fill="#f6c76f"/><path d="M84 35 C84 14 62 6 42 10 C26 14 20 25 20 35 C20 45 26 56 42 60 C62 64 84 56 84 35 Z" fill="#f6c76f"/><circle cx="36" cy="26" r="3.6" fill="#3a3a3a"/></g>
-                </svg>
-            </div>
-            <!-- 泡泡 & 星星 -->
-            <svg class="sb-bubble" style="left:150px; bottom:120px; width:18px;" viewBox="0 0 30 40"><ellipse cx="15" cy="20" rx="13" ry="16" fill="#dcebf5" stroke="#aac8e0" stroke-width="2"/></svg>
-            <svg class="sb-bubble" style="left:230px; bottom:110px; width:13px; animation-delay:-2.2s; animation-duration:6.5s;" viewBox="0 0 30 40"><ellipse cx="15" cy="20" rx="13" ry="16" fill="#dcebf5" stroke="#aac8e0" stroke-width="2"/></svg>
-            <svg class="sb-bubble" style="left:70px; bottom:100px; width:15px; animation-delay:-4s; animation-duration:7.2s;" viewBox="0 0 30 40"><ellipse cx="15" cy="20" rx="13" ry="16" fill="#dcebf5" stroke="#aac8e0" stroke-width="2"/></svg>
-            <svg class="sb-star" style="top:-6px; right:26px; width:40px;" viewBox="0 0 100 100"><path d="M50 5 C55 35 65 45 95 50 C65 55 55 65 50 95 C45 65 35 55 5 50 C35 45 45 35 50 5 Z" fill="#f3e3ae"/></svg>
-            <svg class="sb-star" style="bottom:180px; left:-4px; width:30px; animation-delay:-1.3s;" viewBox="0 0 100 100"><path d="M50 5 C55 35 65 45 95 50 C65 55 55 65 50 95 C45 65 35 55 5 50 C35 45 45 35 50 5 Z" fill="#f3e3ae"/></svg>
-            <!-- 文字与重连按钮 -->
-            <div class="sb-txt">
+            <div class="centerTxt">
                 <span class="txt" id="sodaBootTxt">正在摆桌…</span>
                 <span class="sub" id="sodaBootSub">WELCOME TO SODAFISH</span>
                 <button class="retry" type="button" id="sodaBootRetry" hidden>重新连接</button>
