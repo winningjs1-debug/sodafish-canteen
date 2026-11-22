@@ -2,10 +2,25 @@
 <html lang="zh">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>店主后台 · SodaFish 小食堂</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%90%9F%3C/text%3E%3C/svg%3E">
 <script>
+  /* 外壳版本自检：检测到外壳更新且本地缓存的是旧版时，带新参数强刷一次 */
+  var SHELL_VER = "202611221638";
+  try {
+    var prev = localStorage.getItem("sodaShellVer");
+    if (prev && prev !== SHELL_VER) {
+      localStorage.setItem("sodaShellVer", SHELL_VER);
+      var clean = location.href.replace(/([?&])_rv=\d+/g, "$1").replace(/([?&])$/, "");
+      location.replace(clean + (clean.indexOf("?") >= 0 ? "&" : "?") + "_rv=" + Date.now());
+    } else {
+      localStorage.setItem("sodaShellVer", SHELL_VER);
+    }
+  } catch (e) {}
   try { if (localStorage.getItem("sodaTheme") === "dark") document.documentElement.className = "soda-dark"; } catch (e) {}
 </script>
 <style>
@@ -48,7 +63,7 @@
   f.setAttribute("sandbox", "allow-scripts allow-forms allow-popups allow-modals allow-downloads");
   f.setAttribute("allow", "clipboard-write");
   f.setAttribute("title", document.title || "SodaFish 小食堂");
-  f.src = "app-admin.html?v=202611221625" + (dark ? "&theme=dark" : "");
+  f.src = "app-admin.html?v=202611221638" + (dark ? "&theme=dark" : "");
   document.body.insertBefore(f, document.body.firstChild);
 
   var box = document.getElementById("sodaWrapLoad");
