@@ -269,48 +269,6 @@ textarea.search{resize:vertical;line-height:1.6}
 .pub-row .pub-time{width:190px;font-size:11.5px}
 .dlcell{font-family:var(--mono);font-size:11px;color:var(--brass);overflow-wrap:anywhere}
 .err{background:rgba(142,27,32,.18);border:1px solid var(--maroon);border-radius:7px;padding:12px 14px;font-size:12.5px}
-/* ---------- 点播机：黑胶唱片转动播放 ---------- */
-.juke{margin-top:12px;border:1px dashed rgba(216,184,120,.55);border-radius:7px;padding:14px 16px;background:rgba(216,184,120,.06);display:flex;gap:22px;align-items:center;flex-wrap:wrap}
-@keyframes spinDisc{to{transform:rotate(360deg)}}
-.vinyl-wrap{flex:none;display:flex;flex-direction:column;align-items:center;gap:8px}
-.vinyl{
-  width:132px;height:132px;border-radius:50%;position:relative;
-  background:repeating-radial-gradient(circle at 50% 50%, #191310 0 3px, #251c16 3px 5px);
-  box-shadow:0 4px 14px rgba(0,0,0,.5), inset 0 0 0 1px rgba(216,184,120,.28);
-  display:flex;align-items:center;justify-content:center;
-  animation:spinDisc 4.2s linear infinite;animation-play-state:paused;
-  transition:opacity .3s;
-}
-.vinyl.spinning{animation-play-state:running}
-.vinyl::after{ /* 唱片高光弧线 */
-  content:'';position:absolute;inset:6px;border-radius:50%;
-  background:conic-gradient(from 210deg, rgba(255,255,255,.09), transparent 90deg, transparent 250deg, rgba(255,255,255,.06) 300deg, transparent);
-  pointer-events:none;
-}
-.vinyl-label{
-  width:56px;height:56px;border-radius:50%;background:var(--maroon);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
-  box-shadow:inset 0 0 0 2px rgba(216,184,120,.5), 0 0 0 1px rgba(0,0,0,.4);
-}
-.vinyl-label .vt{font-family:var(--mono);font-size:7px;color:#f5e3c0;letter-spacing:.04em}
-.vinyl-label .va{font-family:var(--mono);font-size:7px;color:rgba(245,227,192,.7)}
-.vinyl-state{font-family:var(--mono);font-size:10px;letter-spacing:.16em}
-.juke-ctl{flex:1;min-width:240px;display:grid;grid-template-columns:1fr;gap:10px}
-.jk-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.jk-lab{font-size:12.5px;color:var(--paper)}
-.switch{position:relative;width:46px;height:24px;border-radius:24px;background:#3a2e28;border:1px solid var(--line);cursor:pointer;flex:none;transition:background .25s,border-color .25s}
-.switch::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:linear-gradient(180deg,var(--paper-hi),var(--paper-2));transition:transform .25s cubic-bezier(.3,.8,.4,1.2);box-shadow:0 1px 3px rgba(0,0,0,.5)}
-.switch.on{background:var(--maroon);border-color:var(--maroon-deep)}
-.switch.on::after{transform:translateX(22px);background:linear-gradient(180deg,#ffe9c9,var(--brass))}
-.vol{display:flex;align-items:center;gap:8px;flex:1;max-width:320px}
-.vol input[type=range]{flex:1;accent-color:var(--maroon-hi);height:4px}
-.vol-num{font-family:var(--mono);font-size:11px;color:var(--muted);min-width:38px;text-align:right}
-.jk-url{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:6px;padding:7px 10px;color:var(--cream);font-size:12px;font-family:var(--mono)}
-.jk-url::placeholder{color:var(--muted-2)}
-.jk-btns{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.msg-ok{font-family:var(--mono);font-size:11px;color:var(--green)}
-.st-on{color:var(--green)}
-.st-off{color:var(--muted-2)}
 </style>
 </head>
 <body>
@@ -340,7 +298,6 @@ textarea.search{resize:vertical;line-height:1.6}
     <button class="tab" type="button" data-tab="notes">点菜便签 <b id="tabNNotes">0</b></button>
     <button class="tab" type="button" data-tab="comments">讨论区 <b id="tabNComments">0</b></button>
     <button class="tab" type="button" data-tab="publish" style="color:var(--brass);font-weight:600">⏰ 定时上架 <b id="tabNPub">0</b></button>
-    <button class="tab" type="button" data-tab="music" style="color:var(--brass);font-weight:600">🎵 点播机</button>
   </nav>
 
   <section class="cards" id="cardsOrders">
@@ -601,28 +558,6 @@ textarea.search{resize:vertical;line-height:1.6}
     </div>
   </div>
 
-  <!-- 点播机：店内背景音乐 -->
-  <div class="panel panel-single" id="panelMusic" hidden>
-    <div class="pub-hero">
-      <div class="pub-title">🎵 点播机 · 店内背景音乐（读者端完全隐形）</div>
-      <p>打开开关点 <b>保存并生效</b>，读者<b>一进食堂</b>就自动循环播放，前台看不到任何音乐标识；关掉开关保存即静音。音量建议 0.2～0.35，似有若无正好。填一首《frequency》的<b>音频直链</b>（mp3 / m4a / ogg）即可。</p>
-    </div>
-    <div class="juke">
-      <div class="vinyl-wrap">
-        <div class="vinyl" id="vinyl">
-          <div class="vinyl-label"><span class="vt">frequency</span><span class="va">HACHI</span></div>
-        </div>
-        <div class="vinyl-state st-off" id="vinylState">○ 已静音</div>
-      </div>
-      <div class="juke-ctl">
-        <div class="jk-row"><span class="jk-lab">音乐开关</span><div class="switch" id="bgmSw" title="点击切换，改完点保存"></div></div>
-        <div class="jk-row"><span class="jk-lab">音量</span><div class="vol"><input type="range" id="bgmVol" min="0" max="100" value="28"><span class="vol-num" id="bgmVolN">0.28</span></div></div>
-        <input class="jk-url" id="bgmUrl" type="text" placeholder="音频文件地址，例如 https://…/frequency.mp3" autocomplete="off" spellcheck="false">
-        <div class="jk-btns"><button class="btn primary" id="bgmSave" type="button">💾 保存并生效</button><span class="msg-ok" id="bgmMsg"></span></div>
-      </div>
-    </div>
-  </div>
-
   <p class="note">
     这个页面口令只在前台挡一下，真正的数据本身是公开的投票与推荐数据，别把私人信息写进留言。
     口令在 admin.html 里改：<code style="font-family:var(--mono)">ADMIN_PASS</code>。
@@ -768,11 +703,6 @@ textarea.search{resize:vertical;line-height:1.6}
       state.qr = settings.wechat_qr || "";
       state.avatar = settings.admin_avatar || "";
       state.notice = settings.shop_notice || "";
-      /* 点播机设置回填：bgm_on / bgm_vol / bgm_url */
-      bgmState.on = settings.bgm_on === "1";
-      bgmState.vol = Math.round(Math.min(1, Math.max(0, Number(settings.bgm_vol) || 0.28)) * 100);
-      bgmState.url = settings.bgm_url || "";
-      renderMusic();
       var bl = unwrap(res[8]) || [];
       state.bookLinks = {};
       bl.forEach(function (r) { state.bookLinks[r.book_code] = { url: r.url || "", pwd: r.pwd || "" }; });
@@ -1484,8 +1414,8 @@ textarea.search{resize:vertical;line-height:1.6}
   });
 
   /* ---------- 标签页 ---------- */
-  var PANELS = { orders: ["panelOrders", "cardsOrders"], shop: ["panelShop", "cardsShop"], menu: ["panelMenu", "cardsMenu"], notes: ["panelNotes", "cardsNotes"], comments: ["panelComments", "cardsComments"], publish: ["panelPublish", "panelPublish"], music: ["panelMusic", "panelMusic"] };
-  var PH = { orders: "搜书名 / 署名 / 留言", shop: "搜单号 / 署名 / 留言 / 书名", menu: "搜编号 / 书名 / 备注", notes: "搜书名 / 作者 / 平台 / 简介", comments: "搜昵称 / 内容 / 书名", publish: "搜编号 / 书名 / 备注", music: "" };
+  var PANELS = { orders: ["panelOrders", "cardsOrders"], shop: ["panelShop", "cardsShop"], menu: ["panelMenu", "cardsMenu"], notes: ["panelNotes", "cardsNotes"], comments: ["panelComments", "cardsComments"], publish: ["panelPublish", "panelPublish"] };
+  var PH = { orders: "搜书名 / 署名 / 留言", shop: "搜单号 / 署名 / 留言 / 书名", menu: "搜编号 / 书名 / 备注", notes: "搜书名 / 作者 / 平台 / 简介", comments: "搜昵称 / 内容 / 书名", publish: "搜编号 / 书名 / 备注" };
   function switchTab(tab) {
     state.tab = tab;
     document.querySelectorAll(".tab").forEach(function (b) { b.classList.toggle("on", b.getAttribute("data-tab") === tab); });
@@ -1638,48 +1568,6 @@ textarea.search{resize:vertical;line-height:1.6}
     } catch (err) {
       $("qrMsg").textContent = "保存失败：" + ((err && err.message) || "网络异常");
     }
-  });
-
-  /* ---------- 点播机：店内背景音乐 ---------- */
-  var bgmState = { on: false, vol: 28, url: "" };
-  function renderMusic() {
-    $("bgmSw").classList.toggle("on", bgmState.on);
-    $("vinyl").classList.toggle("spinning", bgmState.on);
-    var vs = $("vinylState");
-    vs.textContent = bgmState.on ? "● 播放中" : "○ 已静音";
-    vs.className = "vinyl-state " + (bgmState.on ? "st-on" : "st-off");
-    $("bgmVol").value = bgmState.vol;
-    $("bgmVolN").textContent = (bgmState.vol / 100).toFixed(2);
-    var u = $("bgmUrl");
-    if (document.activeElement !== u) u.value = bgmState.url;
-  }
-  $("bgmSw").addEventListener("click", function () {
-    bgmState.on = !bgmState.on;
-    renderMusic();
-  });
-  $("bgmVol").addEventListener("input", function () {
-    bgmState.vol = Number(this.value) || 0;
-    $("bgmVolN").textContent = (bgmState.vol / 100).toFixed(2);
-  });
-  $("bgmSave").addEventListener("click", async function () {
-    var btn = this, msg = $("bgmMsg");
-    var url = $("bgmUrl").value.trim();
-    if (bgmState.on && !url) { msg.textContent = "⚠ 开着开关就要填一个音频地址"; msg.style.color = "var(--maroon-hi)"; return; }
-    btn.disabled = true; msg.textContent = "保存中…"; msg.style.color = "";
-    try {
-      var kv = { bgm_on: bgmState.on ? "1" : "0", bgm_vol: (bgmState.vol / 100).toFixed(2), bgm_url: url };
-      for (var k in kv) {
-        var r = unwrap(await cloud.database.rpc("soda_admin_set_setting", { p_pass: ADMIN_PASS, p_key: k, p_value: kv[k] }));
-        if (r && r.error) throw new Error(r.error);
-      }
-      bgmState.url = url;
-      msg.textContent = "✓ 已保存 · " + (bgmState.on ? "读者进店即自动循环播放" : "音乐已关闭");
-    } catch (err) {
-      msg.textContent = "保存失败：" + ((err && err.message) || "网络异常");
-      msg.style.color = "var(--maroon-hi)";
-    }
-    btn.disabled = false;
-    setTimeout(function () { msg.textContent = ""; msg.style.color = ""; }, 6000);
   });
 
   $("avatarPick").addEventListener("click", function () { $("avatarFile").click(); });
