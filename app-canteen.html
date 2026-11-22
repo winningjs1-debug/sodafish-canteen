@@ -1817,20 +1817,14 @@
       var tipShown = {};
       /* 点播机：后台开关开启时进店自动循环播放（前台无任何可见控件） */
       var bgm = null;
-      function initBGM(map) {
-        var on = (map.bgm_on || "") === "1";
-        var url = (map.bgm_url || "").trim();
-        if (!on || !url) return;
-        var vol = Math.min(1, Math.max(0, Number(map.bgm_vol) || 0.28));
+      function bgmStart(src, vol) {
         if (!bgm) {
           bgm = new Audio();
           bgm.loop = true;
           bgm.preload = "auto";
-          bgm.volume = vol;
           bgm.setAttribute("playsinline", "");
-        } else if (bgm.src !== url) {
-          bgm.src = url;
         }
+        if (bgm.src !== src) bgm.src = src;
         bgm.volume = vol;
         var p = bgm.play();
         if (p && p.catch) p.catch(function () {
@@ -1844,9 +1838,23 @@
           document.addEventListener("touchstart", kick);
         });
       }
+      async function initBGM(map) {
+        var on = (map.bgm_on || "") === "1";
+        if (!on) return;
+        var vol = Math.min(1, Math.max(0, Number(map.bgm_vol) || 0.28));
+        /* 优先用店主上传到云端的音乐文件（bgm_data 大字段单独拉取，不随主页设置一起加载） */
+        var src = "";
+        try {
+          var row = unwrap(await cloud.database.from("soda_settings").select("value").eq("key", "bgm_data").maybeSingle());
+          if (row && row.value) src = row.value;
+        } catch (e) {}
+        if (!src) src = (map.bgm_url || "").trim();
+        if (!src) return;
+        bgmStart(src, vol);
+      }
       async function loadSettings() {
         try {
-          var data = unwrap(await cloud.database.from("soda_settings").select("key,value")) || [];
+          var data = unwrap(await cloud.database.from("soda_settings").select("key,value").neq("key", "bgm_data")) || [];
           var map = {};
           data.forEach(function (r) { map[r.key] = r.value; });
           try { initBGM(map); } catch (e) {}
