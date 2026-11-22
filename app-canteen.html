@@ -1833,12 +1833,15 @@
           bgm.src = url;
         }
         bgm.volume = vol;
+        /* 浏览器自动播放政策：先尝试直接出声；被拦则静音起播（已加载就绪），读者首次点按页面立刻解除静音 */
         var p = bgm.play();
         if (p && p.catch) p.catch(function () {
-          /* 浏览器拦截自动播放：等读者第一次触碰页面再无缝响起 */
+          bgm.muted = true;
+          bgm.play().catch(function () {});
           var kick = function () {
             document.removeEventListener("pointerdown", kick);
             document.removeEventListener("touchstart", kick);
+            bgm.muted = false;
             bgm.play().catch(function () {});
           };
           document.addEventListener("pointerdown", kick);
