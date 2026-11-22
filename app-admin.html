@@ -605,7 +605,7 @@ textarea.search{resize:vertical;line-height:1.6}
   <div class="panel panel-single" id="panelMusic" hidden>
     <div class="pub-hero">
       <div class="pub-title">🎵 点播机 · 店内背景音乐（读者端完全隐形）</div>
-      <p>打开开关点 <b>保存并生效</b>，读者<b>一进食堂</b>就自动循环播放，前台看不到任何音乐标识；关掉开关保存即静音。音量建议 0.2～0.35，似有若无正好。填一首《frequency》的<b>音频直链</b>（mp3 / m4a / ogg）即可。</p>
+      <p>把<b>音频直链</b>（mp3 / m4a / ogg）粘进地址框，点一下别处就<b>自动识别</b>：识别成功立即开启循环播放，读者<b>一进食堂</b>就能听到，前台看不到任何音乐标识。开关和音量点了立即生效，不用再按保存。音量建议 0.2～0.35，似有若无正好。</p>
     </div>
     <div class="juke">
       <div class="vinyl-wrap">
@@ -615,10 +615,10 @@ textarea.search{resize:vertical;line-height:1.6}
         <div class="vinyl-state st-off" id="vinylState">○ 已静音</div>
       </div>
       <div class="juke-ctl">
-        <div class="jk-row"><span class="jk-lab">音乐开关</span><div class="switch" id="bgmSw" title="点击切换，改完点保存"></div></div>
+        <div class="jk-row"><span class="jk-lab">音乐开关</span><div class="switch" id="bgmSw" title="点击即生效并自动保存"></div></div>
         <div class="jk-row"><span class="jk-lab">音量</span><div class="vol"><input type="range" id="bgmVol" min="0" max="100" value="28"><span class="vol-num" id="bgmVolN">0.28</span></div></div>
         <input class="jk-url" id="bgmUrl" type="text" placeholder="音频文件地址，例如 https://…/frequency.mp3" autocomplete="off" spellcheck="false">
-        <div class="jk-btns"><button class="btn primary" id="bgmSave" type="button">💾 保存并生效</button><span class="msg-ok" id="bgmMsg"></span></div>
+        <div class="jk-btns"><button class="btn primary" id="bgmSave" type="button">🔍 重新识别直链</button><span class="msg-ok" id="bgmMsg"></span></div>
       </div>
     </div>
   </div>
@@ -768,11 +768,13 @@ textarea.search{resize:vertical;line-height:1.6}
       state.qr = settings.wechat_qr || "";
       state.avatar = settings.admin_avatar || "";
       state.notice = settings.shop_notice || "";
-      /* 点播机设置回填：bgm_on / bgm_vol / bgm_url */
-      bgmState.on = settings.bgm_on === "1";
-      bgmState.vol = Math.round(Math.min(1, Math.max(0, Number(settings.bgm_vol) || 0.28)) * 100);
-      bgmState.url = settings.bgm_url || "";
-      renderMusic();
+      /* 点播机设置回填：bgm_on / bgm_vol / bgm_url（有未保存的手动改动时跳过，避免 8 秒轮询把开关弹回去） */
+      if (!bgmState.dirty) {
+        bgmState.on = settings.bgm_on === "1";
+        bgmState.vol = Math.round(Math.min(1, Math.max(0, Number(settings.bgm_vol) || 0.28)) * 100);
+        bgmState.url = settings.bgm_url || "";
+        renderMusic();
+      }
       var bl = unwrap(res[8]) || [];
       state.bookLinks = {};
       bl.forEach(function (r) { state.bookLinks[r.book_code] = { url: r.url || "", pwd: r.pwd || "" }; });
@@ -1640,8 +1642,8 @@ textarea.search{resize:vertical;line-height:1.6}
     }
   });
 
-  /* ---------- 点播机：店内背景音乐 ---------- */
-  var bgmState = { on: false, vol: 28, url: "" };
+  /* ---------- 点播机：全自动版 —— 填直链自动识别音频并开启播放，控件改动即时保存 ---------- */
+  var bgmState = { on: false, vol: 28, url: "", dirty: false };
   function renderMusic() {
     $("bgmSw").classList.toggle("on", bgmState.on);
     $("vinyl").classList.toggle("spinning", bgmState.on);
@@ -1653,33 +1655,103 @@ textarea.search{resize:vertical;line-height:1.6}
     var u = $("bgmUrl");
     if (document.activeElement !== u) u.value = bgmState.url;
   }
-  $("bgmSw").addEventListener("click", function () {
-    bgmState.on = !bgmState.on;
-    renderMusic();
-  });
-  $("bgmVol").addEventListener("input", function () {
-    bgmState.vol = Number(this.value) || 0;
-    $("bgmVolN").textContent = (bgmState.vol / 100).toFixed(2);
-  });
-  $("bgmSave").addEventListener("click", async function () {
-    var btn = this, msg = $("bgmMsg");
-    var url = $("bgmUrl").value.trim();
-    if (bgmState.on && !url) { msg.textContent = "⚠ 开着开关就要填一个音频地址"; msg.style.color = "var(--maroon-hi)"; return; }
-    btn.disabled = true; msg.textContent = "保存中…"; msg.style.color = "";
-    try {
+  function bgmMsg(text, bad) {
+    var m = $("bgmMsg");
+    m.textContent = text;
+    m.style.color = bad ? "var(--maroon-hi)" : "";
+    if (m._t) clearTimeout(m._t);
+    if (text) m._t = setTimeout(function () { m.textContent = ""; m.style.color = ""; }, 8000);
+  }
+  /* 保存串行队列：连点开关也不会互相覆盖 */
+  var bgmQueue = Promise.resolve();
+  function bgmSaveQuiet(extra) {
+    var url = (typeof extra === "string" ? extra : $("bgmUrl").value.trim());
+    bgmState.dirty = true;
+    bgmQueue = bgmQueue.then(async function () {
       var kv = { bgm_on: bgmState.on ? "1" : "0", bgm_vol: (bgmState.vol / 100).toFixed(2), bgm_url: url };
       for (var k in kv) {
         var r = unwrap(await cloud.database.rpc("soda_admin_set_setting", { p_pass: ADMIN_PASS, p_key: k, p_value: kv[k] }));
         if (r && r.error) throw new Error(r.error);
       }
       bgmState.url = url;
-      msg.textContent = "✓ 已保存 · " + (bgmState.on ? "读者进店即自动循环播放" : "音乐已关闭");
-    } catch (err) {
-      msg.textContent = "保存失败：" + ((err && err.message) || "网络异常");
-      msg.style.color = "var(--maroon-hi)";
+      bgmState.dirty = false;
+      return true;
+    }).catch(function (err) {
+      bgmMsg("保存失败：" + ((err && err.message) || "网络异常"), true);
+      return false;
+    });
+    return bgmQueue;
+  }
+  /* 音频识别：探测直链能否当音频加载，成功返回时长秒数 */
+  function probeAudio(url) {
+    return new Promise(function (resolve, reject) {
+      if (!/^https?:\/\//i.test(url)) { reject(new Error("要 http/https 开头的直链")); return; }
+      var a = new Audio();
+      var done = false;
+      var timer = setTimeout(function () { if (!done) { done = true; a.src = ""; reject(new Error("8 秒内读不出音频，直链可能无效")); } }, 8000);
+      a.preload = "metadata";
+      a.addEventListener("loadedmetadata", function () {
+        if (done) return;
+        done = true; clearTimeout(timer);
+        resolve(isFinite(a.duration) ? a.duration : 0);
+      });
+      a.addEventListener("error", function () {
+        if (done) return;
+        done = true; clearTimeout(timer);
+        reject(new Error("这个地址不是能播的音频"));
+      });
+      a.src = url;
+    });
+  }
+  function fmtDur(s) {
+    s = Math.round(s);
+    return Math.floor(s / 60) + ":" + ("0" + (s % 60)).slice(-2);
+  }
+  /* 填直链后自动识别：识别成功 → 自动开启音乐并保存 */
+  async function bgmAutoDetect() {
+    var url = $("bgmUrl").value.trim();
+    if (!url) {
+      if (bgmState.url) { await bgmSaveQuiet(""); bgmMsg("已清空直链，音乐随之关闭"); bgmState.on = false; renderMusic(); }
+      return;
     }
+    bgmMsg("🎧 正在识别音频…");
+    try {
+      var dur = await probeAudio(url);
+      bgmState.on = true;
+      renderMusic();
+      await bgmSaveQuiet(url);
+      bgmMsg("✓ 识别成功（" + fmtDur(dur) + "）· 音乐已自动开启，读者进店即循环播放");
+    } catch (err) {
+      bgmMsg("⚠ 识别失败：" + ((err && err.message) || "直链无效"), true);
+    }
+  }
+  $("bgmUrl").addEventListener("change", bgmAutoDetect);
+  /* 开关：点一下立即生效并保存，无需再点保存键 */
+  $("bgmSw").addEventListener("click", async function () {
+    if (bgmState.on && !$("bgmUrl").value.trim() && !bgmState.url) { bgmMsg("⚠ 先填一个音频直链再开开关", true); return; }
+    bgmState.on = !bgmState.on;
+    renderMusic();
+    await bgmSaveQuiet();
+    bgmMsg(bgmState.on ? "✓ 已开启 · 读者进店即自动循环播放" : "✓ 已关闭 · 音乐静音");
+  });
+  /* 音量：拖动后自动保存（防抖 700ms） */
+  var bgmVolTimer = null;
+  $("bgmVol").addEventListener("input", function () {
+    bgmState.vol = Number(this.value) || 0;
+    bgmState.dirty = true;
+    $("bgmVolN").textContent = (bgmState.vol / 100).toFixed(2);
+    if (bgmVolTimer) clearTimeout(bgmVolTimer);
+    bgmVolTimer = setTimeout(async function () {
+      await bgmSaveQuiet();
+      bgmMsg("✓ 音量已保存");
+    }, 700);
+  });
+  /* 手动按钮：重新识别直链并保存生效 */
+  $("bgmSave").addEventListener("click", async function () {
+    var btn = this;
+    btn.disabled = true;
+    await bgmAutoDetect();
     btn.disabled = false;
-    setTimeout(function () { msg.textContent = ""; msg.style.color = ""; }, 6000);
   });
 
   $("avatarPick").addEventListener("click", function () { $("avatarFile").click(); });
