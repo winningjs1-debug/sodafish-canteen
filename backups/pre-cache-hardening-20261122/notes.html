@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SodaFish 小食堂 · 点菜便签</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%90%9F%3C/text%3E%3C/svg%3E">
+<script>
+  try { if (localStorage.getItem("sodaTheme") === "dark") document.documentElement.className = "soda-dark"; } catch (e) {}
+</script>
+<style>
+  :root { --bg:#f4f6f9; --fg:#4f5a66; --sub:#8e99a6; --card:#ffffff; --line:rgba(168,177,190,0.16); }
+  html.soda-dark { --bg:#2a2a2a; --fg:#e0dcd5; --sub:#a09b93; --card:#3a3a3a; --line:rgba(255,255,255,0.03); }
+  html, body { margin:0; padding:0; height:100%; background:var(--bg); }
+  #sodaFrame { display:block; width:100%; height:100vh; height:100dvh; border:0; background:var(--bg); }
+  #sodaWrapLoad {
+    position:fixed; inset:0; z-index:9; display:flex; align-items:center; justify-content:center;
+    background-color:var(--bg);
+    background-image:linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:25px 25px; transition:opacity .3s ease, visibility .3s;
+  }
+  #sodaWrapLoad.gone { opacity:0; visibility:hidden; pointer-events:none; }
+  .sw-card {
+    text-align:center; padding:1.5rem 2.1rem; max-width:78vw;
+    font-family:"KaiTi","STKaiti",serif; color:var(--fg);
+  }
+  .sw-card .e { font-size:2rem; display:block; animation:swFloat 1.6s ease-in-out infinite; }
+  .sw-card .t { font-size:1.05rem; letter-spacing:1px; display:block; margin-top:.45rem; }
+  .sw-card .s { font-family:"Courier New",monospace; font-size:.64rem; letter-spacing:2px; color:var(--sub); display:block; margin-top:.25rem; }
+  .sw-card .r { margin-top:.9rem; font-size:.9rem; padding:.35rem 1.1rem; cursor:pointer; border:1px dashed var(--sub); border-radius:20px; background:transparent; color:var(--fg); font-family:inherit; }
+  @keyframes swFloat { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-6px); } }
+</style>
+</head>
+<body>
+<div id="sodaWrapLoad">
+  <div class="sw-card">
+    <span class="e">🐟</span>
+    <span class="t" id="swT">正在摆桌…</span>
+    <span class="s" id="swS">WELCOME TO SODAFISH</span>
+    <button class="r" type="button" id="swR" hidden>重新连接</button>
+  </div>
+</div>
+<script>
+(function () {
+  var dark = document.documentElement.className.indexOf("soda-dark") >= 0;
+  var f = document.createElement("iframe");
+  f.id = "sodaFrame";
+  f.setAttribute("sandbox", "allow-scripts allow-forms allow-popups allow-modals allow-downloads");
+  f.setAttribute("allow", "clipboard-write");
+  f.setAttribute("title", document.title || "SodaFish 小食堂");
+  f.src = "app-notes.html?v=202611221625" + (dark ? "&theme=dark" : "");
+  document.body.insertBefore(f, document.body.firstChild);
+
+  var box = document.getElementById("sodaWrapLoad");
+  var T = document.getElementById("swT"), S = document.getElementById("swS"), R = document.getElementById("swR");
+  var gone = false;
+  function hide() {
+    if (gone) return;
+    gone = true;
+    if (!box) return;
+    box.className = "gone";
+    setTimeout(function () { try { box.parentNode.removeChild(box); } catch (e) {} }, 400);
+  }
+  function fail() {
+    if (gone) return;
+    if (T) T.textContent = "网速有点慢，没能把食堂端上来";
+    if (S) S.textContent = "TAP TO RETRY";
+    if (R) R.hidden = false;
+  }
+  f.addEventListener("load", function () {
+    /* iframe load 不代表内层画好了：等内层 soda ready 消息才揭幕，绝不提前露白。
+       保底：load 后 8 秒没收到 ready 也揭幕，防止死锁卡加载页。 */
+    setTimeout(function () { hide(); }, 8000);
+  });
+  if (R) R.addEventListener("click", function () { location.reload(); });
+  window.addEventListener("message", function (ev) {
+    var d = ev && ev.data;
+    if (!d || typeof d !== "object") return;
+    if (d.soda === "ready") hide();
+    if (d.soda === "ready" && d.dark) document.documentElement.className = "soda-dark";
+  });
+  setTimeout(fail, 15000);
+})();
+</script>
+</body>
+</html>
