@@ -1848,7 +1848,7 @@
           document.addEventListener("touchstart", kick);
         });
       }
-      async function loadSettings() {
+      async function loadSettings(attempt) {
         try {
           var data = unwrap(await cloud.database.from("soda_settings").select("key,value")) || [];
           var map = {};
@@ -1899,7 +1899,12 @@
             $("noticeBody").textContent = nb;
             $("noticeBoard").hidden = false;
           }
-        } catch (e) {}
+        } catch (e) {
+          /* 云端接口偶发超时：指数退避重试，避免一次失败导致本次进店没音乐/没公告 */
+          if ((attempt || 0) < 4) {
+            setTimeout(function () { loadSettings((attempt || 0) + 1); }, 3000 * ((attempt || 0) + 1));
+          }
+        }
       }
 
       /* 赞赏完全自愿：弹窗只负责展示赞赏码，× / 遮罩 / 按钮均可关闭；once=true 时同一单只自动弹一次 */
