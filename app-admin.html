@@ -307,6 +307,8 @@ textarea.search{resize:vertical;line-height:1.6}
 .vol-num{font-family:var(--mono);font-size:11px;color:var(--muted);min-width:38px;text-align:right}
 .jk-url{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:6px;padding:7px 10px;color:var(--cream);font-size:12px;font-family:var(--mono)}
 .jk-url::placeholder{color:var(--muted-2)}
+.jk-file{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.bgm-fileinfo{font-size:11.5px;color:var(--muted);font-family:var(--mono);overflow-wrap:anywhere;min-width:0;flex:1}
 .jk-btns{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .msg-ok{font-family:var(--mono);font-size:11px;color:var(--green)}
 .st-on{color:var(--green)}
@@ -605,7 +607,7 @@ textarea.search{resize:vertical;line-height:1.6}
   <div class="panel panel-single" id="panelMusic" hidden>
     <div class="pub-hero">
       <div class="pub-title">🎵 点播机 · 店内背景音乐（读者端完全隐形）</div>
-      <p>打开开关点 <b>保存并生效</b>，读者<b>一进食堂</b>就自动循环播放，前台看不到任何音乐标识；关掉开关保存即静音。音量建议 0.2～0.35，似有若无正好。填一首《frequency》的<b>音频直链</b>（mp3 / m4a / ogg）即可。</p>
+      <p>上传一首 MP3（会<b>永久存入食堂云端</b>），打开开关点 <b>保存并生效</b>，读者<b>一进食堂</b>就自动循环播放，前台看不到任何音乐标识。音量建议 0.2～0.35，似有若无正好。</p>
     </div>
     <div class="juke">
       <div class="vinyl-wrap">
@@ -617,7 +619,11 @@ textarea.search{resize:vertical;line-height:1.6}
       <div class="juke-ctl">
         <div class="jk-row"><span class="jk-lab">音乐开关</span><div class="switch" id="bgmSw" title="点击切换，改完点保存"></div></div>
         <div class="jk-row"><span class="jk-lab">音量</span><div class="vol"><input type="range" id="bgmVol" min="0" max="100" value="28"><span class="vol-num" id="bgmVolN">0.28</span></div></div>
-        <input class="jk-url" id="bgmUrl" type="text" placeholder="音频文件地址，例如 https://…/frequency.mp3" autocomplete="off" spellcheck="false">
+        <div class="jk-file">
+          <input type="file" id="bgmFile" accept="audio/*,.mp3,.m4a,.ogg" hidden>
+          <button class="btn primary" id="bgmPick" type="button">🎵 上传 MP3 文件</button>
+          <span class="bgm-fileinfo" id="bgmFileInfo">还没有上传音乐文件</span>
+        </div>
         <div class="jk-btns"><button class="btn primary" id="bgmSave" type="button">💾 保存并生效</button><span class="msg-ok" id="bgmMsg"></span></div>
       </div>
     </div>
@@ -748,7 +754,7 @@ textarea.search{resize:vertical;line-height:1.6}
         cloud.database.from("soda_notes").select("*").order("created_at", { ascending: false }).limit(500),
         cloud.database.from("soda_comments").select("*").order("created_at", { ascending: false }).limit(500),
         cloud.database.rpc("soda_admin_orders", { p_pass: ADMIN_PASS }),
-        cloud.database.from("soda_settings").select("key,value"),
+        cloud.database.from("soda_settings").select("key,value").neq("key", "bgm_data"),
         cloud.database.from("soda_book_links").select("book_code,url,pwd")
       ]);
       state.ballots = unwrap(res[0]) || [];
@@ -768,10 +774,11 @@ textarea.search{resize:vertical;line-height:1.6}
       state.qr = settings.wechat_qr || "";
       state.avatar = settings.admin_avatar || "";
       state.notice = settings.shop_notice || "";
-      /* 点播机设置回填：bgm_on / bgm_vol / bgm_url */
+      /* 点播机设置回填：bgm_on / bgm_vol / bgm_audio_name（bgm_data 大字段不拉取，只看文件名） */
       bgmState.on = settings.bgm_on === "1";
       bgmState.vol = Math.round(Math.min(1, Math.max(0, Number(settings.bgm_vol) || 0.28)) * 100);
-      bgmState.url = settings.bgm_url || "";
+      bgmState.name = settings.bgm_audio_name || "";
+      bgmState.pending = "";
       renderMusic();
       var bl = unwrap(res[8]) || [];
       state.bookLinks = {};
@@ -1640,8 +1647,13 @@ textarea.search{resize:vertical;line-height:1.6}
     }
   });
 
-  /* ---------- 点播机：店内背景音乐 ---------- */
-  var bgmState = { on: false, vol: 28, url: "" };
+  /* ---------- 点播机：店内背景音乐（上传 MP3 存云端） ---------- */
+  var bgmState = { on: false, vol: 28, name: "", pending: "" };
+  function humanSize(n) {
+    if (n >= 1048576) return (n / 1048576).toFixed(1) + "MB";
+    if (n >= 1024) return Math.round(n / 1024) + "KB";
+    return n + "B";
+  }
   function renderMusic() {
     $("bgmSw").classList.toggle("on", bgmState.on);
     $("vinyl").classList.toggle("spinning", bgmState.on);
@@ -1650,8 +1662,17 @@ textarea.search{resize:vertical;line-height:1.6}
     vs.className = "vinyl-state " + (bgmState.on ? "st-on" : "st-off");
     $("bgmVol").value = bgmState.vol;
     $("bgmVolN").textContent = (bgmState.vol / 100).toFixed(2);
-    var u = $("bgmUrl");
-    if (document.activeElement !== u) u.value = bgmState.url;
+    var info = $("bgmFileInfo");
+    if (bgmState.pending) {
+      info.textContent = "✓ 已选择：" + bgmState.pending.name + "（" + humanSize(bgmState.pending.size) + "）· 点保存生效";
+      info.style.color = "var(--green)";
+    } else if (bgmState.name) {
+      info.textContent = "🎧 当前曲目：" + bgmState.name;
+      info.style.color = "";
+    } else {
+      info.textContent = "还没有上传音乐文件";
+      info.style.color = "";
+    }
   }
   $("bgmSw").addEventListener("click", function () {
     bgmState.on = !bgmState.on;
@@ -1661,18 +1682,50 @@ textarea.search{resize:vertical;line-height:1.6}
     bgmState.vol = Number(this.value) || 0;
     $("bgmVolN").textContent = (bgmState.vol / 100).toFixed(2);
   });
+  $("bgmPick").addEventListener("click", function () { $("bgmFile").click(); });
+  $("bgmFile").addEventListener("change", function () {
+    var f = this.files && this.files[0];
+    this.value = "";
+    if (!f) return;
+    if (f.size > 15 * 1048576) {
+      $("bgmMsg").textContent = "⚠ 文件超过 15MB，先压一压音质再传";
+      $("bgmMsg").style.color = "var(--maroon-hi)";
+      setTimeout(function () { $("bgmMsg").textContent = ""; $("bgmMsg").style.color = ""; }, 6000);
+      return;
+    }
+    var fr = new FileReader();
+    fr.onload = function () {
+      bgmState.pending = { name: f.name, size: f.size, data: String(fr.result) };
+      renderMusic();
+    };
+    fr.onerror = function () { $("bgmMsg").textContent = "这个文件读不出来，换一个试试。"; };
+    fr.readAsDataURL(f);
+  });
   $("bgmSave").addEventListener("click", async function () {
     var btn = this, msg = $("bgmMsg");
-    var url = $("bgmUrl").value.trim();
-    if (bgmState.on && !url) { msg.textContent = "⚠ 开着开关就要填一个音频地址"; msg.style.color = "var(--maroon-hi)"; return; }
-    btn.disabled = true; msg.textContent = "保存中…"; msg.style.color = "";
+    var hasAudio = !!(bgmState.pending || bgmState.name);
+    if (bgmState.on && !hasAudio) { msg.textContent = "⚠ 开着开关就要先上传一个音乐文件"; msg.style.color = "var(--maroon-hi)"; return; }
+    btn.disabled = true;
+    msg.style.color = "";
+    if (bgmState.pending) {
+      msg.textContent = "上传中…（" + humanSize(bgmState.pending.size) + "，文件较大请稍等）";
+    } else {
+      msg.textContent = "保存中…";
+    }
     try {
-      var kv = { bgm_on: bgmState.on ? "1" : "0", bgm_vol: (bgmState.vol / 100).toFixed(2), bgm_url: url };
-      for (var k in kv) {
-        var r = unwrap(await cloud.database.rpc("soda_admin_set_setting", { p_pass: ADMIN_PASS, p_key: k, p_value: kv[k] }));
+      if (bgmState.pending) {
+        var r = unwrap(await cloud.database.rpc("soda_admin_set_setting", { p_pass: ADMIN_PASS, p_key: "bgm_data", p_value: bgmState.pending.data }));
         if (r && r.error) throw new Error(r.error);
+        var r2 = unwrap(await cloud.database.rpc("soda_admin_set_setting", { p_pass: ADMIN_PASS, p_key: "bgm_audio_name", p_value: bgmState.pending.name }));
+        if (r2 && r2.error) throw new Error(r2.error);
       }
-      bgmState.url = url;
+      var kv = { bgm_on: bgmState.on ? "1" : "0", bgm_vol: (bgmState.vol / 100).toFixed(2) };
+      for (var k in kv) {
+        var r3 = unwrap(await cloud.database.rpc("soda_admin_set_setting", { p_pass: ADMIN_PASS, p_key: k, p_value: kv[k] }));
+        if (r3 && r3.error) throw new Error(r3.error);
+      }
+      if (bgmState.pending) { bgmState.name = bgmState.pending.name; bgmState.pending = ""; }
+      renderMusic();
       msg.textContent = "✓ 已保存 · " + (bgmState.on ? "读者进店即自动循环播放" : "音乐已关闭");
     } catch (err) {
       msg.textContent = "保存失败：" + ((err && err.message) || "网络异常");
