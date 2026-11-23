@@ -774,14 +774,18 @@
             position: absolute; left: 50%; bottom: 110px; transform: translateX(-50%);
             text-align: center; z-index: 5; width: 100%;
         }
-        .bootB .txt { font-family: var(--font-chinese-title); font-size: 1.05rem; color: var(--ink-main); letter-spacing: 2px; display: block; }
-        .bootB .sub { font-family: 'Space Mono', monospace; font-size: 0.64rem; letter-spacing: 2px; color: var(--ink-sub); display: block; margin-top: 0.4rem; }
+        .bootB .card {
+            display: inline-block; padding: .46rem 1.25rem .5rem; border: 1.5px dashed #85796b;
+            border-radius: 11px; background: rgba(255,253,249,.82); box-shadow: 2px 3px 0 rgba(0,0,0,.045);
+        }
+        .bootB .txt { font-family: "KaiTi","STKaiti","Kaiti SC",serif; font-size: 1.05rem; color: #3d342c; letter-spacing: 1px; display: block; line-height: 1.5; }
+        .bootB .sub { font-family: "Courier New", monospace; font-size: 0.64rem; letter-spacing: 2px; color: #7d9dbb; display: block; margin-top: .2rem; }
         .bootB .retry {
             margin-top: 0.9rem; font-family: var(--font-body); font-size: 0.9rem; padding: 0.35rem 1.1rem; cursor: pointer;
-            border: 1px dashed var(--ink-sub); border-radius: 20px; background: var(--tape-green); color: var(--ink-main);
+            border: 1px dashed #85796b; border-radius: 20px; background: transparent; color: #3d342c;
         }
         /* 小屏与矮屏：场景整体缩放，保证手机/平板/电脑都完整呈现 */
-        @media (max-width: 400px) { .bootB .scene { transform: translate(-50%, -50%) scale(.84); } }
+        @media (max-width: 400px) { .bootB .scene { transform: translate(-50%, -50%) scale(.84); } .bootB .card { padding:.4rem 1rem; } .bootB .txt { font-size:1rem; } .bootB .sub { font-size:.6rem; letter-spacing:1.5px; } }
         @media (max-height: 660px) { .bootB .scene { transform: translate(-50%, -50%) scale(.78); } }
         @media (max-width: 400px) and (max-height: 660px) { .bootB .scene { transform: translate(-50%, -50%) scale(.72); } }
 
@@ -963,9 +967,11 @@
                 <svg class="star-svg" style="bottom:180px; left:-4px; width:30px; animation-delay:-1.3s;" viewBox="0 0 100 100"><path d="M50 5 C55 35 65 45 95 50 C65 55 55 65 50 95 C45 65 35 55 5 50 C35 45 45 35 50 5 Z" fill="#f3e3ae"/></svg>
             </div>
             <div class="centerTxt">
-                <span class="txt" id="sodaBootTxt">正在摆桌…</span>
-                <span class="sub" id="sodaBootSub">WELCOME TO SODAFISH</span>
-                <button class="retry" type="button" id="sodaBootRetry" hidden>重新连接</button>
+                <div class="card">
+                    <span class="txt" id="sodaBootTxt">正在摆桌…</span>
+                    <span class="sub" id="sodaBootSub">WELCOME TO SODAFISH</span>
+                    <button class="retry" type="button" id="sodaBootRetry" hidden>重新连接</button>
+                </div>
             </div>
         </div>
     </div>
