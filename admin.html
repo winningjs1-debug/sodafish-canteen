@@ -52,10 +52,11 @@
   @keyframes swOrbitA { 0% { transform:translate(30px,90px) scaleX(1); } 48% { transform:translate(238px,40px) scaleX(1); } 52% { transform:translate(244px,36px) scaleX(-1); } 98% { transform:translate(40px,130px) scaleX(-1); } 100% { transform:translate(30px,90px) scaleX(1); } }
   @keyframes swOrbitB { 0% { transform:translate(244px,140px) scaleX(-1); } 48% { transform:translate(20px,200px) scaleX(-1); } 52% { transform:translate(14px,204px) scaleX(1); } 98% { transform:translate(230px,96px) scaleX(1); } 100% { transform:translate(244px,140px) scaleX(-1); } }
   .sw-center { position:absolute; left:50%; bottom:110px; transform:translateX(-50%); text-align:center; z-index:5; width:100%; }
-  .sw-card .t { font-size:1.05rem; letter-spacing:1px; display:block; }
-  .sw-card .s { font-family:"Courier New",monospace; font-size:.64rem; letter-spacing:2px; color:var(--sub); display:block; margin-top:.25rem; }
-  .sw-card .r { margin-top:.9rem; font-size:.9rem; padding:.35rem 1.1rem; cursor:pointer; border:1px dashed var(--sub); border-radius:20px; background:transparent; color:var(--fg); font-family:inherit; }
-  @media (max-width:400px) { .sw-scene { transform:translate(-50%,-50%) scale(.84); } }
+  .sw-card { display:inline-block; padding:.46rem 1.25rem .5rem; border:1.5px dashed #85796b; border-radius:11px; background:rgba(255,253,249,.82); box-shadow:2px 3px 0 rgba(0,0,0,.045); }
+  .sw-card .t { font-family:"KaiTi","STKaiti","Kaiti SC",serif; font-size:1.05rem; letter-spacing:1px; color:#3d342c; display:block; line-height:1.5; }
+  .sw-card .s { font-family:"Courier New",monospace; font-size:.64rem; letter-spacing:2px; color:#7d9dbb; display:block; margin-top:.2rem; }
+  .sw-card .r { margin-top:.9rem; font-size:.9rem; padding:.35rem 1.1rem; cursor:pointer; border:1px dashed #85796b; border-radius:20px; background:transparent; color:#3d342c; font-family:inherit; }
+  @media (max-width:400px) { .sw-scene { transform:translate(-50%,-50%) scale(.84); } .sw-card { padding:.4rem 1rem; } .sw-card .t { font-size:1rem; } .sw-card .s { font-size:.6rem; letter-spacing:1.5px; } }
   @media (max-height:660px) { .sw-scene { transform:translate(-50%,-50%) scale(.78); } }
   @media (max-width:400px) and (max-height:660px) { .sw-scene { transform:translate(-50%,-50%) scale(.72); } }
 </style>
@@ -117,7 +118,7 @@
   f.setAttribute("title", document.title || "SodaFish 小食堂");
   /* 三重防缓存：构建版本戳 + 会话随机串 + 时间戳，任何一个变化都会让浏览器/CDN 重新取内页 */
   var nonce = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  var appSrc = function () { return "app-admin.html?v=202611231104&r=" + nonce + (dark ? "&theme=dark" : ""); };
+  var appSrc = function () { return "app-admin.html?v=202611231135&r=" + nonce + (dark ? "&theme=dark" : ""); };
   f.src = appSrc();
   document.body.insertBefore(f, document.body.firstChild);
 
