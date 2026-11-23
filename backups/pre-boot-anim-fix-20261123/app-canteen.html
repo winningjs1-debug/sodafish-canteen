@@ -718,27 +718,32 @@
         .bootB { position: absolute; inset: 0; }
         .bootB .scene { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); width: 340px; height: 430px; }
         .bootB .fish-svg, .bootB .bubble-svg, .bootB .star-svg, .bootB .spiral-svg, .bootB .seaweed, .bootB .orbitFish, .bootB .tubFish { position: absolute; pointer-events: none; overflow: visible; }
-        .bootB .fish-body { animation: tailWiggle 1.1s ease-in-out infinite; transform-origin: 60% 50%; }
-        @keyframes tailWiggle { 0%,100% { transform: rotate(0deg); } 50% { transform: rotate(5deg) translateY(1px); } }
-        @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+        /* 性能：所有动画元素强制独立合成层，避免 WebView 重排抖动 */
+        .bootB .scene, .bootB .fish-body, .bootB .bubble-svg, .bootB .star-svg, .bootB .seaweed,
+        .bootB .orbitFish, .bootB .tubFish, .bootB .sign { transform: translateZ(0); will-change: transform; backface-visibility: hidden; }
+        .bootB .fish-body { animation: tailWiggle 1.4s ease-in-out infinite; transform-origin: 60% 50%; }
+        @keyframes tailWiggle { 0%,100% { transform: rotate(0deg); } 50% { transform: rotate(4deg) translateY(1px); } }
+        @keyframes bob { 0%,100% { transform: translate3d(0,0,0); } 50% { transform: translate3d(0,-9px,0); } }
         @keyframes rise {
-            0% { transform: translateY(0) translateX(0); opacity: 0; }
+            0% { transform: translate3d(0,0,0); opacity: 0; }
             12% { opacity: .95; }
             70% { opacity: .8; }
-            100% { transform: translateY(-320px) translateX(14px); opacity: 0; }
+            100% { transform: translate3d(14px,-320px,0); opacity: 0; }
         }
-        .bootB .star-svg { animation: twinkle 2.6s ease-in-out infinite; }
-        @keyframes twinkle { 0%,100% { opacity: .45; transform: scale(.92); } 50% { opacity: 1; transform: scale(1.06); } }
-        .bootB .spiral-svg { animation: spiralDrift 14s ease-in-out infinite; }
-        @keyframes spiralDrift { 0%,100% { transform: rotate(-8deg) translateY(0); } 50% { transform: rotate(10deg) translateY(-8px); } }
+        .bootB .star-svg { animation: twinkle 2.8s ease-in-out infinite; }
+        /* 星星只做透明度呼吸，不再 scale，避免每帧重绘 */
+        @keyframes twinkle { 0%,100% { opacity: .5; } 50% { opacity: 1; } }
+        .bootB .spiral-svg { animation: spiralDrift 16s ease-in-out infinite; }
+        @keyframes spiralDrift { 0%,100% { transform: translate3d(0,0,0) rotate(-6deg); } 50% { transform: translate3d(0,-8px,0) rotate(8deg); } }
         .bootB .sign {
             position: absolute; left: 50px; top: 10px; width: 190px; height: 250px;
             background: #fff; border: 2px solid #bdbdbd; border-radius: 10px;
             transform: rotate(-2deg); display: flex; flex-direction: column; align-items: center;
-            padding-top: 40px; z-index: 2; animation: signSway 5s ease-in-out infinite; transform-origin: 50% 0;
+            padding-top: 40px; z-index: 2; animation: signSway 6.5s ease-in-out infinite; transform-origin: 50% 0;
             box-shadow: 0 4px 14px rgba(0,0,0,.05);
         }
-        @keyframes signSway { 0%,100% { transform: rotate(-2deg); } 50% { transform: rotate(-.5deg); } }
+        /* 牌子摆动幅度减小、周期拉长，视觉更稳、更省算力 */
+        @keyframes signSway { 0%,100% { transform: rotate(-1.6deg); } 50% { transform: rotate(-.9deg); } }
         .bootB .sign .tape {
             position: absolute; top: -14px; left: 30px;
             background: #8a8a8a; color: #f5f5f5; font-family: 'Space Mono', monospace;
@@ -749,26 +754,35 @@
             font-size: .95rem; color: #8a8a8a; line-height: 1.7; text-align: left; padding: 0 14px;
         }
         .bootB .sign .doodles { margin-top: auto; padding-bottom: 16px; opacity: .75; }
-        .bootB .seaweed { transform-origin: 50% 100%; animation: sway 3.4s ease-in-out infinite; }
-        .bootB .seaweed.s2 { animation-delay: -1.7s; }
-        @keyframes sway { 0%,100% { transform: rotate(-4deg); } 50% { transform: rotate(5deg); } }
-        .bootB .tub { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); width: 250px; }
-        .bootB .tubFish { left: 50%; top: 38px; margin-left: -16px; animation: bob 2.2s ease-in-out infinite; }
-        .bootB .orbit1 { animation: orbitA 11s ease-in-out infinite; }
-        .bootB .orbit2 { animation: orbitB 14s ease-in-out infinite; animation-delay: -5s; }
+        .bootB .seaweed { transform-origin: 50% 100%; animation: sway 4.2s ease-in-out infinite; }
+        .bootB .seaweed.s2 { animation-delay: -2.1s; }
+        @keyframes sway { 0%,100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+        .bootB .tub { position: absolute; bottom: 12px; left: 50%; transform: translate3d(-50%,0,0); width: 250px; }
+        .bootB .tubFish { left: 50%; top: 38px; margin-left: -16px; animation: bob 2.4s ease-in-out infinite; }
+        .bootB .orbit1 { animation: orbitA 12s ease-in-out infinite; }
+        .bootB .orbit2 { animation: orbitB 15s ease-in-out infinite; animation-delay: -6s; }
+        /* 巡游鱼：掉头翻转安排在透明度为 0 的回程段完成，杜绝肉眼可见的压扁闪回 */
         @keyframes orbitA {
-            0% { transform: translate(30px, 90px) scaleX(1); }
-            48% { transform: translate(238px, 40px) scaleX(1); }
-            52% { transform: translate(244px, 36px) scaleX(-1); }
-            98% { transform: translate(40px, 130px) scaleX(-1); }
-            100% { transform: translate(30px, 90px) scaleX(1); }
+            0%   { transform: translate3d(30px,90px,0) scaleX(1);  opacity: 0; }
+            7%   { opacity: 1; }
+            45%  { transform: translate3d(240px,42px,0) scaleX(1); opacity: 1; }
+            50%  { transform: translate3d(246px,40px,0) scaleX(1); opacity: 0; }
+            51%  { transform: translate3d(246px,40px,0) scaleX(-1); opacity: 0; }
+            57%  { opacity: 1; }
+            93%  { transform: translate3d(34px,128px,0) scaleX(-1); opacity: 1; }
+            98%  { transform: translate3d(30px,90px,0) scaleX(-1); opacity: 0; }
+            100% { transform: translate3d(30px,90px,0) scaleX(1); opacity: 0; }
         }
         @keyframes orbitB {
-            0% { transform: translate(244px, 140px) scaleX(-1); }
-            48% { transform: translate(20px, 200px) scaleX(-1); }
-            52% { transform: translate(14px, 204px) scaleX(1); }
-            98% { transform: translate(230px, 96px) scaleX(1); }
-            100% { transform: translate(244px, 140px) scaleX(-1); }
+            0%   { transform: translate3d(244px,140px,0) scaleX(-1); opacity: 0; }
+            7%   { opacity: 1; }
+            45%  { transform: translate3d(24px,198px,0) scaleX(-1); opacity: 1; }
+            50%  { transform: translate3d(16px,204px,0) scaleX(-1); opacity: 0; }
+            51%  { transform: translate3d(16px,204px,0) scaleX(1); opacity: 0; }
+            57%  { opacity: 1; }
+            93%  { transform: translate3d(232px,100px,0) scaleX(1); opacity: 1; }
+            98%  { transform: translate3d(244px,140px,0) scaleX(1); opacity: 0; }
+            100% { transform: translate3d(244px,140px,0) scaleX(-1); opacity: 0; }
         }
         .bootB .centerTxt {
             position: absolute; left: 50%; bottom: 110px; transform: translateX(-50%);
@@ -2314,13 +2328,27 @@
 
       /* ---------- 首屏遮罩 ---------- */
       var bootDone = false, appStarted = false, liveTimer = null;
+      var bootShownAt = Date.now(); /* 记录启动屏出现时间，保证动画至少完整播一轮再揭幕 */
 
-      function hideBoot() {
+      function hideBootNow() {
         var el = $("sodaBoot");
         bootDone = true;
         if (!el) return;
         el.classList.add("gone");
         setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 400);
+      }
+      /* 数据即便秒回，也至少停留 minMs 毫秒让动画播完整，避免「一闪而过」的观感；
+         同时通知外层同步揭幕，杜绝两层动画各自重播 */
+      function hideBoot() {
+        var minMs = 2400;
+        var wait = Math.max(0, minMs - (Date.now() - bootShownAt));
+        setTimeout(function () { hideBootNow(); tellParentReady(); }, wait);
+      }
+      var readySent = false;
+      function tellParentReady() {
+        if (readySent) return;
+        readySent = true;
+        postTheme();
       }
 
       function bootFail(msg) {
@@ -2356,8 +2384,8 @@
           paintMyOrders();
           if (!liveTimer) liveTimer = setInterval(refreshLive, 6000);
           if (!bookTimer) bookTimer = setInterval(pollBooks, 10000);
+          /* hideBoot 内部保证最小展示时长，并在揭幕瞬间统一通知外层揭幕 */
           hideBoot();
-          postTheme();
         } catch (err) {
           appStarted = false;
           $("liveTxt").textContent = "菜单加载失败，正在重试…";
