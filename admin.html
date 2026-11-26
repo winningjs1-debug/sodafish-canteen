@@ -128,6 +128,9 @@
 <script>
 (function () {
   var dark = document.documentElement.className.indexOf("soda-dark") >= 0;
+  var appFile = "app-admin.html";
+  /* 镜像源提示：若本页就是从 CDN/raw 打开的，直接走备源注入，避免再被 iframe 策略拦一道 */
+  var onMirror = location.host.indexOf("cdn.jsdelivr.net") >= 0 || location.host.indexOf("raw.githubusercontent.com") >= 0;
   var f = document.createElement("iframe");
   f.id = "sodaFrame";
   f.setAttribute("sandbox", "allow-scripts allow-forms allow-popups allow-modals allow-downloads");
@@ -135,13 +138,13 @@
   f.setAttribute("title", document.title || "SodaFish 小食堂");
   /* 三重防缓存：构建版本戳 + 会话随机串 + 时间戳，任何一个变化都会让浏览器/CDN 重新取内页 */
   var nonce = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  var appSrc = function () { return "app-admin.html?v=202611231525&r=" + nonce + (dark ? "&theme=dark" : ""); };
-  f.src = appSrc();
+  var appSrc = function () { return "app-admin.html?v=202611261506&r=" + nonce + (dark ? "&theme=dark" : ""); };
+  if (!onMirror) f.src = appSrc();
   document.body.insertBefore(f, document.body.firstChild);
 
   var box = document.getElementById("sodaWrapLoad");
   var T = document.getElementById("swT"), S = document.getElementById("swS"), R = document.getElementById("swR");
-  var gone = false;
+  var gone = false, appReady = false;
   function hide() {
     if (gone) return;
     gone = true;
@@ -149,29 +152,53 @@
     box.className = "gone";
     setTimeout(function () { try { box.parentNode.removeChild(box); } catch (e) {} }, 400);
   }
-  function fail() {
-    if (gone) return;
-    if (T) T.textContent = "网速有点慢，没能把食堂端上来";
-    if (S) S.textContent = "TAP TO RETRY";
-    if (R) R.hidden = false;
-  }
-  f.addEventListener("load", function () {
-    /* 揭幕只由内层 soda ready 消息驱动，保证外层动画与内层启动屏严丝合缝，
-       杜绝「动画播两遍」的闪回观感。保底：load 后 12 秒仍未 ready 才揭幕，
-       防止死锁；旧版 8 秒偏早，在慢机上会在内层启动屏未消失时就露白。 */
-    setTimeout(function () { hide(); }, 12000);
-  });
-  /* 已移除「6 秒未揭幕就静默换 nonce 重载 iframe」保险：慢机（如华为 Nova7）
-     内层尚在加载时会被重启，导致启动动画重播闪回、白白加重卡顿。
-     缓存失效仍由构建戳 + 会话随机串保证；重试交给用户主动点击。 */
-  if (R) R.addEventListener("click", function () { location.reload(); });
+  /* 揭幕触发分两路、互不依赖：
+     ① 内层发来 ready（正常路径，两层动画严丝合缝）
+     ② 独立 4.5 秒定时器——绝不挂在 iframe load 上，因为内层 236KB 若被弱网截断，
+        iframe 永远不 load，旧版就会卡到 15 秒弹出「网速有点慢」。现在无论 iframe
+        状态如何，4.5 秒必定揭幕，用户先看到界面，内容由备源/异步加载补齐。 */
+  function reveal() { appReady = true; hide(); }
   window.addEventListener("message", function (ev) {
     var d = ev && ev.data;
     if (!d || typeof d !== "object") return;
-    if (d.soda === "ready") hide();
+    if (d.soda === "ready") reveal();
     if (d.soda === "ready" && d.dark) document.documentElement.className = "soda-dark";
   });
-  setTimeout(fail, 15000);
+  setTimeout(function () { hide(); }, 4500);
+  if (R) R.addEventListener("click", function () { location.reload(); });
+
+  /* ===== 条件式备用源：只在内容确实没就绪时启用，正常访问零影响、不重播动画 =====
+     github.io 单链路在弱网下会把 236KB 内层页截断，iframe 卡住且发不出 ready。
+     主源 7 秒仍未 ready 就从 jsDelivr / raw（均允许跨域读取）拉完整内页，
+     校验通过后用 srcdoc 注入同一个 iframe，内层随即 ready；全程加载页不再出现。 */
+  var mirrorBases = [
+    "https://cdn.jsdelivr.net/gh/winningjs1-debug/sodafish-canteen@main/",
+    "https://raw.githubusercontent.com/winningjs1-debug/sodafish-canteen/main/"
+  ];
+  var mirrorTried = false;
+  function loadFromMirror() {
+    if (appReady || mirrorTried || !f) return;
+    mirrorTried = true;
+    var i = 0;
+    (function attempt() {
+      if (i >= mirrorBases.length) return; /* 静默放弃，界面已揭幕，不再弹失败文案 */
+      var baseUrl = mirrorBases[i++];
+      fetch(baseUrl + appFile + "?r=" + Date.now(), { cache: "no-store", mode: "cors" })
+        .then(function (resp) {
+          if (!resp.ok) throw new Error("HTTP " + resp.status);
+          return resp.text();
+        })
+        .then(function (html) {
+          if (appReady) return; /* 期间已 ready 则无需注入 */
+          if (!html || html.length < 100000 || html.indexOf("sodaBoot") < 0) throw new Error("incomplete");
+          var baseTag = '<base href="' + baseUrl + '">';
+          var doc = html.replace(/<head([^>]*)>/i, function (m) { return m + baseTag; });
+          f.srcdoc = doc;
+        })
+        .catch(function () { if (!appReady) attempt(); });
+    })();
+  }
+  setTimeout(loadFromMirror, onMirror ? 0 : 7000);
 })();
 </script>
 </body>
