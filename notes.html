@@ -138,7 +138,7 @@
   f.setAttribute("title", document.title || "SodaFish 小食堂");
   /* 三重防缓存：构建版本戳 + 会话随机串 + 时间戳，任何一个变化都会让浏览器/CDN 重新取内页 */
   var nonce = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  var appSrc = function () { return "app-notes.html?v=202611261527&r=" + nonce + (dark ? "&theme=dark" : ""); };
+  var appSrc = function () { return "app-notes.html?v=202611261942&r=" + nonce + (dark ? "&theme=dark" : ""); };
   if (!onMirror) f.src = appSrc();
   document.body.insertBefore(f, document.body.firstChild);
 
