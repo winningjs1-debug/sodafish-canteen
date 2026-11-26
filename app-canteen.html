@@ -2340,11 +2340,18 @@
       }
       /* 数据即便秒回，也至少停留 minMs 毫秒让动画播完整，避免「一闪而过」的观感；
          同时通知外层同步揭幕，杜绝两层动画各自重播 */
+      var revealTimerSet = false;
       function hideBoot() {
+        if (revealTimerSet) return;
+        revealTimerSet = true;
+        /* 揭幕与云端数据解耦：启动屏最多 2.4 秒就退场，绝不让弱网把用户卡在加载页。
+           云端数据改为后台异步拉取，先让用户进店看到界面，数据到了再填充。 */
         var minMs = 2400;
         var wait = Math.max(0, minMs - (Date.now() - bootShownAt));
         setTimeout(function () { hideBootNow(); tellParentReady(); }, wait);
       }
+      /* 最终兜底：无论 SDK / 云端是否就绪，3.2 秒后强制揭幕，保证任何设备都能进店 */
+      setTimeout(function () { hideBoot(); }, 3200);
       var readySent = false;
       function tellParentReady() {
         if (readySent) return;
@@ -2378,6 +2385,8 @@
       async function startApp() {
         if (appStarted) return;
         appStarted = true;
+        /* 先揭幕，用户无需再等云端；数据异步拉取，慢网也能立即进店 */
+        hideBoot();
         try {
           await loadBooks();
           await refreshLive();
@@ -2385,14 +2394,11 @@
           paintMyOrders();
           if (!liveTimer) liveTimer = setInterval(refreshLive, 6000);
           if (!bookTimer) bookTimer = setInterval(pollBooks, 10000);
-          /* hideBoot 内部保证最小展示时长，并在揭幕瞬间统一通知外层揭幕 */
-          hideBoot();
         } catch (err) {
-          appStarted = false;
+          /* 云端失败只在店内显示提示，不再回退到加载页，不阻塞揭幕 */
           $("liveTxt").textContent = "菜单加载失败，正在重试…";
           $("grid-main").innerHTML = '<div class="grid-note">菜单没能从云端取回来，正在自动重试…</div>';
-          bootFail("网速有点慢，没能把菜单端上来");
-          setTimeout(function () { if (!appStarted) startApp(); }, 3500);
+          setTimeout(function () { if (appStarted) { appStarted = false; startApp(); } }, 3500);
         }
       }
 
