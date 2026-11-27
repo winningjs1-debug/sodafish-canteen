@@ -130,7 +130,7 @@
   var dark = document.documentElement.className.indexOf("soda-dark") >= 0;
   var f = document.createElement("iframe");
   f.id = "sodaFrame";
-  f.setAttribute("sandbox", "allow-scripts allow-forms allow-popups allow-modals allow-downloads");
+  f.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads");
   f.setAttribute("allow", "clipboard-write");
   f.setAttribute("title", document.title || "SodaFish 小食堂");
   /* 三重防缓存：构建版本戳 + 会话随机串 + 时间戳，任何一个变化都会让浏览器/CDN 重新取内页 */
