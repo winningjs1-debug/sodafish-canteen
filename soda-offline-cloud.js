@@ -21,7 +21,7 @@
     write(s);
     return s;
   }
-  function write(d) { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) {} }
+  function write(d) { try { localStorage.setItem(KEY, JSON.stringify(d)); return true; } catch (e) { try { console.warn("sodaOfflineDB 写入失败", e); } catch (e2) {} return false; } }
   function nowISO() { return new Date().toISOString(); }
   function pickCols(row, cols) {
     if (!cols || cols === "*" || !row) return row;
@@ -67,7 +67,7 @@
     else if (name === "soda_notes") { d.notes = d.notes || []; d.notes.unshift(r); }
     else if (name === "soda_comments") { d.comments = d.comments || []; d.comments.unshift(r); }
     else if (name === "soda_shop_orders") { d.orders = d.orders || []; d.orders.unshift(r); }
-    write(d);
+    if (!write(d)) throw new Error("浏览器存储空间不足");
     return r;
   }
 
@@ -178,7 +178,7 @@
         }
         deliverOrder(d, o);
       }
-      write(d); return { ok: true };
+      if (!write(d)) return { error: "浏览器存储空间不足，保存失败" }; return { ok: true };
     },
     soda_admin_book_save: function (p, d) {
       if (!pass(p && p.p_pass)) return { error: "口令不对" };
@@ -199,12 +199,12 @@
       for (var i = 0; i < d.books.length; i++) if (d.books[i].code === code) { idx = i; break; }
       if (idx >= 0) { row.created_at = d.books[idx].created_at || row.created_at; d.books[idx] = row; }
       else d.books.push(row);
-      write(d); return { ok: true, code: code };
+      if (!write(d)) return { error: "浏览器存储空间不足，保存失败" }; return { ok: true, code: code };
     },
     soda_admin_book_delete: function (p, d) {
       if (!pass(p && p.p_pass)) return { error: "口令不对" };
       d.books = (d.books || []).filter(function (b) { return b.code !== p.p_code; });
-      write(d); return { ok: true };
+      if (!write(d)) return { error: "浏览器存储空间不足，保存失败" }; return { ok: true };
     },
     soda_admin_book_link_save: function (p, d) {
       if (!pass(p && p.p_pass)) return { error: "口令不对" };
@@ -234,7 +234,7 @@
     soda_admin_set_setting: function (p, d) {
       if (!pass(p && p.p_pass)) return { error: "口令不对" };
       d.settings = d.settings || {}; d.settings[p.p_key] = p.p_value || "";
-      write(d); return { ok: true };
+      if (!write(d)) return { error: "浏览器存储空间不足，保存失败" }; return { ok: true };
     },
     soda_place_order: function (p, d) {
       var codes = Array.isArray(p.p_book_codes) ? p.p_book_codes : [];
